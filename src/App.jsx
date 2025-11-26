@@ -7,6 +7,7 @@ import Footer from './components/Footer';
 import VacancyList from './components/VacancyList';
 import CreateVacancyForm from './components/CreateVacancyForm';
 import AuthForm from './components/AuthForm';
+import ApplicationsList from './components/ApplicationsList';
 
 // --- Основной компонент App ---
 function App() {
@@ -117,6 +118,10 @@ function App() {
             }} 
             onCancel={() => setCurrentPage('home')}
           />
+        )}
+
+        {currentPage === 'applications' && user && (
+          <ApplicationsList user={user} />
         )}
       </main>
 
