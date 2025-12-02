@@ -1,5 +1,5 @@
 import React from 'react';
-import { LucideTrash2 } from 'lucide-react';
+import { Trash2 } from 'lucide-react';
 import { UserRole, API_URL } from '../constants';
 
 const VacancyList = ({ vacancies, user, onDelete }) => {
@@ -57,7 +57,7 @@ const VacancyList = ({ vacancies, user, onDelete }) => {
                   className="text-red-400 hover:text-red-600"
                   title="Удалить вакансию"
                 >
-                  <LucideTrash2 className="h-5 w-5" />
+                  <Trash2 className="h-5 w-5" />
                 </button>
               )}
             </div>

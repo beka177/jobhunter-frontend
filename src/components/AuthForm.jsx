@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { LucideAlertCircle } from 'lucide-react';
+import { AlertCircle } from 'lucide-react';
 import { API_URL, UserRole } from '../constants';
 
 const AuthForm = ({ isRegister = false, onSuccess, onNavigate }) => {
@@ -70,7 +70,7 @@ const AuthForm = ({ isRegister = false, onSuccess, onNavigate }) => {
           {error && (
             <div className="bg-red-50 border-l-4 border-red-400 p-4">
               <div className="flex">
-                <LucideAlertCircle className="h-5 w-5 text-red-400" />
+                <AlertCircle className="h-5 w-5 text-red-400" />
                 <div className="ml-3">
                   <p className="text-sm text-red-700">{error}</p>
                 </div>

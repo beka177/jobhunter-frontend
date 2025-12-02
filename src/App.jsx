@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { API_URL } from './constants';
+import { API_URL, UserRole } from './constants';
 
 // Импорт компонентов из отдельных файлов
 import Navbar from './components/Navbar';
@@ -8,6 +8,7 @@ import VacancyList from './components/VacancyList';
 import CreateVacancyForm from './components/CreateVacancyForm';
 import AuthForm from './components/AuthForm';
 import ApplicationsList from './components/ApplicationsList';
+import ResumeForm from './components/ResumeForm';
 
 // --- Основной компонент App ---
 function App() {
@@ -109,7 +110,7 @@ function App() {
           <AuthForm isRegister onSuccess={handleLoginSuccess} onNavigate={setCurrentPage} />
         )}
 
-        {currentPage === 'create-vacancy' && user && (
+        {currentPage === 'create-vacancy' && user && user.role === UserRole.EMPLOYER && (
           <CreateVacancyForm 
             user={user} 
             onSuccess={() => {
@@ -120,8 +121,12 @@ function App() {
           />
         )}
 
-        {currentPage === 'applications' && user && (
+        {currentPage === 'applications' && user && user.role === UserRole.EMPLOYER && (
           <ApplicationsList user={user} />
+        )}
+
+        {currentPage === 'resume' && user && user.role === UserRole.SEEKER && (
+          <ResumeForm user={user} onSuccess={() => alert('Резюме обновлено')} />
         )}
       </main>
 

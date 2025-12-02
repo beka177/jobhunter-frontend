@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { LucideFileText, LucideUser, LucideMail, LucideCalendar } from 'lucide-react';
+import { FileText, User, Mail, Calendar } from 'lucide-react';
 import { API_URL } from '../constants';
 
 const ApplicationsList = ({ user }) => {
@@ -33,7 +33,7 @@ const ApplicationsList = ({ user }) => {
   if (applications.length === 0) {
     return (
       <div className="text-center py-10 bg-white rounded-lg shadow">
-        <LucideFileText className="mx-auto h-12 w-12 text-gray-400" />
+        <FileText className="mx-auto h-12 w-12 text-gray-400" />
         <h3 className="mt-2 text-sm font-medium text-gray-900">Нет откликов</h3>
         <p className="mt-1 text-sm text-gray-500">Пока никто не откликнулся на ваши вакансии.</p>
       </div>
@@ -61,16 +61,16 @@ const ApplicationsList = ({ user }) => {
                 <div className="mt-2 sm:flex sm:justify-between">
                   <div className="sm:flex">
                     <p className="flex items-center text-sm text-gray-500 mr-6">
-                      <LucideUser className="flex-shrink-0 mr-1.5 h-4 w-4 text-gray-400" />
+                      <User className="flex-shrink-0 mr-1.5 h-4 w-4 text-gray-400" />
                       {app.seeker_name}
                     </p>
                     <p className="flex items-center text-sm text-gray-500">
-                      <LucideMail className="flex-shrink-0 mr-1.5 h-4 w-4 text-gray-400" />
+                      <Mail className="flex-shrink-0 mr-1.5 h-4 w-4 text-gray-400" />
                       {app.seeker_email}
                     </p>
                   </div>
                   <div className="mt-2 flex items-center text-sm text-gray-500 sm:mt-0">
-                    <LucideCalendar className="flex-shrink-0 mr-1.5 h-4 w-4 text-gray-400" />
+                    <Calendar className="flex-shrink-0 mr-1.5 h-4 w-4 text-gray-400" />
                     <p>
                       {new Date(app.created_at).toLocaleDateString()}
                     </p>
