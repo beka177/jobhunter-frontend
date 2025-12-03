@@ -9,6 +9,7 @@ import CreateVacancyForm from './components/CreateVacancyForm';
 import AuthForm from './components/AuthForm';
 import ApplicationsList from './components/ApplicationsList';
 import ResumeForm from './components/ResumeForm';
+import SeekerApplications from './components/SeekerApplications';
 
 // --- Основной компонент App ---
 function App() {
@@ -18,6 +19,20 @@ function App() {
   const [loadingVacancies, setLoadingVacancies] = useState(false);
   const [isConnected, setIsConnected] = useState(false);
   const [connectionError, setConnectionError] = useState('');
+
+  // 1. ВОССТАНОВЛЕНИЕ СЕССИИ (При загрузке страницы)
+  useEffect(() => {
+    // Проверяем, есть ли сохраненный пользователь в браузере
+    const savedUser = localStorage.getItem('jobhunter_user');
+    if (savedUser) {
+      try {
+        const parsedUser = JSON.parse(savedUser);
+        setUser(parsedUser);
+      } catch (e) {
+        console.error("Ошибка чтения пользователя из памяти", e);
+      }
+    }
+  }, []);
 
   // Получение вакансий
   const fetchVacancies = useCallback(async () => {
@@ -48,13 +63,21 @@ function App() {
     fetchVacancies();
   }, [fetchVacancies]);
 
+  // 2. СОХРАНЕНИЕ СЕССИИ (При успешном входе)
   const handleLoginSuccess = (userData) => {
+    // Сохраняем данные в память браузера
+    localStorage.setItem('jobhunter_user', JSON.stringify(userData));
+    
     setUser(userData);
     setCurrentPage('home');
     fetchVacancies();
   };
 
+  // 3. УДАЛЕНИЕ СЕССИИ (При выходе)
   const handleLogout = () => {
+    // Очищаем память браузера
+    localStorage.removeItem('jobhunter_user');
+    
     setUser(null);
     setCurrentPage('login');
   };
@@ -82,6 +105,7 @@ function App() {
           </div>
         )}
 
+        {/* Главная страница */}
         {currentPage === 'home' && (
           <>
             <div className="mb-8 text-center">
@@ -102,6 +126,7 @@ function App() {
           </>
         )}
 
+        {/* Страницы авторизации */}
         {currentPage === 'login' && (
           <AuthForm onSuccess={handleLoginSuccess} onNavigate={setCurrentPage} />
         )}
@@ -110,6 +135,7 @@ function App() {
           <AuthForm isRegister onSuccess={handleLoginSuccess} onNavigate={setCurrentPage} />
         )}
 
+        {/* Страницы работодателя */}
         {currentPage === 'create-vacancy' && user && user.role === UserRole.EMPLOYER && (
           <CreateVacancyForm 
             user={user} 
@@ -121,12 +147,21 @@ function App() {
           />
         )}
 
+        {/* 
+          ВАЖНО: ApplicationsList строго внутри условия. 
+          Если это не страница 'applications' или юзер не Employer, компонент даже не вызовется.
+        */}
         {currentPage === 'applications' && user && user.role === UserRole.EMPLOYER && (
           <ApplicationsList user={user} />
         )}
 
+        {/* Страницы соискателя */}
         {currentPage === 'resume' && user && user.role === UserRole.SEEKER && (
           <ResumeForm user={user} onSuccess={() => alert('Резюме обновлено')} />
+        )}
+
+        {currentPage === 'seeker-applications' && user && user.role === UserRole.SEEKER && (
+          <SeekerApplications user={user} />
         )}
       </main>
 
