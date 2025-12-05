@@ -150,18 +150,23 @@ function App() {
         {/* 
           ВАЖНО: ApplicationsList строго внутри условия. 
           Если это не страница 'applications' или юзер не Employer, компонент даже не вызовется.
+          Передаем onNavigate для кнопки назад.
         */}
         {currentPage === 'applications' && user && user.role === UserRole.EMPLOYER && (
-          <ApplicationsList user={user} />
+          <ApplicationsList user={user} onNavigate={setCurrentPage} />
         )}
 
         {/* Страницы соискателя */}
         {currentPage === 'resume' && user && user.role === UserRole.SEEKER && (
-          <ResumeForm user={user} onSuccess={() => alert('Резюме обновлено')} />
+          <ResumeForm 
+            user={user} 
+            onSuccess={() => alert('Резюме обновлено')} 
+            onNavigate={setCurrentPage} 
+          />
         )}
 
         {currentPage === 'seeker-applications' && user && user.role === UserRole.SEEKER && (
-          <SeekerApplications user={user} />
+          <SeekerApplications user={user} onNavigate={setCurrentPage} />
         )}
       </main>
 

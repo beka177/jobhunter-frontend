@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { AlertCircle } from 'lucide-react';
+import { AlertCircle, ArrowLeft } from 'lucide-react';
 import { API_URL, UserRole } from '../constants';
 
 const AuthForm = ({ isRegister = false, onSuccess, onNavigate }) => {
@@ -50,8 +50,15 @@ const AuthForm = ({ isRegister = false, onSuccess, onNavigate }) => {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-[80vh] px-4">
-      <div className="max-w-md w-full space-y-8 bg-white p-8 rounded-lg shadow">
+    <div className="flex items-center justify-center min-h-[80vh] px-4 relative">
+      <button 
+        onClick={() => onNavigate('home')} 
+        className="absolute top-0 left-0 md:top-4 md:left-4 flex items-center text-gray-500 hover:text-blue-600 transition-colors"
+      >
+        <ArrowLeft className="h-5 w-5 mr-1" /> На главную
+      </button>
+
+      <div className="max-w-md w-full space-y-8 bg-white p-8 rounded-lg shadow mt-8 md:mt-0">
         <div>
           <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
             {isRegister ? 'Регистрация' : 'Вход в систему'}

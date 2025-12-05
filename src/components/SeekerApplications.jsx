@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { Clock, CheckCircle, XCircle, Building } from 'lucide-react';
+import { Clock, CheckCircle, XCircle, Building, ArrowLeft } from 'lucide-react';
 import { API_URL } from '../constants';
 
-const SeekerApplications = ({ user }) => {
+const SeekerApplications = ({ user, onNavigate }) => {
   const [applications, setApplications] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -27,6 +27,13 @@ const SeekerApplications = ({ user }) => {
 
   return (
     <div className="max-w-4xl mx-auto mt-6 px-4">
+      <button 
+        onClick={() => onNavigate('home')} 
+        className="mb-4 flex items-center text-gray-500 hover:text-blue-600 transition-colors"
+      >
+        <ArrowLeft className="h-5 w-5 mr-1" /> На главную
+      </button>
+
       <h2 className="text-2xl font-bold text-gray-900 mb-6">История моих откликов</h2>
       
       {applications.length === 0 ? (
