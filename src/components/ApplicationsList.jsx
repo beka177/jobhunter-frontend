@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import { FileText, User, Mail, Calendar, CheckCircle, XCircle, Clock, ArrowLeft } from 'lucide-react';
+import { FileText, User, Mail, Calendar, CheckCircle, XCircle, Clock, ArrowLeft, Eye, X, GraduationCap, MapPin, Phone, Globe } from 'lucide-react';
 import { API_URL, UserRole } from '../constants';
 
 const ApplicationsList = ({ user, onNavigate }) => {
   const [applications, setApplications] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [selectedApp, setSelectedApp] = useState(null); // Для модального окна
 
-  // 1. Сначала объявляем хук эффекта, но внутри делаем проверку
+  // 1. Сначала объявляем хук эффекта
   useEffect(() => {
-    // Если пользователя нет или он не работодатель, не делаем запрос
     if (!user || user.role !== UserRole.EMPLOYER) {
       setLoading(false);
       return;
@@ -42,6 +42,10 @@ const ApplicationsList = ({ user, onNavigate }) => {
         setApplications(prev => prev.map(app => 
           app.id === appId ? { ...app, status: newStatus } : app
         ));
+        // Если меняем статус в модальном окне, обновляем и его
+        if (selectedApp && selectedApp.id === appId) {
+          setSelectedApp(prev => ({ ...prev, status: newStatus }));
+        }
       } else {
         const err = await response.json();
         console.error('Error update:', err);
@@ -53,8 +57,7 @@ const ApplicationsList = ({ user, onNavigate }) => {
     }
   };
 
-  // 2. ЗАЩИТА РЕНДЕРИНГА:
-  // Если это не работодатель — возвращаем null (компонент вообще не рисуется в DOM)
+  // 2. ЗАЩИТА РЕНДЕРИНГА
   if (!user || user.role !== UserRole.EMPLOYER) {
     return null;
   }
@@ -85,7 +88,10 @@ const ApplicationsList = ({ user, onNavigate }) => {
               <li key={app.id} className="hover:bg-blue-50 transition-colors">
                 <div className="px-6 py-6 sm:px-8">
                   <div className="flex items-center justify-between">
-                    <p className="text-lg font-bold text-blue-700 truncate">{app.vacancy_title}</p>
+                    <div>
+                      <p className="text-lg font-bold text-blue-700 truncate">{app.vacancy_title}</p>
+                      <p className="text-sm text-gray-500 mt-1">Кандидат: <span className="font-semibold text-gray-900">{app.seeker_name}</span></p>
+                    </div>
                     <div className="flex-shrink-0 flex items-center">
                       {app.status === 'pending' && <span className="px-3 py-1 inline-flex text-sm leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800"><Clock className="w-4 h-4 mr-1.5"/> Ожидает</span>}
                       {app.status === 'accepted' && <span className="px-3 py-1 inline-flex text-sm leading-5 font-semibold rounded-full bg-green-100 text-green-800"><CheckCircle className="w-4 h-4 mr-1.5"/> Принят</span>}
@@ -93,57 +99,152 @@ const ApplicationsList = ({ user, onNavigate }) => {
                     </div>
                   </div>
                   
-                  <div className="mt-4">
-                    <div className="sm:flex sm:justify-between">
-                      <div className="sm:flex flex-col space-y-2">
-                        <p className="flex items-center text-base text-gray-900 font-bold">
-                          <User className="flex-shrink-0 mr-2 h-5 w-5 text-gray-400" />
-                          {app.seeker_name}
-                        </p>
-                        <p className="flex items-center text-sm text-gray-600">
-                          <Mail className="flex-shrink-0 mr-2 h-4 w-4 text-gray-400" />
-                          {app.seeker_email}
-                        </p>
-                         {app.phone && (
-                          <p className="flex items-center text-sm text-gray-600 ml-6">
-                            Тел: <span className="text-gray-900 ml-1">{app.phone}</span>
-                          </p>
-                        )}
-                      </div>
-                      <div className="mt-2 flex items-center text-sm text-gray-500 sm:mt-0 self-start">
-                        <Calendar className="flex-shrink-0 mr-1.5 h-4 w-4 text-gray-400" />
-                        <p>{new Date(app.created_at).toLocaleDateString()}</p>
-                      </div>
-                    </div>
-                    
-                    <div className="mt-4 bg-white border border-gray-200 p-4 rounded-lg shadow-sm">
-                      <p className="text-sm"><strong className="text-gray-900">Профессия:</strong> {app.profession || 'Не указана'}</p>
-                      <p className="mt-2 text-sm"><strong className="text-gray-900">Навыки:</strong> {app.skills || 'Не указаны'}</p>
+                  <div className="mt-4 flex items-center justify-between">
+                    <div className="flex items-center text-sm text-gray-500">
+                      <Calendar className="flex-shrink-0 mr-1.5 h-4 w-4 text-gray-400" />
+                      <p>Дата отклика: {new Date(app.created_at).toLocaleDateString()}</p>
                     </div>
 
-                    {app.status === 'pending' && (
-                      <div className="mt-6 flex space-x-4">
-                        <button
-                          onClick={() => handleStatusChange(app.id, 'accepted')}
-                          className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-bold rounded-md text-white bg-green-600 hover:bg-green-700 shadow-sm transition-colors"
-                        >
-                          <CheckCircle className="w-4 h-4 mr-2" />
-                          Принять
-                        </button>
-                        <button
-                           onClick={() => handleStatusChange(app.id, 'rejected')}
-                          className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-bold rounded-md text-white bg-red-600 hover:bg-red-700 shadow-sm transition-colors"
-                        >
-                          <XCircle className="w-4 h-4 mr-2" />
-                          Отказать
-                        </button>
-                      </div>
-                    )}
+                    <div className="flex space-x-3">
+                      <button
+                        onClick={() => setSelectedApp(app)}
+                        className="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+                      >
+                        <Eye className="w-4 h-4 mr-2" />
+                        Посмотреть резюме
+                      </button>
+
+                      {app.status === 'pending' && (
+                        <>
+                          <button
+                            onClick={() => handleStatusChange(app.id, 'accepted')}
+                            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-bold rounded-md text-white bg-green-600 hover:bg-green-700 shadow-sm"
+                          >
+                            Принять
+                          </button>
+                          <button
+                             onClick={() => handleStatusChange(app.id, 'rejected')}
+                            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-bold rounded-md text-white bg-red-600 hover:bg-red-700 shadow-sm"
+                          >
+                            Отказать
+                          </button>
+                        </>
+                      )}
+                    </div>
                   </div>
                 </div>
               </li>
             ))}
           </ul>
+        </div>
+      )}
+
+      {/* --- МОДАЛЬНОЕ ОКНО ПРОСМОТРА РЕЗЮМЕ --- */}
+      {selectedApp && (
+        <div className="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+          <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            {/* Фон */}
+            <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" onClick={() => setSelectedApp(null)}></div>
+
+            <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+
+            {/* Карточка */}
+            <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full">
+              <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                <div className="flex justify-between items-start mb-4 border-b pb-4">
+                  <h3 className="text-2xl font-bold text-gray-900" id="modal-title">
+                    Резюме кандидата
+                  </h3>
+                  <button onClick={() => setSelectedApp(null)} className="text-gray-400 hover:text-gray-500">
+                    <X className="h-6 w-6" />
+                  </button>
+                </div>
+                
+                <div className="space-y-4">
+                  <div className="flex items-center space-x-4">
+                    <div className="h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold text-xl">
+                      {(selectedApp.seeker_name || 'U').charAt(0).toUpperCase()}
+                    </div>
+                    <div>
+                      <p className="text-xl font-bold">{selectedApp.surname} {selectedApp.first_name} {selectedApp.patronymic}</p>
+                      <p className="text-sm text-gray-500">{selectedApp.seeker_email}</p>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                     <div className="bg-gray-50 p-3 rounded">
+                        <span className="text-xs text-gray-500 block">Желаемая должность</span>
+                        <span className="font-semibold text-gray-900">{selectedApp.profession || 'Не указана'}</span>
+                     </div>
+                     <div className="bg-gray-50 p-3 rounded">
+                        <span className="text-xs text-gray-500 block">Город</span>
+                        <span className="font-semibold text-gray-900 flex items-center">
+                           <MapPin className="w-3 h-3 mr-1" /> {selectedApp.city || 'Не указан'}
+                        </span>
+                     </div>
+                  </div>
+
+                  <div className="border-t pt-4">
+                    <h4 className="font-bold text-gray-800 flex items-center mb-2">
+                        <User className="w-4 h-4 mr-2" /> Личные данные
+                    </h4>
+                    <div className="grid grid-cols-2 gap-y-2 text-sm text-gray-700">
+                        <p>Пол: <span className="font-medium">{selectedApp.gender === 'male' ? 'Мужской' : 'Женский'}</span></p>
+                        <p>Дата рождения: <span className="font-medium">{selectedApp.birthday || '-'}</span></p>
+                        <p>Гражданство: <span className="font-medium">{selectedApp.citizenship || '-'}</span></p>
+                        <p className="flex items-center"><Phone className="w-3 h-3 mr-1"/> {selectedApp.phone || '-'}</p>
+                    </div>
+                  </div>
+
+                  <div className="border-t pt-4">
+                    <h4 className="font-bold text-gray-800 flex items-center mb-2">
+                        <GraduationCap className="w-4 h-4 mr-2" /> Образование
+                    </h4>
+                    <p className="text-sm text-gray-700"><span className="font-semibold">{selectedApp.education_level}</span></p>
+                    <p className="text-sm text-gray-600">{selectedApp.education_institution}</p>
+                    <p className="text-sm text-gray-500">{selectedApp.education_faculty} {selectedApp.education_specialization && `— ${selectedApp.education_specialization}`}</p>
+                    {selectedApp.education_year && <p className="text-xs text-gray-400 mt-1">Год окончания: {selectedApp.education_year}</p>}
+                  </div>
+
+                  <div className="border-t pt-4">
+                    <h4 className="font-bold text-gray-800 flex items-center mb-2">
+                        <Globe className="w-4 h-4 mr-2" /> Навыки
+                    </h4>
+                    <div className="bg-gray-50 p-3 rounded text-sm text-gray-700 border border-gray-100">
+                        {selectedApp.skills || 'Навыки не указаны'}
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                {selectedApp.status === 'pending' && (
+                    <>
+                        <button
+                        type="button"
+                        className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-green-600 text-base font-medium text-white hover:bg-green-700 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm"
+                        onClick={() => { handleStatusChange(selectedApp.id, 'accepted'); setSelectedApp(null); }}
+                        >
+                        Принять
+                        </button>
+                        <button
+                        type="button"
+                        className="mt-3 w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+                        onClick={() => { handleStatusChange(selectedApp.id, 'rejected'); setSelectedApp(null); }}
+                        >
+                        Отказать
+                        </button>
+                    </>
+                )}
+                <button
+                  type="button"
+                  className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+                  onClick={() => setSelectedApp(null)}
+                >
+                  Закрыть
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       )}
     </div>
