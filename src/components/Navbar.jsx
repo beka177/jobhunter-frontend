@@ -13,7 +13,7 @@ const Navbar = ({ user, onLogout, onNavigate }) => (
         </div>
 
         {/* Меню (справа) */}
-        <div className="flex items-center space-x-4">
+        <div className="flex items-center space-x-3">
           {user ? (
             <>
               {/* Имя пользователя (скрыто на мобильных) */}
@@ -26,17 +26,17 @@ const Navbar = ({ user, onLogout, onNavigate }) => (
                 <>
                   <button
                     onClick={() => onNavigate('applications')}
-                    className="flex items-center text-gray-600 hover:text-blue-600 px-3 py-2 text-sm font-medium transition-colors"
+                    className="flex items-center px-3 py-2 rounded-md text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-700 transition-colors shadow-sm"
                     title="Отклики на вакансии"
                   >
-                    <FileText className="h-5 w-5 mr-1" />
+                    <FileText className="h-4 w-4 mr-1.5" />
                     <span className="hidden md:inline">Отклики</span>
                   </button>
                   <button
                     onClick={() => onNavigate('create-vacancy')}
-                    className="flex items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 shadow-sm transition-colors"
+                    className="flex items-center px-3 py-2 rounded-md text-sm font-bold text-white bg-green-600 hover:bg-green-700 shadow-sm transition-colors"
                   >
-                    <Plus className="h-4 w-4 mr-1" />
+                    <Plus className="h-4 w-4 mr-1.5" />
                     <span className="hidden md:inline">Вакансия</span>
                   </button>
                 </>
@@ -47,29 +47,30 @@ const Navbar = ({ user, onLogout, onNavigate }) => (
                 <>
                  <button
                     onClick={() => onNavigate('resume')}
-                    className="flex items-center text-gray-600 hover:text-blue-600 px-3 py-2 text-sm font-medium transition-colors"
+                    className="flex items-center px-3 py-2 rounded-md text-sm font-bold text-white bg-emerald-600 hover:bg-emerald-700 transition-colors shadow-sm"
                   >
-                    <FileText className="h-5 w-5 mr-1" />
+                    <FileText className="h-4 w-4 mr-1.5" />
                     <span className="hidden md:inline">Резюме</span>
                   </button>
                   <button
                     onClick={() => onNavigate('seeker-applications')}
-                    className="flex items-center text-gray-600 hover:text-blue-600 px-3 py-2 text-sm font-medium transition-colors"
+                    className="flex items-center px-3 py-2 rounded-md text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-700 transition-colors shadow-sm"
                     title="Мои отклики"
                   >
-                    <Bell className="h-5 w-5 mr-1" />
+                    <Bell className="h-4 w-4 mr-1.5" />
                     <span className="hidden md:inline">Отклики</span>
                   </button>
                 </>
               )}
               
-              {/* Кнопка Выход */}
+              {/* Кнопка Выход (БОЛЬШАЯ И КРАСНАЯ) */}
               <button
                 onClick={onLogout}
-                className="flex items-center text-gray-400 hover:text-red-600 ml-2 transition-colors p-2"
+                className="flex items-center px-4 py-2 rounded-md text-sm font-bold text-white bg-red-600 hover:bg-red-700 ml-2 shadow-sm transition-colors"
                 title="Выйти из аккаунта"
               >
-                <LogOut className="h-6 w-6" />
+                <LogOut className="h-4 w-4 mr-2" />
+                Выйти
               </button>
             </>
           ) : (
