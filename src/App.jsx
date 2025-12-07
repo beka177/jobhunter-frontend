@@ -10,31 +10,29 @@ import AuthForm from './components/AuthForm';
 import ApplicationsList from './components/ApplicationsList';
 import ResumeForm from './components/ResumeForm';
 import SeekerApplications from './components/SeekerApplications';
+import VacancyDetails from './components/VacancyDetails'; // НОВЫЙ КОМПОНЕНТ
 
-// --- Основной компонент App ---
 function App() {
   const [currentPage, setCurrentPage] = useState('home');
+  const [selectedVacancyId, setSelectedVacancyId] = useState(null); // ID выбранной вакансии
   const [user, setUser] = useState(null);
   const [vacancies, setVacancies] = useState([]);
   const [loadingVacancies, setLoadingVacancies] = useState(false);
   const [isConnected, setIsConnected] = useState(false);
   const [connectionError, setConnectionError] = useState('');
 
-  // 1. ВОССТАНОВЛЕНИЕ СЕССИИ (При загрузке страницы)
   useEffect(() => {
-    // Проверяем, есть ли сохраненный пользователь в браузере
     const savedUser = localStorage.getItem('jobhunter_user');
     if (savedUser) {
       try {
         const parsedUser = JSON.parse(savedUser);
         setUser(parsedUser);
       } catch (e) {
-        console.error("Ошибка чтения пользователя из памяти", e);
+        console.error("Ошибка чтения пользователя", e);
       }
     }
   }, []);
 
-  // Получение вакансий
   const fetchVacancies = useCallback(async () => {
     setLoadingVacancies(true);
     setConnectionError('');
@@ -46,50 +44,45 @@ function App() {
         setVacancies(data);
         setIsConnected(true);
       } else {
-        console.error("Expected array, got:", data);
         setVacancies([]);
       }
     } catch (error) {
-      console.error("Failed to fetch vacancies:", error);
       setIsConnected(false);
-      setConnectionError('Ошибка: Сервер недоступен. Убедитесь, что OSPanel запущен, а файлы лежат в domains/jobhunter/api');
+      setConnectionError('Ошибка: Сервер недоступен.');
     } finally {
       setLoadingVacancies(false);
     }
   }, []);
 
-  // Проверка соединения при загрузке
   useEffect(() => {
     fetchVacancies();
   }, [fetchVacancies]);
 
-  // 2. СОХРАНЕНИЕ СЕССИИ (При успешном входе)
   const handleLoginSuccess = (userData) => {
-    // Сохраняем данные в память браузера
     localStorage.setItem('jobhunter_user', JSON.stringify(userData));
-    
     setUser(userData);
     setCurrentPage('home');
     fetchVacancies();
   };
 
-  // 3. УДАЛЕНИЕ СЕССИИ (При выходе)
   const handleLogout = () => {
-    // Очищаем память браузера
     localStorage.removeItem('jobhunter_user');
-    
     setUser(null);
     setCurrentPage('login');
   };
 
   const handleDeleteVacancy = async (id) => {
-    if (!window.confirm('Вы уверены, что хотите удалить вакансию?')) return;
+    if (!window.confirm('Вы уверены?')) return;
     try {
       await fetch(`${API_URL}/vacancies.php?id=${id}`, { method: 'DELETE' });
-      fetchVacancies(); // Обновляем список
-    } catch (e) {
-      alert('Ошибка удаления');
-    }
+      fetchVacancies();
+    } catch (e) { alert('Ошибка удаления'); }
+  };
+
+  // Переход к деталям вакансии
+  const handleOpenVacancy = (id) => {
+    setSelectedVacancyId(id);
+    setCurrentPage('vacancy-details');
   };
 
   return (
@@ -98,71 +91,54 @@ function App() {
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full flex-grow">
         {!isConnected && currentPage === 'home' && (
-           <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-6" role="alert">
-            <strong className="font-bold">Ошибка соединения с сервером!</strong>
-            <span className="block sm:inline"> {connectionError || 'Проверьте консоль браузера (F12) для деталей.'}</span>
-            <p className="mt-2 text-sm">Проверьте, что файлы бэкенда находятся в папке <code>OSPanel/domains/jobhunter/api</code></p>
+           <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-6">
+            <strong className="font-bold">Нет связи с сервером!</strong>
+            <span className="block sm:inline"> Проверьте OSPanel.</span>
           </div>
         )}
 
-        {/* Главная страница */}
         {currentPage === 'home' && (
           <>
             <div className="mb-8 text-center">
               <h1 className="text-4xl font-extrabold text-gray-900 tracking-tight sm:text-5xl mb-2">
                 Найди работу мечты
               </h1>
-              <p className="text-lg text-gray-500">
-                Тысячи вакансий от ведущих компаний.
-              </p>
             </div>
             {loadingVacancies ? (
-              <div className="flex justify-center py-12">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-              </div>
+              <div className="text-center py-10">Загрузка...</div>
             ) : (
-              <VacancyList vacancies={vacancies} user={user} onDelete={handleDeleteVacancy} />
+              <VacancyList 
+                vacancies={vacancies} 
+                user={user} 
+                onDelete={handleDeleteVacancy}
+                onOpenVacancy={handleOpenVacancy} // Передаем функцию открытия
+              />
             )}
           </>
         )}
 
-        {/* Страницы авторизации */}
-        {currentPage === 'login' && (
-          <AuthForm onSuccess={handleLoginSuccess} onNavigate={setCurrentPage} />
+        {/* СТРАНИЦА ДЕТАЛЕЙ ВАКАНСИИ */}
+        {currentPage === 'vacancy-details' && selectedVacancyId && (
+            <VacancyDetails 
+                vacancyId={selectedVacancyId} 
+                user={user} 
+                onNavigate={setCurrentPage} 
+            />
         )}
 
-        {currentPage === 'register' && (
-          <AuthForm isRegister onSuccess={handleLoginSuccess} onNavigate={setCurrentPage} />
-        )}
-
-        {/* Страницы работодателя */}
+        {currentPage === 'login' && <AuthForm onSuccess={handleLoginSuccess} onNavigate={setCurrentPage} />}
+        {currentPage === 'register' && <AuthForm isRegister onSuccess={handleLoginSuccess} onNavigate={setCurrentPage} />}
+        
         {currentPage === 'create-vacancy' && user && user.role === UserRole.EMPLOYER && (
-          <CreateVacancyForm 
-            user={user} 
-            onSuccess={() => {
-              setCurrentPage('home');
-              fetchVacancies();
-            }} 
-            onCancel={() => setCurrentPage('home')}
-          />
+          <CreateVacancyForm user={user} onSuccess={() => { setCurrentPage('home'); fetchVacancies(); }} onCancel={() => setCurrentPage('home')} />
         )}
 
-        {/* 
-          ВАЖНО: ApplicationsList строго внутри условия. 
-          Если это не страница 'applications' или юзер не Employer, компонент даже не вызовется.
-          Передаем onNavigate для кнопки назад.
-        */}
         {currentPage === 'applications' && user && user.role === UserRole.EMPLOYER && (
           <ApplicationsList user={user} onNavigate={setCurrentPage} />
         )}
 
-        {/* Страницы соискателя */}
         {currentPage === 'resume' && user && user.role === UserRole.SEEKER && (
-          <ResumeForm 
-            user={user} 
-            onSuccess={() => alert('Резюме обновлено')} 
-            onNavigate={setCurrentPage} 
-          />
+          <ResumeForm user={user} onSuccess={() => alert('Резюме обновлено')} onNavigate={setCurrentPage} />
         )}
 
         {currentPage === 'seeker-applications' && user && user.role === UserRole.SEEKER && (
