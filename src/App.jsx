@@ -10,7 +10,8 @@ import AuthForm from './components/AuthForm';
 import ApplicationsList from './components/ApplicationsList';
 import ResumeForm from './components/ResumeForm';
 import SeekerApplications from './components/SeekerApplications';
-import VacancyDetails from './components/VacancyDetails'; // НОВЫЙ КОМПОНЕНТ
+import VacancyDetails from './components/VacancyDetails';
+import HelpPage from './components/HelpPage'; // НОВЫЙ КОМПОНЕНТ
 
 function App() {
   const [currentPage, setCurrentPage] = useState('home');
@@ -111,19 +112,22 @@ function App() {
                 vacancies={vacancies} 
                 user={user} 
                 onDelete={handleDeleteVacancy}
-                onOpenVacancy={handleOpenVacancy} // Передаем функцию открытия
+                onOpenVacancy={handleOpenVacancy} 
               />
             )}
           </>
         )}
 
-        {/* СТРАНИЦА ДЕТАЛЕЙ ВАКАНСИИ */}
         {currentPage === 'vacancy-details' && selectedVacancyId && (
             <VacancyDetails 
                 vacancyId={selectedVacancyId} 
                 user={user} 
                 onNavigate={setCurrentPage} 
             />
+        )}
+
+        {currentPage === 'help' && (
+            <HelpPage onNavigate={setCurrentPage} />
         )}
 
         {currentPage === 'login' && <AuthForm onSuccess={handleLoginSuccess} onNavigate={setCurrentPage} />}

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Briefcase, Plus, LogOut, User, FileText, Bell } from 'lucide-react';
+import { Briefcase, Plus, LogOut, User, FileText, Bell, HelpCircle } from 'lucide-react';
 import { UserRole } from '../constants';
 
 const Navbar = ({ user, onLogout, onNavigate }) => (
@@ -14,6 +14,16 @@ const Navbar = ({ user, onLogout, onNavigate }) => (
 
         {/* Меню */}
         <div className="flex items-center space-x-3">
+          {/* Кнопка Помощь (Видна всем) */}
+          <button
+            onClick={() => onNavigate('help')}
+            className="flex items-center px-3 py-2 rounded-md text-sm font-medium text-gray-600 hover:text-blue-600 hover:bg-gray-50 transition-colors"
+            title="Помощь"
+          >
+            <HelpCircle className="h-5 w-5 mr-1" />
+            <span className="hidden sm:inline">Помощь</span>
+          </button>
+
           {user ? (
             <>
               <div className="flex items-center text-gray-600 hidden sm:flex text-sm font-medium border-r pr-4 mr-2">
