@@ -6,6 +6,7 @@ const AuthForm = ({ isRegister = false, onSuccess, onNavigate }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
+  const [avatar, setAvatar] = useState(''); // Новое поле для аватара
   const [role, setRole] = useState(UserRole.SEEKER);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -20,6 +21,7 @@ const AuthForm = ({ isRegister = false, onSuccess, onNavigate }) => {
     
     if (isRegister) {
       body.name = name;
+      body.avatar = avatar; // Отправляем аватар
       body.role = role;
     }
 
@@ -49,7 +51,6 @@ const AuthForm = ({ isRegister = false, onSuccess, onNavigate }) => {
     }
   };
 
-  // Стиль для белого фона инпутов
   const inputStyle = { backgroundColor: '#ffffff', color: '#000000' };
 
   return (
@@ -90,19 +91,24 @@ const AuthForm = ({ isRegister = false, onSuccess, onNavigate }) => {
           
           <div className="rounded-md shadow-sm -space-y-px">
             {isRegister && (
-              <div>
-                <input type="text" required value={name} onChange={e => setName(e.target.value)} style={inputStyle} className="appearance-none rounded-none rounded-t-lg relative block w-full px-3 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm transition-colors bg-white" placeholder="Ваше Имя" />
-              </div>
+              <>
+                <div>
+                  <input type="text" required value={name} onChange={e => setName(e.target.value)} style={inputStyle} className="appearance-none rounded-t-lg relative block w-full px-3 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm transition-colors bg-white" placeholder="Ваше Имя" />
+                </div>
+                <div>
+                  <input type="text" value={avatar} onChange={e => setAvatar(e.target.value)} style={inputStyle} className="appearance-none relative block w-full px-3 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm transition-colors bg-white" placeholder="Ссылка на фото профиля (необязательно)" />
+                </div>
+              </>
             )}
             <div>
-              <input type="email" required value={email} onChange={e => setEmail(e.target.value)} style={inputStyle} className={`appearance-none rounded-none relative block w-full px-3 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm transition-colors bg-white ${!isRegister && 'rounded-t-lg'}`} placeholder="Email адрес" />
+              <input type="email" required value={email} onChange={e => setEmail(e.target.value)} style={inputStyle} className={`appearance-none relative block w-full px-3 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm transition-colors bg-white ${!isRegister && 'rounded-t-lg'}`} placeholder="Email адрес" />
             </div>
             <div>
-              <input type="password" required value={password} onChange={e => setPassword(e.target.value)} style={inputStyle} className={`appearance-none rounded-none relative block w-full px-3 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm transition-colors bg-white ${!isRegister && 'rounded-b-lg'}`} placeholder="Пароль" />
+              <input type="password" required value={password} onChange={e => setPassword(e.target.value)} style={inputStyle} className={`appearance-none relative block w-full px-3 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm transition-colors bg-white ${!isRegister && 'rounded-b-lg'}`} placeholder="Пароль" />
             </div>
             {isRegister && (
               <div>
-                <select value={role} onChange={e => setRole(e.target.value)} style={inputStyle} className="appearance-none rounded-none rounded-b-lg relative block w-full px-3 py-3 border border-gray-300 text-gray-900 bg-white focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm cursor-pointer">
+                <select value={role} onChange={e => setRole(e.target.value)} style={inputStyle} className="appearance-none rounded-b-lg relative block w-full px-3 py-3 border border-gray-300 text-gray-900 bg-white focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm cursor-pointer">
                   <option value={UserRole.SEEKER}>Я ищу работу (Соискатель)</option>
                   <option value={UserRole.EMPLOYER}>Я нанимаю (Работодатель)</option>
                 </select>

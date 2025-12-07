@@ -3,33 +3,25 @@ import { Trash2, Search, Briefcase, Filter, X } from 'lucide-react';
 import { UserRole, API_URL } from '../constants';
 
 const VacancyList = ({ vacancies, user, onDelete }) => {
-  // Состояния для фильтров
   const [searchTerm, setSearchTerm] = useState('');
   const [minSalary, setMinSalary] = useState('');
   const [keywords, setKeywords] = useState('');
 
-  // Функция очистки числа из строки (например "120 000 руб" -> 120000)
   const parseSalary = (salaryStr) => {
     if (!salaryStr) return 0;
     return parseInt(salaryStr.replace(/\D/g, '')) || 0;
   };
 
-  // ЛОГИКА ФИЛЬТРАЦИИ
   const filteredVacancies = vacancies.filter((job) => {
-    // 1. Поиск по названию (основная строка)
     const matchesTitle = job.title.toLowerCase().includes(searchTerm.toLowerCase());
-    
-    // 2. Поиск по ключевым словам (в описании)
     const matchesKeywords = keywords 
       ? job.description.toLowerCase().includes(keywords.toLowerCase()) 
       : true;
 
-    // 3. Фильтр по зарплате
     let matchesSalary = true;
     if (minSalary) {
       const jobSalary = parseSalary(job.salary);
       const targetSalary = parseInt(minSalary) || 0;
-      // Если в вакансии не указана зарплата цифрами, показываем её (или скрываем, по желанию)
       matchesSalary = jobSalary >= targetSalary;
     }
 
@@ -62,7 +54,6 @@ const VacancyList = ({ vacancies, user, onDelete }) => {
         })
       });
 
-      // ЖЕСТКИЙ ПЕРЕХВАТ ОШИБКИ 409
       if (response.status === 409) {
         alert('Вы уже откликнулись на эту вакансию ранее.');
         return;
@@ -80,13 +71,12 @@ const VacancyList = ({ vacancies, user, onDelete }) => {
     }
   };
 
-  // Стиль для белых инпутов
-  const inputStyle = { backgroundColor: 'white', color: 'black' };
+  const inputStyle = { backgroundColor: '#ffffff', color: '#000000' };
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
       
-      {/* --- ЛЕВАЯ КОЛОНКА: ФИЛЬТРЫ --- */}
+      {/* ФИЛЬТРЫ */}
       <div className="lg:col-span-1 space-y-6">
         <div className="bg-white p-5 rounded-lg shadow-sm border border-gray-200 sticky top-24">
           <div className="flex items-center justify-between mb-4">
@@ -101,22 +91,17 @@ const VacancyList = ({ vacancies, user, onDelete }) => {
           </div>
 
           <div className="space-y-4">
-            {/* Поиск */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Поиск</label>
-              <div className="relative">
-                <input
-                  type="text"
-                  className="block w-full pl-3 pr-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-blue-500 focus:border-blue-500"
-                  placeholder="Должность..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  style={inputStyle}
-                />
-              </div>
+              <input
+                type="text"
+                className="block w-full pl-3 pr-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-blue-500 focus:border-blue-500"
+                placeholder="Должность..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                style={inputStyle}
+              />
             </div>
-
-            {/* Зарплата */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Зарплата от</label>
               <input
@@ -128,8 +113,6 @@ const VacancyList = ({ vacancies, user, onDelete }) => {
                 style={inputStyle}
               />
             </div>
-
-             {/* Ключевые слова */}
              <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Ключевые слова</label>
               <input
@@ -145,7 +128,7 @@ const VacancyList = ({ vacancies, user, onDelete }) => {
         </div>
       </div>
 
-      {/* --- ПРАВАЯ КОЛОНКА: СПИСОК ВАКАНСИЙ --- */}
+      {/* СПИСОК ВАКАНСИЙ */}
       <div className="lg:col-span-3 space-y-4">
         {filteredVacancies.length === 0 ? (
           <div className="text-center py-16 bg-white rounded-lg shadow-sm border border-gray-100">
@@ -159,16 +142,27 @@ const VacancyList = ({ vacancies, user, onDelete }) => {
             <div key={job.id} className="bg-white overflow-hidden shadow-sm hover:shadow-md rounded-lg border border-gray-200 transition-all duration-200">
               <div className="p-6">
                 <div className="flex justify-between items-start">
-                  <div className="flex-grow">
-                    <h3 className="text-xl font-bold text-blue-600 hover:underline cursor-pointer">{job.title}</h3>
-                    <div className="mt-1 flex items-center text-gray-900 font-bold text-lg">
-                      {job.salary}
-                    </div>
-                    <p className="mt-1 text-sm text-gray-500 font-medium">{job.employer_name}</p>
-                    
-                    <div className="mt-3 text-sm text-gray-600 line-clamp-3">
-                      {job.description}
-                    </div>
+                  
+                  {/* Левая часть: Картинка (если есть) и Текст */}
+                  <div className="flex gap-6 flex-grow">
+                     {job.image ? (
+                        <img src={job.image} alt="Logo" className="w-32 h-32 rounded-md object-contain bg-gray-50 border border-gray-100 flex-shrink-0" />
+                     ) : (
+                        <div className="w-32 h-32 rounded-md bg-gray-100 flex items-center justify-center text-gray-400 flex-shrink-0">
+                            <Briefcase className="w-12 h-12" />
+                        </div>
+                     )}
+                     
+                     <div className="flex-grow">
+                        <h3 className="text-xl font-bold text-blue-600 hover:underline cursor-pointer">{job.title}</h3>
+                        <div className="mt-1 flex items-center text-gray-900 font-bold text-lg">
+                        {job.salary}
+                        </div>
+                        <p className="mt-1 text-sm text-gray-500 font-medium">{job.employer_name}</p>
+                        <div className="mt-3 text-sm text-gray-600 line-clamp-3">
+                        {job.description}
+                        </div>
+                     </div>
                   </div>
                   
                   {user?.role === UserRole.EMPLOYER && String(user.id) === String(job.employer_id) && (

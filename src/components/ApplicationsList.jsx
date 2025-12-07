@@ -5,9 +5,8 @@ import { API_URL, UserRole } from '../constants';
 const ApplicationsList = ({ user, onNavigate }) => {
   const [applications, setApplications] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [selectedApp, setSelectedApp] = useState(null); // Для модального окна
+  const [selectedApp, setSelectedApp] = useState(null);
 
-  // 1. Сначала объявляем хук эффекта
   useEffect(() => {
     if (!user || user.role !== UserRole.EMPLOYER) {
       setLoading(false);
@@ -42,22 +41,18 @@ const ApplicationsList = ({ user, onNavigate }) => {
         setApplications(prev => prev.map(app => 
           app.id === appId ? { ...app, status: newStatus } : app
         ));
-        // Если меняем статус в модальном окне, обновляем и его
         if (selectedApp && selectedApp.id === appId) {
           setSelectedApp(prev => ({ ...prev, status: newStatus }));
         }
       } else {
         const err = await response.json();
-        console.error('Error update:', err);
         alert('Ошибка обновления статуса: ' + (err.message || 'Неизвестная ошибка'));
       }
     } catch (error) {
-      console.error('Network error:', error);
-      alert('Ошибка сети. Проверьте консоль (F12) и убедитесь, что в db.php разрешен метод PATCH.');
+      alert('Ошибка сети. Проверьте консоль.');
     }
   };
 
-  // 2. ЗАЩИТА РЕНДЕРИНГА
   if (!user || user.role !== UserRole.EMPLOYER) {
     return null;
   }
@@ -88,10 +83,22 @@ const ApplicationsList = ({ user, onNavigate }) => {
               <li key={app.id} className="hover:bg-blue-50 transition-colors">
                 <div className="px-6 py-6 sm:px-8">
                   <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-lg font-bold text-blue-700 truncate">{app.vacancy_title}</p>
-                      <p className="text-sm text-gray-500 mt-1">Кандидат: <span className="font-semibold text-gray-900">{app.seeker_name}</span></p>
+                    <div className="flex items-center gap-3">
+                      {/* АВАТАР В СПИСКЕ */}
+                      {app.avatar ? (
+                        <img src={app.avatar} alt="Avatar" className="w-10 h-10 rounded-full object-cover border border-gray-200" />
+                      ) : (
+                        <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-500">
+                            <User className="w-6 h-6" />
+                        </div>
+                      )}
+                      
+                      <div>
+                        <p className="text-lg font-bold text-blue-700 truncate">{app.vacancy_title}</p>
+                        <p className="text-sm text-gray-500 mt-1">Кандидат: <span className="font-semibold text-gray-900">{app.seeker_name}</span></p>
+                      </div>
                     </div>
+
                     <div className="flex-shrink-0 flex items-center">
                       {app.status === 'pending' && <span className="px-3 py-1 inline-flex text-sm leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800"><Clock className="w-4 h-4 mr-1.5"/> Ожидает</span>}
                       {app.status === 'accepted' && <span className="px-3 py-1 inline-flex text-sm leading-5 font-semibold rounded-full bg-green-100 text-green-800"><CheckCircle className="w-4 h-4 mr-1.5"/> Принят</span>}
@@ -139,22 +146,15 @@ const ApplicationsList = ({ user, onNavigate }) => {
         </div>
       )}
 
-      {/* --- МОДАЛЬНОЕ ОКНО ПРОСМОТРА РЕЗЮМЕ --- */}
       {selectedApp && (
-        <div className="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <div className="fixed inset-0 z-50 overflow-y-auto">
           <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-            {/* Фон */}
             <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" onClick={() => setSelectedApp(null)}></div>
-
             <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-
-            {/* Карточка */}
             <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full">
               <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                 <div className="flex justify-between items-start mb-4 border-b pb-4">
-                  <h3 className="text-2xl font-bold text-gray-900" id="modal-title">
-                    Резюме кандидата
-                  </h3>
+                  <h3 className="text-2xl font-bold text-gray-900">Резюме кандидата</h3>
                   <button onClick={() => setSelectedApp(null)} className="text-gray-400 hover:text-gray-500">
                     <X className="h-6 w-6" />
                   </button>
@@ -162,11 +162,17 @@ const ApplicationsList = ({ user, onNavigate }) => {
                 
                 <div className="space-y-4">
                   <div className="flex items-center space-x-4">
-                    <div className="h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold text-xl">
-                      {(selectedApp.seeker_name || 'U').charAt(0).toUpperCase()}
-                    </div>
+                    {/* АВАТАР В МОДАЛЬНОМ ОКНЕ */}
+                    {selectedApp.avatar ? (
+                        <img src={selectedApp.avatar} alt="Avatar" className="h-16 w-16 rounded-full object-cover border border-blue-100" />
+                    ) : (
+                        <div className="h-16 w-16 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold text-xl">
+                            {(selectedApp.seeker_name || 'U').charAt(0).toUpperCase()}
+                        </div>
+                    )}
+                    
                     <div>
-                      <p className="text-xl font-bold">{selectedApp.surname} {selectedApp.first_name} {selectedApp.patronymic}</p>
+                      <p className="text-xl font-bold">{selectedApp.surname} {selectedApp.first_name}</p>
                       <p className="text-sm text-gray-500">{selectedApp.seeker_email}</p>
                     </div>
                   </div>
@@ -185,9 +191,7 @@ const ApplicationsList = ({ user, onNavigate }) => {
                   </div>
 
                   <div className="border-t pt-4">
-                    <h4 className="font-bold text-gray-800 flex items-center mb-2">
-                        <User className="w-4 h-4 mr-2" /> Личные данные
-                    </h4>
+                    <h4 className="font-bold text-gray-800 flex items-center mb-2"><User className="w-4 h-4 mr-2" /> Личные данные</h4>
                     <div className="grid grid-cols-2 gap-y-2 text-sm text-gray-700">
                         <p>Пол: <span className="font-medium">{selectedApp.gender === 'male' ? 'Мужской' : 'Женский'}</span></p>
                         <p>Дата рождения: <span className="font-medium">{selectedApp.birthday || '-'}</span></p>
@@ -197,51 +201,20 @@ const ApplicationsList = ({ user, onNavigate }) => {
                   </div>
 
                   <div className="border-t pt-4">
-                    <h4 className="font-bold text-gray-800 flex items-center mb-2">
-                        <GraduationCap className="w-4 h-4 mr-2" /> Образование
-                    </h4>
+                    <h4 className="font-bold text-gray-800 flex items-center mb-2"><GraduationCap className="w-4 h-4 mr-2" /> Образование</h4>
                     <p className="text-sm text-gray-700"><span className="font-semibold">{selectedApp.education_level}</span></p>
                     <p className="text-sm text-gray-600">{selectedApp.education_institution}</p>
-                    <p className="text-sm text-gray-500">{selectedApp.education_faculty} {selectedApp.education_specialization && `— ${selectedApp.education_specialization}`}</p>
-                    {selectedApp.education_year && <p className="text-xs text-gray-400 mt-1">Год окончания: {selectedApp.education_year}</p>}
+                    <p className="text-sm text-gray-500">{selectedApp.education_faculty}</p>
                   </div>
 
                   <div className="border-t pt-4">
-                    <h4 className="font-bold text-gray-800 flex items-center mb-2">
-                        <Globe className="w-4 h-4 mr-2" /> Навыки
-                    </h4>
-                    <div className="bg-gray-50 p-3 rounded text-sm text-gray-700 border border-gray-100">
-                        {selectedApp.skills || 'Навыки не указаны'}
-                    </div>
+                    <h4 className="font-bold text-gray-800 flex items-center mb-2"><Globe className="w-4 h-4 mr-2" /> Навыки</h4>
+                    <div className="bg-gray-50 p-3 rounded text-sm text-gray-700 border border-gray-100">{selectedApp.skills || 'Навыки не указаны'}</div>
                   </div>
                 </div>
               </div>
               <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                {selectedApp.status === 'pending' && (
-                    <>
-                        <button
-                        type="button"
-                        className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-green-600 text-base font-medium text-white hover:bg-green-700 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm"
-                        onClick={() => { handleStatusChange(selectedApp.id, 'accepted'); setSelectedApp(null); }}
-                        >
-                        Принять
-                        </button>
-                        <button
-                        type="button"
-                        className="mt-3 w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
-                        onClick={() => { handleStatusChange(selectedApp.id, 'rejected'); setSelectedApp(null); }}
-                        >
-                        Отказать
-                        </button>
-                    </>
-                )}
-                <button
-                  type="button"
-                  className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
-                  onClick={() => setSelectedApp(null)}
-                >
-                  Закрыть
-                </button>
+                <button type="button" className="w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 sm:ml-3 sm:w-auto sm:text-sm" onClick={() => setSelectedApp(null)}>Закрыть</button>
               </div>
             </div>
           </div>

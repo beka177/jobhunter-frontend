@@ -5,6 +5,7 @@ const CreateVacancyForm = ({ user, onSuccess, onCancel }) => {
   const [title, setTitle] = useState('');
   const [salary, setSalary] = useState('');
   const [description, setDescription] = useState('');
+  const [image, setImage] = useState(''); // Новое поле для картинки
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
@@ -18,7 +19,8 @@ const CreateVacancyForm = ({ user, onSuccess, onCancel }) => {
           employer_id: user.id,
           title,
           salary,
-          description
+          description,
+          image // Отправляем картинку
         })
       });
       if (response.ok) {
@@ -42,6 +44,10 @@ const CreateVacancyForm = ({ user, onSuccess, onCancel }) => {
         <div>
           <label className="block text-sm font-medium text-gray-700">Название должности</label>
           <input type="text" required value={title} onChange={e => setTitle(e.target.value)} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 border p-2 bg-white" placeholder="Например: PHP Разработчик" />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700">Ссылка на логотип/картинку (необязательно)</label>
+          <input type="text" value={image} onChange={e => setImage(e.target.value)} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 border p-2 bg-white" placeholder="https://..." />
         </div>
         <div>
           <label className="block text-sm font-medium text-gray-700">Зарплата</label>
