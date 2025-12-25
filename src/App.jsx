@@ -6,16 +6,17 @@ import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import VacancyList from './components/VacancyList';
 import CreateVacancyForm from './components/CreateVacancyForm';
+import EditVacancyForm from './components/EditVacancyForm'; // НОВЫЙ ИМПОРТ
 import AuthForm from './components/AuthForm';
 import ApplicationsList from './components/ApplicationsList';
 import ResumeForm from './components/ResumeForm';
 import SeekerApplications from './components/SeekerApplications';
 import VacancyDetails from './components/VacancyDetails';
-import HelpPage from './components/HelpPage'; // НОВЫЙ КОМПОНЕНТ
+import HelpPage from './components/HelpPage';
 
 function App() {
   const [currentPage, setCurrentPage] = useState('home');
-  const [selectedVacancyId, setSelectedVacancyId] = useState(null); // ID выбранной вакансии
+  const [selectedVacancyId, setSelectedVacancyId] = useState(null); 
   const [user, setUser] = useState(null);
   const [vacancies, setVacancies] = useState([]);
   const [loadingVacancies, setLoadingVacancies] = useState(false);
@@ -80,10 +81,15 @@ function App() {
     } catch (e) { alert('Ошибка удаления'); }
   };
 
-  // Переход к деталям вакансии
   const handleOpenVacancy = (id) => {
     setSelectedVacancyId(id);
     setCurrentPage('vacancy-details');
+  };
+
+  // Метод для перехода к редактированию
+  const handleEditVacancy = (id) => {
+    setSelectedVacancyId(id);
+    setCurrentPage('edit-vacancy');
   };
 
   return (
@@ -112,6 +118,7 @@ function App() {
                 vacancies={vacancies} 
                 user={user} 
                 onDelete={handleDeleteVacancy}
+                onEdit={handleEditVacancy}
                 onOpenVacancy={handleOpenVacancy} 
               />
             )}
@@ -122,7 +129,16 @@ function App() {
             <VacancyDetails 
                 vacancyId={selectedVacancyId} 
                 user={user} 
-                onNavigate={setCurrentPage} 
+                onNavigate={setCurrentPage}
+                onEdit={handleEditVacancy}
+            />
+        )}
+
+        {currentPage === 'edit-vacancy' && selectedVacancyId && (
+            <EditVacancyForm 
+                vacancyId={selectedVacancyId} 
+                onSuccess={() => { setCurrentPage('home'); fetchVacancies(); }} 
+                onCancel={() => setCurrentPage('home')} 
             />
         )}
 
