@@ -1,5 +1,6 @@
+
 import React from 'react';
-import { Briefcase, Plus, LogOut, User, FileText, Bell, HelpCircle } from 'lucide-react';
+import { Briefcase, Plus, LogOut, User, FileText, Bell, HelpCircle, List } from 'lucide-react';
 import { UserRole } from '../constants';
 
 const Navbar = ({ user, onLogout, onNavigate }) => (
@@ -26,7 +27,7 @@ const Navbar = ({ user, onLogout, onNavigate }) => (
 
           {user ? (
             <>
-              <div className="flex items-center text-gray-600 hidden sm:flex text-sm font-medium border-r pr-4 mr-2">
+              <div className="flex items-center text-gray-600 hidden lg:flex text-sm font-medium border-r pr-4 mr-2">
                 {user.avatar ? (
                     <img src={user.avatar} alt="Avatar" className="w-8 h-8 rounded-full object-cover mr-2 border border-gray-200" />
                 ) : (
@@ -40,7 +41,14 @@ const Navbar = ({ user, onLogout, onNavigate }) => (
               </div>
               
               {user.role === UserRole.EMPLOYER && (
-                <>
+                <div className="flex items-center space-x-2">
+                  <button
+                    onClick={() => onNavigate('my-vacancies')}
+                    className="flex items-center px-4 py-2 rounded-md text-sm font-bold text-white bg-blue-500 hover:bg-blue-600 transition-colors shadow-sm"
+                  >
+                    <List className="h-4 w-4 mr-2" />
+                    <span className="hidden md:inline">Мои вакансии</span>
+                  </button>
                   <button
                     onClick={() => onNavigate('applications')}
                     className="flex items-center px-4 py-2 rounded-md text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-700 transition-colors shadow-sm"
@@ -55,7 +63,7 @@ const Navbar = ({ user, onLogout, onNavigate }) => (
                     <Plus className="h-4 w-4 mr-2" />
                     <span className="hidden md:inline">Вакансия</span>
                   </button>
-                </>
+                </div>
               )}
 
               {user.role === UserRole.SEEKER && (
@@ -77,14 +85,14 @@ const Navbar = ({ user, onLogout, onNavigate }) => (
                 </>
               )}
               
-              {/* Кнопка ВЫЙТИ - Красная, Прямоугольная, Большая */}
+              {/* Кнопка ВЫЙТИ */}
               <button
                 onClick={onLogout}
-                className="flex items-center px-6 py-2 rounded-md text-sm font-bold text-white bg-red-600 hover:bg-red-700 ml-4 shadow-md transition-all transform hover:scale-105"
+                className="flex items-center px-4 py-2 rounded-md text-sm font-bold text-white bg-red-600 hover:bg-red-700 ml-2 shadow-md transition-all transform hover:scale-105"
                 title="Выйти из аккаунта"
               >
-                <LogOut className="h-4 w-4 mr-2" />
-                ВЫЙТИ
+                <LogOut className="h-4 w-4 sm:mr-2" />
+                <span className="hidden sm:inline">ВЫЙТИ</span>
               </button>
             </>
           ) : (

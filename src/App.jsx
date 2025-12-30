@@ -1,12 +1,14 @@
+
 import React, { useState, useEffect, useCallback } from 'react';
 import { API_URL, UserRole } from './constants';
+import { ArrowLeft } from 'lucide-react';
 
 // Импорт компонентов из отдельных файлов
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import VacancyList from './components/VacancyList';
 import CreateVacancyForm from './components/CreateVacancyForm';
-import EditVacancyForm from './components/EditVacancyForm'; // НОВЫЙ ИМПОРТ
+import EditVacancyForm from './components/EditVacancyForm'; 
 import AuthForm from './components/AuthForm';
 import ApplicationsList from './components/ApplicationsList';
 import ResumeForm from './components/ResumeForm';
@@ -125,6 +127,31 @@ function App() {
           </>
         )}
 
+        {currentPage === 'my-vacancies' && user && user.role === UserRole.EMPLOYER && (
+          <>
+            <div className="flex items-center mb-8">
+              <button 
+                onClick={() => setCurrentPage('home')} 
+                className="mr-4 p-2 hover:bg-white rounded-full transition-colors text-blue-600"
+              >
+                <ArrowLeft className="h-6 w-6" />
+              </button>
+              <h1 className="text-3xl font-extrabold text-gray-900">Мои опубликованные вакансии</h1>
+            </div>
+            {loadingVacancies ? (
+              <div className="text-center py-10">Загрузка...</div>
+            ) : (
+              <VacancyList 
+                vacancies={vacancies.filter(v => String(v.employer_id) === String(user.id))} 
+                user={user} 
+                onDelete={handleDeleteVacancy}
+                onEdit={handleEditVacancy}
+                onOpenVacancy={handleOpenVacancy} 
+              />
+            )}
+          </>
+        )}
+
         {currentPage === 'vacancy-details' && selectedVacancyId && (
             <VacancyDetails 
                 vacancyId={selectedVacancyId} 
@@ -137,8 +164,8 @@ function App() {
         {currentPage === 'edit-vacancy' && selectedVacancyId && (
             <EditVacancyForm 
                 vacancyId={selectedVacancyId} 
-                onSuccess={() => { setCurrentPage('home'); fetchVacancies(); }} 
-                onCancel={() => setCurrentPage('home')} 
+                onSuccess={() => { setCurrentPage('my-vacancies'); fetchVacancies(); }} 
+                onCancel={() => setCurrentPage('my-vacancies')} 
             />
         )}
 
@@ -150,7 +177,7 @@ function App() {
         {currentPage === 'register' && <AuthForm isRegister onSuccess={handleLoginSuccess} onNavigate={setCurrentPage} />}
         
         {currentPage === 'create-vacancy' && user && user.role === UserRole.EMPLOYER && (
-          <CreateVacancyForm user={user} onSuccess={() => { setCurrentPage('home'); fetchVacancies(); }} onCancel={() => setCurrentPage('home')} />
+          <CreateVacancyForm user={user} onSuccess={() => { setCurrentPage('my-vacancies'); fetchVacancies(); }} onCancel={() => setCurrentPage('home')} />
         )}
 
         {currentPage === 'applications' && user && user.role === UserRole.EMPLOYER && (
