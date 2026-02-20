@@ -2,8 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { ArrowLeft, Save } from 'lucide-react';
 import { API_URL } from '../constants';
 
+// Форма создания/редактирования резюме пользователя
 const ResumeForm = ({ user, onSuccess, onNavigate }) => {
   const [loading, setLoading] = useState(false);
+  // formData содержит все поля резюме — инициализируем пустыми значениями
   const [formData, setFormData] = useState({
     surname: '', first_name: '', patronymic: '',
     gender: 'male', city: '', phone: '',
@@ -14,13 +16,14 @@ const ResumeForm = ({ user, onSuccess, onNavigate }) => {
     skills: ''
   });
 
-  // Загружаем существующее резюме, если есть
+  // При загрузке компонента пытаемся получить уже существующее резюме пользователя
   useEffect(() => {
     const fetchResume = async () => {
       try {
         const response = await fetch(`${API_URL}/resumes.php?user_id=${user.id}`);
         const data = await response.json();
         if (data) {
+          // Заполняем formData значениями из базы, если они есть
           const cleanData = {};
           Object.keys(formData).forEach(key => {
             cleanData[key] = data[key] || '';
@@ -34,11 +37,13 @@ const ResumeForm = ({ user, onSuccess, onNavigate }) => {
     fetchResume();
   }, [user.id]);
 
+  // Универсальный обработчик изменения полей формы
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
+  // Отправка формы на сервер (создание или обновление резюме)
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -65,12 +70,13 @@ const ResumeForm = ({ user, onSuccess, onNavigate }) => {
     }
   };
 
-  // ПРИНУДИТЕЛЬНО БЕЛЫЙ ФОН для инпутов
+  // Стили для инпутов: принудительно белый фон для лучшей читабельности
   const inputStyle = { backgroundColor: '#ffffff', color: '#000000' };
   const inputClass = "mt-1 block w-full border border-gray-300 rounded-lg shadow-sm p-3 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white text-gray-900";
 
   return (
     <div className="max-w-4xl mx-auto mt-6 px-4 pb-12">
+      {/* Кнопка назад к списку вакансий */}
       <button 
         onClick={() => onNavigate('home')} 
         className="mb-6 inline-flex items-center px-4 py-2 bg-white border border-blue-600 text-blue-700 rounded-md hover:bg-blue-50 transition-colors font-medium shadow-sm"
@@ -87,7 +93,7 @@ const ResumeForm = ({ user, onSuccess, onNavigate }) => {
             <h3 className="text-xl font-semibold text-gray-800 mb-6">Заполните основную информацию</h3>
             
             <div className="grid grid-cols-1 gap-6">
-              {/* Профессия (на кого ищем работу) */}
+              {/* Профессия (какую должность ищет пользователь) */}
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-1">Желаемая должность</label>
                 <input type="text" name="profession" value={formData.profession} onChange={handleChange} className={inputClass} style={inputStyle} placeholder="Например: Программист 1С" required />

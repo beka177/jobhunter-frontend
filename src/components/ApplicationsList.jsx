@@ -2,11 +2,13 @@ import React, { useEffect, useState } from 'react';
 import { FileText, User, Mail, Calendar, CheckCircle, XCircle, Clock, ArrowLeft, Eye, X, GraduationCap, MapPin, Phone, Globe } from 'lucide-react';
 import { API_URL, UserRole } from '../constants';
 
+// Компонент для работодателя: список откликов на вакансии
 const ApplicationsList = ({ user, onNavigate }) => {
   const [applications, setApplications] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [selectedApp, setSelectedApp] = useState(null);
+  const [selectedApp, setSelectedApp] = useState(null); 
 
+  // При монтировании компонента загружаем отклики только если пользователь — работодатель
   useEffect(() => {
     if (!user || user.role !== UserRole.EMPLOYER) {
       setLoading(false);
@@ -15,6 +17,7 @@ const ApplicationsList = ({ user, onNavigate }) => {
     fetchApplications();
   }, [user]);
 
+  // Запрос списка откликов для конкретного работодателя
   const fetchApplications = async () => {
     try {
       const response = await fetch(`${API_URL}/applications.php?employer_id=${user.id}`);
@@ -29,6 +32,7 @@ const ApplicationsList = ({ user, onNavigate }) => {
     }
   };
 
+  // Изменение статуса отклика (PATCH)
   const handleStatusChange = async (appId, newStatus) => {
     try {
       const response = await fetch(`${API_URL}/applications.php`, {
@@ -38,6 +42,7 @@ const ApplicationsList = ({ user, onNavigate }) => {
       });
       
       if (response.ok) {
+        // Обновляем статус локально, чтобы UI сразу отразил изменения
         setApplications(prev => prev.map(app => 
           app.id === appId ? { ...app, status: newStatus } : app
         ));
@@ -53,6 +58,7 @@ const ApplicationsList = ({ user, onNavigate }) => {
     }
   };
 
+  // Если пользователь не авторизован или не работодатель — ничего не показываем
   if (!user || user.role !== UserRole.EMPLOYER) {
     return null;
   }
@@ -71,12 +77,14 @@ const ApplicationsList = ({ user, onNavigate }) => {
       <h2 className="text-3xl font-extrabold text-gray-900 mb-6">Отклики на ваши вакансии</h2>
       
       {applications.length === 0 ? (
+         // Если откликов нет — показываем заглушку
          <div className="text-center py-16 bg-white rounded-xl shadow-sm border border-gray-100 mt-6">
           <FileText className="mx-auto h-16 w-16 text-gray-300" />
           <h3 className="mt-4 text-lg font-medium text-gray-900">Нет откликов</h3>
           <p className="mt-2 text-gray-500">Пока никто не откликнулся на ваши вакансии.</p>
         </div>
       ) : (
+        // Иначе выводим список откликов
         <div className="bg-white shadow overflow-hidden sm:rounded-md border border-gray-200">
           <ul className="divide-y divide-gray-200">
             {applications.map((app) => (
@@ -84,7 +92,6 @@ const ApplicationsList = ({ user, onNavigate }) => {
                 <div className="px-6 py-6 sm:px-8">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      {/* АВАТАР В СПИСКЕ */}
                       {app.avatar ? (
                         <img src={app.avatar} alt="Avatar" className="w-10 h-10 rounded-full object-cover border border-gray-200" />
                       ) : (
@@ -121,6 +128,7 @@ const ApplicationsList = ({ user, onNavigate }) => {
                         Посмотреть резюме
                       </button>
 
+
                       {app.status === 'pending' && (
                         <>
                           <button
@@ -146,6 +154,7 @@ const ApplicationsList = ({ user, onNavigate }) => {
         </div>
       )}
 
+      {/* Модальное окно с подробным резюме выбранного кандидата */}
       {selectedApp && (
         <div className="fixed inset-0 z-50 overflow-y-auto">
           <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
@@ -162,7 +171,7 @@ const ApplicationsList = ({ user, onNavigate }) => {
                 
                 <div className="space-y-4">
                   <div className="flex items-center space-x-4">
-                    {/* АВАТАР В МОДАЛЬНОМ ОКНЕ */}
+                    {/* Аватар в модальном окне */}
                     {selectedApp.avatar ? (
                         <img src={selectedApp.avatar} alt="Avatar" className="h-16 w-16 rounded-full object-cover border border-blue-100" />
                     ) : (

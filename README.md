@@ -1,16 +1,79 @@
-# React + Vite
+# JobHunter — веб-приложение для поиска работы
+Студент: Сейткали Б. Н.  
+Группа: Ис-23-19б
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## Описание проекта
+JobHunter — это веб-приложение, предназначенное для поиска работы.
+Пользователи могут регистрироваться, просматривать вакансии,
+создавать резюме и откликаться на интересующие предложения.
 
-Currently, two official plugins are available:
+Проект разработан в рамках курсовой работы по дисциплине
+«Основы backend разработки».
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+---
 
-## React Compiler
+## Функциональные возможности
+- регистрация и авторизация пользователей;
+- просмотр списка вакансий;
+- добавление вакансий;
+- создание и просмотр резюме;
+- отклик на вакансии;
+- взаимодействие клиента и сервера через REST API.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+---
 
-## Expanding the ESLint configuration
+## Используемые технологии
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+### Frontend
+- HTML
+- CSS
+- JavaScript
+
+### Backend
+- PHP
+- REST API
+
+### База данных
+- MySQL
+
+### Инструменты
+- Postman — тестирование API
+- OpenServer / XAMPP — локальный сервер
+- GitHub — хранение проекта
+
+---
+
+## Архитектура приложения
+Приложение построено по клиент-серверной архитектуре.
+
+Frontend отправляет HTTP-запросы к backend-части,
+реализованной в виде REST API.
+Backend обрабатывает запросы, взаимодействует с базой данных
+и возвращает данные в формате JSON.
+
+---
+
+## Структура проекта
+/api
+├── auth.php
+├── vacancies.php
+├── resumes.php
+├── applications.php
+├── help.php
+└── db.php
+
+---
+
+## Установка и запуск
+
+1. Установить OpenServer или XAMPP
+2. Скопировать проект в папку `htdocs` или `domains`
+3. Импортировать базу данных MySQL
+4. Запустить локальный сервер
+5. Открыть проект в браузере
+
+---
+
+## Тестирование API
+Для тестирования backend-части используется Postman.
+Все основные endpoints проверены с помощью коллекции запросов.

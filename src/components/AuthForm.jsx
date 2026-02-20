@@ -2,15 +2,18 @@ import React, { useState } from 'react';
 import { AlertCircle, ArrowLeft } from 'lucide-react';
 import { API_URL, UserRole } from '../constants';
 
+// Компонент формы авторизации и регистрации в зависимости от пропса isRegister
 const AuthForm = ({ isRegister = false, onSuccess, onNavigate }) => {
+  // Поля формы
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
-  const [avatar, setAvatar] = useState(''); // Новое поле для аватара
+  const [avatar, setAvatar] = useState(''); 
   const [role, setRole] = useState(UserRole.SEEKER);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
+  // Отправка формы: POST к auth.php?action=login|register
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
@@ -20,8 +23,9 @@ const AuthForm = ({ isRegister = false, onSuccess, onNavigate }) => {
     const body = { email, password };
     
     if (isRegister) {
+      // Если это регистрация — добавляем дополнительные поля
       body.name = name;
-      body.avatar = avatar; // Отправляем аватар
+      body.avatar = avatar; // Отправляем ссылку на аватар
       body.role = role;
     }
 
@@ -36,25 +40,31 @@ const AuthForm = ({ isRegister = false, onSuccess, onNavigate }) => {
 
       if (response.ok) {
         if (isRegister) {
+          // После регистрации предлагаем перейти на форму входа
           alert('Регистрация успешна! Теперь войдите.');
           onNavigate('login');
         } else {
+          // При успешном логине вызываем callback из App с данными пользователя
           onSuccess(data.user);
         }
       } else {
+        // Показываем сообщение об ошибке, если сервер вернул не-OK
         setError(data.message || 'Произошла ошибка');
       }
     } catch (err) {
+      // Ошибка сети или сервер не отвечает
       setError('Ошибка соединения с сервером (Backend не отвечает)');
     } finally {
       setLoading(false);
     }
   };
 
+  // Стиль для полей — принудительно белый фон, чтобы было читабельно
   const inputStyle = { backgroundColor: '#ffffff', color: '#000000' };
 
   return (
     <div className="flex items-center justify-center min-h-[80vh] px-4 relative pt-12 md:pt-0">
+      {/* Кнопка возврата на главную */}
       <button 
         onClick={() => onNavigate('home')} 
         className="absolute top-4 left-4 md:top-8 md:left-8 inline-flex items-center px-4 py-2 bg-white border border-blue-600 text-blue-700 rounded-md hover:bg-blue-50 transition-colors font-medium shadow-sm"
@@ -78,6 +88,7 @@ const AuthForm = ({ isRegister = false, onSuccess, onNavigate }) => {
           </p>
         </div>
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+          {/* Показываем ошибку, если есть */}
           {error && (
             <div className="bg-red-50 border-l-4 border-red-400 p-4 rounded-r">
               <div className="flex">
@@ -92,6 +103,7 @@ const AuthForm = ({ isRegister = false, onSuccess, onNavigate }) => {
           <div className="rounded-md shadow-sm -space-y-px">
             {isRegister && (
               <>
+                {/* Если регистрация — дополнительные поля: имя и ссылка на аватар */}
                 <div>
                   <input type="text" required value={name} onChange={e => setName(e.target.value)} style={inputStyle} className="appearance-none rounded-t-lg relative block w-full px-3 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm transition-colors bg-white" placeholder="Ваше Имя" />
                 </div>

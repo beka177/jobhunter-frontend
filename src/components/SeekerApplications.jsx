@@ -2,10 +2,12 @@ import React, { useEffect, useState } from 'react';
 import { Clock, CheckCircle, XCircle, Building, ArrowLeft } from 'lucide-react';
 import { API_URL } from '../constants';
 
+// Компонент отображает список откликов текущего соискателя
 const SeekerApplications = ({ user, onNavigate }) => {
   const [applications, setApplications] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  // Загружаем историю откликов пользователя
   useEffect(() => {
     const fetchApps = async () => {
       try {
@@ -27,6 +29,7 @@ const SeekerApplications = ({ user, onNavigate }) => {
 
   return (
     <div className="max-w-4xl mx-auto mt-6 px-4">
+      {/* Кнопка возврата на главную */}
       <button 
         onClick={() => onNavigate('home')} 
         className="mb-6 inline-flex items-center px-4 py-2 bg-white border border-blue-600 text-blue-700 rounded-md hover:bg-blue-50 transition-colors font-medium shadow-sm"
@@ -61,6 +64,7 @@ const SeekerApplications = ({ user, onNavigate }) => {
                   </div>
                   
                   <div className="flex-shrink-0">
+                    {/* Отображаем статус отклика */}
                     {app.status === 'pending' && (
                       <span className="flex items-center px-4 py-2 rounded-full text-sm font-bold bg-yellow-100 text-yellow-800 border border-yellow-200">
                         <Clock className="w-4 h-4 mr-2" /> На рассмотрении

@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { ArrowLeft, Building, Calendar, User, Pencil, Briefcase, DollarSign } from 'lucide-react';
 import { API_URL, UserRole } from '../constants';
@@ -93,7 +94,7 @@ const VacancyDetails = ({ vacancyId, user, onNavigate, onEdit }) => {
                 <img 
                   src={vacancy.image} 
                   alt="Company Logo" 
-                  className="w-full max-w-md h-80 rounded-2xl object-contain bg-gray-50 border border-gray-100 shadow-inner" 
+                  className="w-full max-w-md h-80 rounded-2xl object-cover bg-gray-50 border border-gray-100 shadow-inner" 
                 />
              ) : (
                 <div className="w-full max-w-md h-80 rounded-2xl bg-gray-100 flex items-center justify-center text-gray-400 border border-dashed border-gray-300">
@@ -108,8 +109,7 @@ const VacancyDetails = ({ vacancyId, user, onNavigate, onEdit }) => {
             
             <div className="flex flex-wrap items-center gap-6">
               <div className="flex items-center text-3xl font-bold text-blue-600">
-                <DollarSign className="w-7 h-7 mr-1" />
-                {vacancy.salary}
+                Зарплата: {vacancy.salary}
               </div>
               <div className="flex items-center text-gray-600 font-medium text-lg bg-gray-50 px-4 py-1 rounded-full border border-gray-100">
                 <Building className="w-5 h-5 mr-2 text-gray-400" />

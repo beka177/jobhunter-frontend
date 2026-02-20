@@ -18,7 +18,7 @@ const Navbar = ({ user, onLogout, onNavigate }) => (
           {/* Кнопка Помощь (Видна всем) */}
           <button
             onClick={() => onNavigate('help')}
-            className="flex items-center px-3 py-2 rounded-md text-sm font-medium text-gray-600 hover:text-blue-600 hover:bg-gray-50 transition-colors"
+            className="flex items-center px-3 py-2 rounded-md text-sm font-medium text-white hover:text-blue-600 hover:bg-gray-50 transition-colors"
             title="Помощь"
           >
             <HelpCircle className="h-5 w-5 mr-1" />

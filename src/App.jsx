@@ -110,7 +110,7 @@ function App() {
           <>
             <div className="mb-8 text-center">
               <h1 className="text-4xl font-extrabold text-gray-900 tracking-tight sm:text-5xl mb-2">
-                Найди работу мечты
+                Найди работу мечты!
               </h1>
             </div>
             {loadingVacancies ? (
