@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Briefcase, Plus, LogOut, User, FileText, Bell, HelpCircle, List } from 'lucide-react';
+import { Briefcase, Plus, LogOut, User, FileText, Bell, HelpCircle, List, Heart } from 'lucide-react';
 import { UserRole } from '../constants';
 
 const Navbar = ({ user, onLogout, onNavigate }) => (
@@ -18,7 +18,7 @@ const Navbar = ({ user, onLogout, onNavigate }) => (
           {/* Кнопка Помощь (Видна всем) */}
           <button
             onClick={() => onNavigate('help')}
-            className="flex items-center px-3 py-2 rounded-md text-sm font-medium text-white hover:text-blue-600 hover:bg-gray-50 transition-colors"
+            className="flex items-center px-3 py-2 rounded-md text-sm font-medium text-gray-600 hover:text-blue-600 hover:bg-gray-50 transition-colors"
             title="Помощь"
           >
             <HelpCircle className="h-5 w-5 mr-1" />
@@ -68,7 +68,14 @@ const Navbar = ({ user, onLogout, onNavigate }) => (
 
               {user.role === UserRole.SEEKER && (
                 <>
-                 <button
+                  <button
+                    onClick={() => onNavigate('favorites')}
+                    className="flex items-center px-4 py-2 rounded-md text-sm font-bold text-white bg-pink-500 hover:bg-pink-600 transition-colors shadow-sm"
+                  >
+                    <Heart className="h-4 w-4 mr-2" />
+                    <span className="hidden md:inline">Избранное</span>
+                  </button>
+                  <button
                     onClick={() => onNavigate('resume')}
                     className="flex items-center px-4 py-2 rounded-md text-sm font-bold text-white bg-emerald-600 hover:bg-emerald-700 transition-colors shadow-sm"
                   >

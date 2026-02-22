@@ -1,18 +1,19 @@
 
 import React, { useState, useMemo } from 'react';
-import { Trash2, Briefcase, Filter, X, Pencil, ChevronDown, Check, ChevronsUpDown } from 'lucide-react';
+import { Trash2, Briefcase, Filter, X, Pencil, ChevronDown, Check, ChevronsUpDown, Heart } from 'lucide-react';
 import { UserRole, API_URL } from '../constants';
 
-const VacancyList = ({ vacancies, user, onDelete, onEdit, onOpenVacancy }) => {
+const VacancyList = ({ vacancies, user, favorites = [], onToggleFavorite, onDelete, onEdit, onOpenVacancy }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [minSalary, setMinSalary] = useState('');
   const [keywords, setKeywords] = useState('');
   const [sortBy, setSortBy] = useState('date_desc'); 
   const [isSortOpen, setIsSortOpen] = useState(false);
   
-  const [period, setPeriod] = useState('all'); 
+  const [period, setPeriod] = useState('all'); // 'all', 'month', 'week', 'three_days'
   const [isPeriodOpen, setIsPeriodOpen] = useState(false);
 
+  // Обновленные опции сортировки согласно финальному запросу
   const sortOptions = [
     { id: 'date_desc', label: 'По дате' },
     { id: 'salary_asc', label: 'По возрастанию зарплаты' },
@@ -236,7 +237,7 @@ const VacancyList = ({ vacancies, user, onDelete, onEdit, onOpenVacancy }) => {
                    </div>
                 </div>
                 {user?.role === UserRole.EMPLOYER && String(user.id) === String(job.employer_id) && (
-                  <div className="flex flex-col space-y-1 ml-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <div className="flex flex-col space-y-1 ml-4 opacity-0 group-hover:opacity-100 transition-opacity">
                     <button 
                       onClick={(e) => { e.stopPropagation(); onEdit(job.id); }} 
                       className="text-gray-400 hover:text-blue-500 p-2 transition-colors rounded-xl hover:bg-blue-50"
@@ -252,6 +253,15 @@ const VacancyList = ({ vacancies, user, onDelete, onEdit, onOpenVacancy }) => {
                       <Trash2 className="h-5 w-5" />
                     </button>
                   </div>
+                )}
+                {user?.role === UserRole.SEEKER && (
+                  <button 
+                    onClick={(e) => { e.stopPropagation(); onToggleFavorite(job.id); }}
+                    className={`ml-4 p-2 rounded-full transition-colors ${favorites.includes(job.id) ? 'text-red-500 bg-red-50' : 'text-gray-300 hover:text-red-400 hover:bg-gray-50'}`}
+                    title={favorites.includes(job.id) ? "Убрать из избранного" : "В избранное"}
+                  >
+                    <Heart className={`h-6 w-6 ${favorites.includes(job.id) ? 'fill-current' : ''}`} />
+                  </button>
                 )}
               </div>
               <div className="mt-6 flex items-center justify-between border-t border-gray-50 pt-4">

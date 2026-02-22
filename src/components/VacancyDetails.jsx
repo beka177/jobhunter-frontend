@@ -1,9 +1,9 @@
 
 import React, { useState, useEffect } from 'react';
-import { ArrowLeft, Building, Calendar, User, Pencil, Briefcase, DollarSign } from 'lucide-react';
+import { ArrowLeft, Building, Calendar, User, Pencil, Briefcase, DollarSign, Heart } from 'lucide-react';
 import { API_URL, UserRole } from '../constants';
 
-const VacancyDetails = ({ vacancyId, user, onNavigate, onEdit }) => {
+const VacancyDetails = ({ vacancyId, user, favorites = [], onToggleFavorite, onNavigate, onEdit }) => {
   const [vacancy, setVacancy] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -109,7 +109,8 @@ const VacancyDetails = ({ vacancyId, user, onNavigate, onEdit }) => {
             
             <div className="flex flex-wrap items-center gap-6">
               <div className="flex items-center text-3xl font-bold text-blue-600">
-                Зарплата: {vacancy.salary}
+                <DollarSign className="w-7 h-7 mr-1" />
+                {vacancy.salary}
               </div>
               <div className="flex items-center text-gray-600 font-medium text-lg bg-gray-50 px-4 py-1 rounded-full border border-gray-100">
                 <Building className="w-5 h-5 mr-2 text-gray-400" />
@@ -146,13 +147,26 @@ const VacancyDetails = ({ vacancyId, user, onNavigate, onEdit }) => {
 
           {/* Кнопка отклика */}
           {(!user || user.role === UserRole.SEEKER) && (
-            <div className="mt-12 flex justify-center">
+            <div className="mt-12 flex justify-center gap-4">
               <button 
                 onClick={handleApply} 
                 className="w-full md:w-auto px-12 py-5 text-xl font-black text-white bg-blue-600 rounded-2xl hover:bg-blue-700 shadow-2xl transition-all transform hover:scale-105 active:scale-95 focus:ring-4 focus:ring-blue-200"
               >
                 Откликнуться сейчас
               </button>
+              {user && (
+                <button 
+                  onClick={() => onToggleFavorite(vacancy.id)}
+                  className={`px-6 py-5 rounded-2xl border-2 transition-all transform hover:scale-105 active:scale-95 ${
+                    favorites.includes(vacancy.id) 
+                      ? 'border-red-500 bg-red-50 text-red-500' 
+                      : 'border-gray-200 text-gray-400 hover:border-red-300 hover:text-red-400'
+                  }`}
+                  title={favorites.includes(vacancy.id) ? "Убрать из избранного" : "В избранное"}
+                >
+                  <Heart className={`w-8 h-8 ${favorites.includes(vacancy.id) ? 'fill-current' : ''}`} />
+                </button>
+              )}
             </div>
           )}
           

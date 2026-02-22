@@ -15,6 +15,7 @@ import ResumeForm from './components/ResumeForm';
 import SeekerApplications from './components/SeekerApplications';
 import VacancyDetails from './components/VacancyDetails';
 import HelpPage from './components/HelpPage';
+import FavoritesList from './components/FavoritesList';
 
 function App() {
   const [currentPage, setCurrentPage] = useState('home');
@@ -24,6 +25,63 @@ function App() {
   const [loadingVacancies, setLoadingVacancies] = useState(false);
   const [isConnected, setIsConnected] = useState(false);
   const [connectionError, setConnectionError] = useState('');
+  const [favorites, setFavorites] = useState([]);
+
+  const fetchFavorites = useCallback(async (userId) => {
+    if (!userId) return;
+    try {
+      const response = await fetch(`${API_URL}/favorites.php?user_id=${userId}`);
+      if (response.ok) {
+        const data = await response.json();
+        if (Array.isArray(data)) {
+          setFavorites(data.map(item => item.id));
+        }
+      }
+    } catch (error) {
+      console.error("Ошибка загрузки избранного", error);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (user && user.role === UserRole.SEEKER) {
+      fetchFavorites(user.id);
+    } else {
+      setFavorites([]);
+    }
+  }, [user, fetchFavorites]);
+
+  const toggleFavorite = async (vacancyId) => {
+    if (!user) {
+      alert('Войдите, чтобы добавить в избранное');
+      return;
+    }
+    
+    const isFav = favorites.includes(vacancyId);
+    const method = isFav ? 'DELETE' : 'POST';
+    const url = isFav 
+      ? `${API_URL}/favorites.php?user_id=${user.id}&vacancy_id=${vacancyId}`
+      : `${API_URL}/favorites.php`;
+    
+    const body = isFav ? null : JSON.stringify({ user_id: user.id, vacancy_id: vacancyId });
+
+    try {
+      const response = await fetch(url, {
+        method,
+        headers: isFav ? {} : { 'Content-Type': 'application/json' },
+        body
+      });
+      
+      if (response.ok) {
+        if (isFav) {
+          setFavorites(prev => prev.filter(id => id !== vacancyId));
+        } else {
+          setFavorites(prev => [...prev, vacancyId]);
+        }
+      }
+    } catch (error) {
+      console.error("Ошибка обновления избранного", error);
+    }
+  };
 
   useEffect(() => {
     const savedUser = localStorage.getItem('jobhunter_user');
@@ -110,7 +168,7 @@ function App() {
           <>
             <div className="mb-8 text-center">
               <h1 className="text-4xl font-extrabold text-gray-900 tracking-tight sm:text-5xl mb-2">
-                Найди работу мечты!
+                Найди работу мечты
               </h1>
             </div>
             {loadingVacancies ? (
@@ -119,12 +177,22 @@ function App() {
               <VacancyList 
                 vacancies={vacancies} 
                 user={user} 
+                favorites={favorites}
+                onToggleFavorite={toggleFavorite}
                 onDelete={handleDeleteVacancy}
                 onEdit={handleEditVacancy}
                 onOpenVacancy={handleOpenVacancy} 
               />
             )}
           </>
+        )}
+
+        {currentPage === 'favorites' && user && user.role === UserRole.SEEKER && (
+          <FavoritesList 
+            user={user} 
+            onNavigate={setCurrentPage} 
+            onOpenVacancy={handleOpenVacancy} 
+          />
         )}
 
         {currentPage === 'my-vacancies' && user && user.role === UserRole.EMPLOYER && (
@@ -156,6 +224,8 @@ function App() {
             <VacancyDetails 
                 vacancyId={selectedVacancyId} 
                 user={user} 
+                favorites={favorites}
+                onToggleFavorite={toggleFavorite}
                 onNavigate={setCurrentPage}
                 onEdit={handleEditVacancy}
             />
