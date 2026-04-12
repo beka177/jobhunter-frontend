@@ -2,18 +2,15 @@ import React, { useState } from 'react';
 import { AlertCircle, ArrowLeft } from 'lucide-react';
 import { API_URL, UserRole } from '../constants';
 
-// Компонент формы авторизации и регистрации в зависимости от пропса isRegister
 const AuthForm = ({ isRegister = false, onSuccess, onNavigate }) => {
-  // Поля формы
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
-  const [avatar, setAvatar] = useState(''); 
+  const [avatar, setAvatar] = useState(''); // Новое поле для аватара
   const [role, setRole] = useState(UserRole.SEEKER);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  // Отправка формы: POST к auth.php?action=login|register
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
@@ -23,9 +20,8 @@ const AuthForm = ({ isRegister = false, onSuccess, onNavigate }) => {
     const body = { email, password };
     
     if (isRegister) {
-      // Если это регистрация — добавляем дополнительные поля
       body.name = name;
-      body.avatar = avatar; // Отправляем ссылку на аватар
+      body.avatar = avatar; // Отправляем аватар
       body.role = role;
     }
 
@@ -40,55 +36,46 @@ const AuthForm = ({ isRegister = false, onSuccess, onNavigate }) => {
 
       if (response.ok) {
         if (isRegister) {
-          // После регистрации предлагаем перейти на форму входа
           alert('Регистрация успешна! Теперь войдите.');
           onNavigate('login');
         } else {
-          // При успешном логине вызываем callback из App с данными пользователя
           onSuccess(data.user);
         }
       } else {
-        // Показываем сообщение об ошибке, если сервер вернул не-OK
         setError(data.message || 'Произошла ошибка');
       }
     } catch (err) {
-      // Ошибка сети или сервер не отвечает
       setError('Ошибка соединения с сервером (Backend не отвечает)');
     } finally {
       setLoading(false);
     }
   };
 
-  // Стиль для полей — принудительно белый фон, чтобы было читабельно
-  const inputStyle = { backgroundColor: '#ffffff', color: '#000000' };
-
   return (
     <div className="flex items-center justify-center min-h-[80vh] px-4 relative pt-12 md:pt-0">
-      {/* Кнопка возврата на главную */}
       <button 
         onClick={() => onNavigate('home')} 
-        className="absolute top-4 left-4 md:top-8 md:left-8 inline-flex items-center px-4 py-2 bg-white border border-blue-600 text-blue-700 rounded-md hover:bg-blue-50 transition-colors font-medium shadow-sm"
+        className="absolute top-4 left-4 md:top-8 md:left-8 inline-flex items-center px-4 py-2 bg-white dark:bg-gray-800 border border-blue-600 dark:border-blue-400 text-blue-700 dark:text-blue-300 rounded-md hover:bg-blue-50 dark:hover:bg-gray-700 transition-colors font-medium shadow-sm"
       >
         <ArrowLeft className="h-5 w-5 mr-2" /> На главную
       </button>
 
-      <div className="max-w-md w-full space-y-8 bg-white p-8 rounded-xl shadow-lg border border-gray-100 mt-8 md:mt-0">
+      <div className="max-w-md w-full space-y-8 bg-white dark:bg-gray-800 p-8 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 mt-8 md:mt-0 transition-colors">
         <div>
-          <h2 className="mt-2 text-center text-3xl font-extrabold text-gray-900 tracking-tight">
+          <h2 className="mt-2 text-center text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight">
             {isRegister ? 'Создать аккаунт' : 'Вход в систему'}
           </h2>
-          <p className="mt-2 text-center text-sm text-gray-600">
+          <p className="mt-2 text-center text-sm text-gray-600 dark:text-gray-400">
             {isRegister ? 'Уже есть аккаунт? ' : 'Нет аккаунта? '}
             <span 
               onClick={() => onNavigate(isRegister ? 'login' : 'register')}
-              className="font-bold text-blue-600 hover:text-blue-500 cursor-pointer transition-colors"
+              className="font-bold text-blue-600 dark:text-blue-400 hover:text-blue-500 dark:hover:text-blue-300 cursor-pointer transition-colors"
             >
               {isRegister ? 'Войти' : 'Зарегистрироваться'}
             </span>
           </p>
         </div>
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          {/* Показываем ошибку, если есть */}
           {error && (
             <div className="bg-red-50 border-l-4 border-red-400 p-4 rounded-r">
               <div className="flex">
@@ -103,24 +90,23 @@ const AuthForm = ({ isRegister = false, onSuccess, onNavigate }) => {
           <div className="rounded-md shadow-sm -space-y-px">
             {isRegister && (
               <>
-                {/* Если регистрация — дополнительные поля: имя и ссылка на аватар */}
                 <div>
-                  <input type="text" required value={name} onChange={e => setName(e.target.value)} style={inputStyle} className="appearance-none rounded-t-lg relative block w-full px-3 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm transition-colors bg-white" placeholder="Ваше Имя" />
+                  <input type="text" required value={name} onChange={e => setName(e.target.value)} className="appearance-none rounded-t-lg relative block w-full px-3 py-3 border border-gray-300 dark:border-gray-600 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm transition-colors bg-white dark:bg-gray-700" placeholder="Ваше Имя" />
                 </div>
                 <div>
-                  <input type="text" value={avatar} onChange={e => setAvatar(e.target.value)} style={inputStyle} className="appearance-none relative block w-full px-3 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm transition-colors bg-white" placeholder="Ссылка на фото профиля (необязательно)" />
+                  <input type="text" value={avatar} onChange={e => setAvatar(e.target.value)} className="appearance-none relative block w-full px-3 py-3 border border-gray-300 dark:border-gray-600 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm transition-colors bg-white dark:bg-gray-700" placeholder="Ссылка на фото профиля (необязательно)" />
                 </div>
               </>
             )}
             <div>
-              <input type="email" required value={email} onChange={e => setEmail(e.target.value)} style={inputStyle} className={`appearance-none relative block w-full px-3 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm transition-colors bg-white ${!isRegister && 'rounded-t-lg'}`} placeholder="Email адрес" />
+              <input type="email" required value={email} onChange={e => setEmail(e.target.value)} className={`appearance-none relative block w-full px-3 py-3 border border-gray-300 dark:border-gray-600 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm transition-colors bg-white dark:bg-gray-700 ${!isRegister && 'rounded-t-lg'}`} placeholder="Email адрес" />
             </div>
             <div>
-              <input type="password" required value={password} onChange={e => setPassword(e.target.value)} style={inputStyle} className={`appearance-none relative block w-full px-3 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm transition-colors bg-white ${!isRegister && 'rounded-b-lg'}`} placeholder="Пароль" />
+              <input type="password" required value={password} onChange={e => setPassword(e.target.value)} className={`appearance-none relative block w-full px-3 py-3 border border-gray-300 dark:border-gray-600 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm transition-colors bg-white dark:bg-gray-700 ${!isRegister && 'rounded-b-lg'}`} placeholder="Пароль" />
             </div>
             {isRegister && (
               <div>
-                <select value={role} onChange={e => setRole(e.target.value)} style={inputStyle} className="appearance-none rounded-b-lg relative block w-full px-3 py-3 border border-gray-300 text-gray-900 bg-white focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm cursor-pointer">
+                <select value={role} onChange={e => setRole(e.target.value)} className="appearance-none rounded-b-lg relative block w-full px-3 py-3 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white bg-white dark:bg-gray-700 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm cursor-pointer">
                   <option value={UserRole.SEEKER}>Я ищу работу (Соискатель)</option>
                   <option value={UserRole.EMPLOYER}>Я нанимаю (Работодатель)</option>
                 </select>

@@ -71,7 +71,7 @@ const VacancyDetails = ({ vacancyId, user, favorites = [], onToggleFavorite, onN
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
         <button 
           onClick={() => onNavigate('home')} 
-          className="inline-flex items-center px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium shadow-sm"
+          className="inline-flex items-center px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors font-medium shadow-sm"
         >
           <ArrowLeft className="h-5 w-5 mr-2" /> Назад к списку
         </button>
@@ -86,7 +86,7 @@ const VacancyDetails = ({ vacancyId, user, favorites = [], onToggleFavorite, onN
         )}
       </div>
 
-      <div className="bg-white shadow-xl rounded-3xl overflow-hidden border border-gray-100">
+      <div className="bg-white dark:bg-gray-800 shadow-xl rounded-3xl overflow-hidden border border-gray-100 dark:border-gray-700 transition-colors">
         <div className="p-8">
           {/* Изображение логотипа */}
           <div className="mb-10 flex justify-center">
@@ -94,26 +94,26 @@ const VacancyDetails = ({ vacancyId, user, favorites = [], onToggleFavorite, onN
                 <img 
                   src={vacancy.image} 
                   alt="Company Logo" 
-                  className="w-full max-w-md h-80 rounded-2xl object-cover bg-gray-50 border border-gray-100 shadow-inner" 
+                  className="w-full max-w-md h-80 rounded-2xl object-cover bg-gray-50 dark:bg-gray-700 border border-gray-100 dark:border-gray-600 shadow-inner" 
                 />
              ) : (
-                <div className="w-full max-w-md h-80 rounded-2xl bg-gray-100 flex items-center justify-center text-gray-400 border border-dashed border-gray-300">
+                <div className="w-full max-w-md h-80 rounded-2xl bg-gray-100 dark:bg-gray-700 flex items-center justify-center text-gray-400 dark:text-gray-500 border border-dashed border-gray-300 dark:border-gray-600">
                     <Building className="w-24 h-24 opacity-20" />
                 </div>
              )}
           </div>
 
           {/* Основная информация */}
-          <div className="border-b border-gray-100 pb-8 mb-8">
-            <h1 className="text-4xl font-black text-gray-900 mb-4 leading-tight">{vacancy.title}</h1>
+          <div className="border-b border-gray-100 dark:border-gray-700 pb-8 mb-8">
+            <h1 className="text-4xl font-black text-gray-900 dark:text-white mb-4 leading-tight">{vacancy.title}</h1>
             
             <div className="flex flex-wrap items-center gap-6">
-              <div className="flex items-center text-3xl font-bold text-blue-600">
+              <div className="flex items-center text-3xl font-bold text-blue-600 dark:text-blue-400">
                 <DollarSign className="w-7 h-7 mr-1" />
                 {vacancy.salary}
               </div>
-              <div className="flex items-center text-gray-600 font-medium text-lg bg-gray-50 px-4 py-1 rounded-full border border-gray-100">
-                <Building className="w-5 h-5 mr-2 text-gray-400" />
+              <div className="flex items-center text-gray-600 dark:text-gray-300 font-medium text-lg bg-gray-50 dark:bg-gray-700 px-4 py-1 rounded-full border border-gray-100 dark:border-gray-600">
+                <Building className="w-5 h-5 mr-2 text-gray-400 dark:text-gray-500" />
                 {vacancy.employer_name}
               </div>
             </div>
@@ -121,16 +121,16 @@ const VacancyDetails = ({ vacancyId, user, favorites = [], onToggleFavorite, onN
 
           {/* Детализация (Сетки и инфо-блоки) */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-10">
-            <div className="bg-blue-50 p-6 rounded-2xl border border-blue-100">
-              <h3 className="text-sm font-bold text-blue-800 uppercase tracking-wider mb-2">Дата публикации</h3>
-              <div className="flex items-center text-blue-900 font-semibold">
+            <div className="bg-blue-50 dark:bg-blue-900/30 p-6 rounded-2xl border border-blue-100 dark:border-blue-800">
+              <h3 className="text-sm font-bold text-blue-800 dark:text-blue-300 uppercase tracking-wider mb-2">Дата публикации</h3>
+              <div className="flex items-center text-blue-900 dark:text-blue-100 font-semibold">
                 <Calendar className="w-5 h-5 mr-2 opacity-70" />
                 {new Date(vacancy.created_at).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' })}
               </div>
             </div>
-            <div className="bg-emerald-50 p-6 rounded-2xl border border-emerald-100">
-              <h3 className="text-sm font-bold text-emerald-800 uppercase tracking-wider mb-2">Тип занятости</h3>
-              <div className="flex items-center text-emerald-900 font-semibold">
+            <div className="bg-emerald-50 dark:bg-emerald-900/30 p-6 rounded-2xl border border-emerald-100 dark:border-emerald-800">
+              <h3 className="text-sm font-bold text-emerald-800 dark:text-emerald-300 uppercase tracking-wider mb-2">Тип занятости</h3>
+              <div className="flex items-center text-emerald-900 dark:text-emerald-100 font-semibold">
                 <Briefcase className="w-5 h-5 mr-2 opacity-70" />
                 Полная занятость
               </div>
@@ -139,8 +139,8 @@ const VacancyDetails = ({ vacancyId, user, favorites = [], onToggleFavorite, onN
 
           {/* Описание вакансии */}
           <div className="prose prose-blue max-w-none">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">Описание вакансии</h2>
-            <div className="text-gray-700 text-lg leading-relaxed whitespace-pre-line bg-gray-50 p-6 rounded-2xl border border-gray-100">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Описание вакансии</h2>
+            <div className="text-gray-700 dark:text-gray-300 text-lg leading-relaxed whitespace-pre-line bg-gray-50 dark:bg-gray-700 p-6 rounded-2xl border border-gray-100 dark:border-gray-600">
               {vacancy.description}
             </div>
           </div>
@@ -159,8 +159,8 @@ const VacancyDetails = ({ vacancyId, user, favorites = [], onToggleFavorite, onN
                   onClick={() => onToggleFavorite(vacancy.id)}
                   className={`px-6 py-5 rounded-2xl border-2 transition-all transform hover:scale-105 active:scale-95 ${
                     favorites.includes(vacancy.id) 
-                      ? 'border-red-500 bg-red-50 text-red-500' 
-                      : 'border-gray-200 text-gray-400 hover:border-red-300 hover:text-red-400'
+                      ? 'border-red-500 bg-red-50 dark:bg-red-900/30 text-red-500' 
+                      : 'border-gray-200 dark:border-gray-600 text-gray-400 dark:text-gray-500 hover:border-red-300 dark:hover:border-red-400 hover:text-red-400'
                   }`}
                   title={favorites.includes(vacancy.id) ? "Убрать из избранного" : "В избранное"}
                 >
@@ -171,7 +171,7 @@ const VacancyDetails = ({ vacancyId, user, favorites = [], onToggleFavorite, onN
           )}
           
           {user && user.role === UserRole.EMPLOYER && !isOwner && (
-             <div className="mt-12 p-4 bg-yellow-50 border border-yellow-200 rounded-xl text-yellow-800 text-center font-medium">
+             <div className="mt-12 p-4 bg-yellow-50 dark:bg-yellow-900/30 border border-yellow-200 dark:border-yellow-800 rounded-xl text-yellow-800 dark:text-yellow-200 text-center font-medium">
                Вы вошли как работодатель. Отклики доступны только соискателям.
              </div>
           )}

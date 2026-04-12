@@ -16,6 +16,8 @@ import SeekerApplications from './components/SeekerApplications';
 import VacancyDetails from './components/VacancyDetails';
 import HelpPage from './components/HelpPage';
 import FavoritesList from './components/FavoritesList';
+import EditProfileForm from './components/EditProfileForm';
+import AdminPanel from './components/AdminPanel';
 
 function App() {
   const [currentPage, setCurrentPage] = useState('home');
@@ -84,7 +86,7 @@ function App() {
   };
 
   useEffect(() => {
-    const savedUser = localStorage.getItem('jobhunter_user');
+    const savedUser = localStorage.getItem('jobsearch_user');
     if (savedUser) {
       try {
         const parsedUser = JSON.parse(savedUser);
@@ -121,16 +123,22 @@ function App() {
   }, [fetchVacancies]);
 
   const handleLoginSuccess = (userData) => {
-    localStorage.setItem('jobhunter_user', JSON.stringify(userData));
+    localStorage.setItem('jobsearch_user', JSON.stringify(userData));
     setUser(userData);
     setCurrentPage('home');
     fetchVacancies();
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('jobhunter_user');
+    localStorage.removeItem('jobsearch_user');
     setUser(null);
     setCurrentPage('login');
+  };
+
+  const handleUpdateProfile = (updatedUser) => {
+    localStorage.setItem('jobsearch_user', JSON.stringify(updatedUser));
+    setUser(updatedUser);
+    setCurrentPage('home'); // Or stay on profile page? Let's go home for now or maybe stay.
   };
 
   const handleDeleteVacancy = async (id) => {
@@ -153,12 +161,12 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col font-sans text-gray-900">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col font-sans text-gray-900 dark:text-gray-100 transition-colors duration-200">
       <Navbar user={user} onLogout={handleLogout} onNavigate={setCurrentPage} />
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full flex-grow">
         {!isConnected && currentPage === 'home' && (
-           <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-6">
+           <div className="bg-red-100 dark:bg-red-900/30 border border-red-400 dark:border-red-800/50 text-red-700 dark:text-red-400 px-4 py-3 rounded relative mb-6">
             <strong className="font-bold">Нет связи с сервером!</strong>
             <span className="block sm:inline"> Проверьте OSPanel.</span>
           </div>
@@ -167,12 +175,12 @@ function App() {
         {currentPage === 'home' && (
           <>
             <div className="mb-8 text-center">
-              <h1 className="text-4xl font-extrabold text-gray-900 tracking-tight sm:text-5xl mb-2">
+              <h1 className="text-4xl font-extrabold text-gray-900 dark:text-white tracking-tight sm:text-5xl mb-2">
                 Найди работу мечты
               </h1>
             </div>
             {loadingVacancies ? (
-              <div className="text-center py-10">Загрузка...</div>
+              <div className="text-center py-10 dark:text-gray-400">Загрузка...</div>
             ) : (
               <VacancyList 
                 vacancies={vacancies} 
@@ -200,14 +208,14 @@ function App() {
             <div className="flex items-center mb-8">
               <button 
                 onClick={() => setCurrentPage('home')} 
-                className="mr-4 p-2 hover:bg-white rounded-full transition-colors text-blue-600"
+                className="mr-4 p-2 hover:bg-white dark:hover:bg-gray-800 rounded-full transition-colors text-blue-600 dark:text-blue-400"
               >
                 <ArrowLeft className="h-6 w-6" />
               </button>
-              <h1 className="text-3xl font-extrabold text-gray-900">Мои опубликованные вакансии</h1>
+              <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white">Мои опубликованные вакансии</h1>
             </div>
             {loadingVacancies ? (
-              <div className="text-center py-10">Загрузка...</div>
+              <div className="text-center py-10 dark:text-gray-400">Загрузка...</div>
             ) : (
               <VacancyList 
                 vacancies={vacancies.filter(v => String(v.employer_id) === String(user.id))} 
@@ -234,8 +242,21 @@ function App() {
         {currentPage === 'edit-vacancy' && selectedVacancyId && (
             <EditVacancyForm 
                 vacancyId={selectedVacancyId} 
-                onSuccess={() => { setCurrentPage('my-vacancies'); fetchVacancies(); }} 
-                onCancel={() => setCurrentPage('my-vacancies')} 
+                onSuccess={() => { 
+                  if (user?.role === UserRole.ADMIN) {
+                    setCurrentPage('admin-panel');
+                  } else {
+                    setCurrentPage('my-vacancies'); 
+                  }
+                  fetchVacancies(); 
+                }} 
+                onCancel={() => {
+                  if (user?.role === UserRole.ADMIN) {
+                    setCurrentPage('admin-panel');
+                  } else {
+                    setCurrentPage('my-vacancies'); 
+                  }
+                }} 
             />
         )}
 
@@ -246,6 +267,18 @@ function App() {
         {currentPage === 'login' && <AuthForm onSuccess={handleLoginSuccess} onNavigate={setCurrentPage} />}
         {currentPage === 'register' && <AuthForm isRegister onSuccess={handleLoginSuccess} onNavigate={setCurrentPage} />}
         
+        {currentPage === 'edit-profile' && user && (
+          <EditProfileForm 
+            user={user} 
+            onUpdate={handleUpdateProfile} 
+            onCancel={() => setCurrentPage('home')} 
+          />
+        )}
+
+        {currentPage === 'admin-panel' && user && user.role === UserRole.ADMIN && (
+          <AdminPanel user={user} onNavigate={setCurrentPage} onEditVacancy={handleEditVacancy} />
+        )}
+
         {currentPage === 'create-vacancy' && user && user.role === UserRole.EMPLOYER && (
           <CreateVacancyForm user={user} onSuccess={() => { setCurrentPage('my-vacancies'); fetchVacancies(); }} onCancel={() => setCurrentPage('home')} />
         )}

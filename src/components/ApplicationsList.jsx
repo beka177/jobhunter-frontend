@@ -2,13 +2,11 @@ import React, { useEffect, useState } from 'react';
 import { FileText, User, Mail, Calendar, CheckCircle, XCircle, Clock, ArrowLeft, Eye, X, GraduationCap, MapPin, Phone, Globe } from 'lucide-react';
 import { API_URL, UserRole } from '../constants';
 
-// Компонент для работодателя: список откликов на вакансии
 const ApplicationsList = ({ user, onNavigate }) => {
   const [applications, setApplications] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [selectedApp, setSelectedApp] = useState(null); 
+  const [selectedApp, setSelectedApp] = useState(null);
 
-  // При монтировании компонента загружаем отклики только если пользователь — работодатель
   useEffect(() => {
     if (!user || user.role !== UserRole.EMPLOYER) {
       setLoading(false);
@@ -17,7 +15,6 @@ const ApplicationsList = ({ user, onNavigate }) => {
     fetchApplications();
   }, [user]);
 
-  // Запрос списка откликов для конкретного работодателя
   const fetchApplications = async () => {
     try {
       const response = await fetch(`${API_URL}/applications.php?employer_id=${user.id}`);
@@ -32,7 +29,6 @@ const ApplicationsList = ({ user, onNavigate }) => {
     }
   };
 
-  // Изменение статуса отклика (PATCH)
   const handleStatusChange = async (appId, newStatus) => {
     try {
       const response = await fetch(`${API_URL}/applications.php`, {
@@ -42,7 +38,6 @@ const ApplicationsList = ({ user, onNavigate }) => {
       });
       
       if (response.ok) {
-        // Обновляем статус локально, чтобы UI сразу отразил изменения
         setApplications(prev => prev.map(app => 
           app.id === appId ? { ...app, status: newStatus } : app
         ));
@@ -58,7 +53,6 @@ const ApplicationsList = ({ user, onNavigate }) => {
     }
   };
 
-  // Если пользователь не авторизован или не работодатель — ничего не показываем
   if (!user || user.role !== UserRole.EMPLOYER) {
     return null;
   }
@@ -69,65 +63,63 @@ const ApplicationsList = ({ user, onNavigate }) => {
     <div className="space-y-6 mt-6 max-w-7xl mx-auto">
        <button 
         onClick={() => onNavigate('home')} 
-        className="inline-flex items-center px-4 py-2 bg-white border border-blue-600 text-blue-700 rounded-md hover:bg-blue-50 transition-colors font-medium shadow-sm mb-4"
+        className="inline-flex items-center px-4 py-2 bg-white dark:bg-gray-800 border border-blue-600 dark:border-blue-500 text-blue-700 dark:text-blue-400 rounded-md hover:bg-blue-50 dark:hover:bg-gray-700 transition-colors font-medium shadow-sm mb-4"
       >
         <ArrowLeft className="h-5 w-5 mr-2" /> Назад
       </button>
 
-      <h2 className="text-3xl font-extrabold text-gray-900 mb-6">Отклики на ваши вакансии</h2>
+      <h2 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-6">Отклики на ваши вакансии</h2>
       
       {applications.length === 0 ? (
-         // Если откликов нет — показываем заглушку
-         <div className="text-center py-16 bg-white rounded-xl shadow-sm border border-gray-100 mt-6">
-          <FileText className="mx-auto h-16 w-16 text-gray-300" />
-          <h3 className="mt-4 text-lg font-medium text-gray-900">Нет откликов</h3>
-          <p className="mt-2 text-gray-500">Пока никто не откликнулся на ваши вакансии.</p>
+         <div className="text-center py-16 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 mt-6">
+          <FileText className="mx-auto h-16 w-16 text-gray-300 dark:text-gray-600" />
+          <h3 className="mt-4 text-lg font-medium text-gray-900 dark:text-white">Нет откликов</h3>
+          <p className="mt-2 text-gray-500 dark:text-gray-400">Пока никто не откликнулся на ваши вакансии.</p>
         </div>
       ) : (
-        // Иначе выводим список откликов
-        <div className="bg-white shadow overflow-hidden sm:rounded-md border border-gray-200">
-          <ul className="divide-y divide-gray-200">
+        <div className="bg-white dark:bg-gray-800 shadow overflow-hidden sm:rounded-md border border-gray-200 dark:border-gray-700">
+          <ul className="divide-y divide-gray-200 dark:divide-gray-700">
             {applications.map((app) => (
-              <li key={app.id} className="hover:bg-blue-50 transition-colors">
+              <li key={app.id} className="hover:bg-blue-50 dark:hover:bg-gray-700/50 transition-colors">
                 <div className="px-6 py-6 sm:px-8">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
+                      {/* АВАТАР В СПИСКЕ */}
                       {app.avatar ? (
-                        <img src={app.avatar} alt="Avatar" className="w-10 h-10 rounded-full object-cover border border-gray-200" />
+                        <img src={app.avatar} alt="Avatar" className="w-10 h-10 rounded-full object-cover border border-gray-200 dark:border-gray-700" />
                       ) : (
-                        <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-500">
+                        <div className="w-10 h-10 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-gray-500 dark:text-gray-400">
                             <User className="w-6 h-6" />
                         </div>
                       )}
                       
                       <div>
-                        <p className="text-lg font-bold text-blue-700 truncate">{app.vacancy_title}</p>
-                        <p className="text-sm text-gray-500 mt-1">Кандидат: <span className="font-semibold text-gray-900">{app.seeker_name}</span></p>
+                        <p className="text-lg font-bold text-blue-700 dark:text-blue-400 truncate">{app.vacancy_title}</p>
+                        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Кандидат: <span className="font-semibold text-gray-900 dark:text-white">{app.seeker_name}</span></p>
                       </div>
                     </div>
 
                     <div className="flex-shrink-0 flex items-center">
-                      {app.status === 'pending' && <span className="px-3 py-1 inline-flex text-sm leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800"><Clock className="w-4 h-4 mr-1.5"/> Ожидает</span>}
-                      {app.status === 'accepted' && <span className="px-3 py-1 inline-flex text-sm leading-5 font-semibold rounded-full bg-green-100 text-green-800"><CheckCircle className="w-4 h-4 mr-1.5"/> Принят</span>}
-                      {app.status === 'rejected' && <span className="px-3 py-1 inline-flex text-sm leading-5 font-semibold rounded-full bg-red-100 text-red-800"><XCircle className="w-4 h-4 mr-1.5"/> Отклонен</span>}
+                      {app.status === 'pending' && <span className="px-3 py-1 inline-flex text-sm leading-5 font-semibold rounded-full bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-400"><Clock className="w-4 h-4 mr-1.5"/> Ожидает</span>}
+                      {app.status === 'accepted' && <span className="px-3 py-1 inline-flex text-sm leading-5 font-semibold rounded-full bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400"><CheckCircle className="w-4 h-4 mr-1.5"/> Принят</span>}
+                      {app.status === 'rejected' && <span className="px-3 py-1 inline-flex text-sm leading-5 font-semibold rounded-full bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-400"><XCircle className="w-4 h-4 mr-1.5"/> Отклонен</span>}
                     </div>
                   </div>
                   
                   <div className="mt-4 flex items-center justify-between">
-                    <div className="flex items-center text-sm text-gray-500">
-                      <Calendar className="flex-shrink-0 mr-1.5 h-4 w-4 text-gray-400" />
+                    <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
+                      <Calendar className="flex-shrink-0 mr-1.5 h-4 w-4 text-gray-400 dark:text-gray-500" />
                       <p>Дата отклика: {new Date(app.created_at).toLocaleDateString()}</p>
                     </div>
 
                     <div className="flex space-x-3">
                       <button
                         onClick={() => setSelectedApp(app)}
-                        className="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+                        className="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 shadow-sm text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700"
                       >
                         <Eye className="w-4 h-4 mr-2" />
                         Посмотреть резюме
                       </button>
-
 
                       {app.status === 'pending' && (
                         <>
@@ -154,54 +146,53 @@ const ApplicationsList = ({ user, onNavigate }) => {
         </div>
       )}
 
-      {/* Модальное окно с подробным резюме выбранного кандидата */}
       {selectedApp && (
         <div className="fixed inset-0 z-50 overflow-y-auto">
           <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-            <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" onClick={() => setSelectedApp(null)}></div>
+            <div className="fixed inset-0 bg-gray-500 dark:bg-gray-900 bg-opacity-75 dark:bg-opacity-80 transition-opacity" onClick={() => setSelectedApp(null)}></div>
             <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-            <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full">
-              <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                <div className="flex justify-between items-start mb-4 border-b pb-4">
-                  <h3 className="text-2xl font-bold text-gray-900">Резюме кандидата</h3>
-                  <button onClick={() => setSelectedApp(null)} className="text-gray-400 hover:text-gray-500">
+            <div className="inline-block align-bottom bg-white dark:bg-gray-800 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full">
+              <div className="bg-white dark:bg-gray-800 px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                <div className="flex justify-between items-start mb-4 border-b dark:border-gray-700 pb-4">
+                  <h3 className="text-2xl font-bold text-gray-900 dark:text-white">Резюме кандидата</h3>
+                  <button onClick={() => setSelectedApp(null)} className="text-gray-400 hover:text-gray-500 dark:hover:text-gray-300">
                     <X className="h-6 w-6" />
                   </button>
                 </div>
                 
                 <div className="space-y-4">
                   <div className="flex items-center space-x-4">
-                    {/* Аватар в модальном окне */}
+                    {/* АВАТАР В МОДАЛЬНОМ ОКНЕ */}
                     {selectedApp.avatar ? (
-                        <img src={selectedApp.avatar} alt="Avatar" className="h-16 w-16 rounded-full object-cover border border-blue-100" />
+                        <img src={selectedApp.avatar} alt="Avatar" className="h-16 w-16 rounded-full object-cover border border-blue-100 dark:border-blue-900/50" />
                     ) : (
-                        <div className="h-16 w-16 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold text-xl">
+                        <div className="h-16 w-16 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-400 font-bold text-xl">
                             {(selectedApp.seeker_name || 'U').charAt(0).toUpperCase()}
                         </div>
                     )}
                     
                     <div>
-                      <p className="text-xl font-bold">{selectedApp.surname} {selectedApp.first_name}</p>
-                      <p className="text-sm text-gray-500">{selectedApp.seeker_email}</p>
+                      <p className="text-xl font-bold dark:text-white">{selectedApp.surname} {selectedApp.first_name}</p>
+                      <p className="text-sm text-gray-500 dark:text-gray-400">{selectedApp.seeker_email}</p>
                     </div>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-                     <div className="bg-gray-50 p-3 rounded">
-                        <span className="text-xs text-gray-500 block">Желаемая должность</span>
-                        <span className="font-semibold text-gray-900">{selectedApp.profession || 'Не указана'}</span>
+                     <div className="bg-gray-50 dark:bg-gray-700/50 p-3 rounded">
+                        <span className="text-xs text-gray-500 dark:text-gray-400 block">Желаемая должность</span>
+                        <span className="font-semibold text-gray-900 dark:text-white">{selectedApp.profession || 'Не указана'}</span>
                      </div>
-                     <div className="bg-gray-50 p-3 rounded">
-                        <span className="text-xs text-gray-500 block">Город</span>
-                        <span className="font-semibold text-gray-900 flex items-center">
+                     <div className="bg-gray-50 dark:bg-gray-700/50 p-3 rounded">
+                        <span className="text-xs text-gray-500 dark:text-gray-400 block">Город</span>
+                        <span className="font-semibold text-gray-900 dark:text-white flex items-center">
                            <MapPin className="w-3 h-3 mr-1" /> {selectedApp.city || 'Не указан'}
                         </span>
                      </div>
                   </div>
 
-                  <div className="border-t pt-4">
-                    <h4 className="font-bold text-gray-800 flex items-center mb-2"><User className="w-4 h-4 mr-2" /> Личные данные</h4>
-                    <div className="grid grid-cols-2 gap-y-2 text-sm text-gray-700">
+                  <div className="border-t dark:border-gray-700 pt-4">
+                    <h4 className="font-bold text-gray-800 dark:text-gray-200 flex items-center mb-2"><User className="w-4 h-4 mr-2" /> Личные данные</h4>
+                    <div className="grid grid-cols-2 gap-y-2 text-sm text-gray-700 dark:text-gray-300">
                         <p>Пол: <span className="font-medium">{selectedApp.gender === 'male' ? 'Мужской' : 'Женский'}</span></p>
                         <p>Дата рождения: <span className="font-medium">{selectedApp.birthday || '-'}</span></p>
                         <p>Гражданство: <span className="font-medium">{selectedApp.citizenship || '-'}</span></p>
@@ -209,21 +200,21 @@ const ApplicationsList = ({ user, onNavigate }) => {
                     </div>
                   </div>
 
-                  <div className="border-t pt-4">
-                    <h4 className="font-bold text-gray-800 flex items-center mb-2"><GraduationCap className="w-4 h-4 mr-2" /> Образование</h4>
-                    <p className="text-sm text-gray-700"><span className="font-semibold">{selectedApp.education_level}</span></p>
-                    <p className="text-sm text-gray-600">{selectedApp.education_institution}</p>
-                    <p className="text-sm text-gray-500">{selectedApp.education_faculty}</p>
+                  <div className="border-t dark:border-gray-700 pt-4">
+                    <h4 className="font-bold text-gray-800 dark:text-gray-200 flex items-center mb-2"><GraduationCap className="w-4 h-4 mr-2" /> Образование</h4>
+                    <p className="text-sm text-gray-700 dark:text-gray-300"><span className="font-semibold">{selectedApp.education_level}</span></p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">{selectedApp.education_institution}</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">{selectedApp.education_faculty}</p>
                   </div>
 
-                  <div className="border-t pt-4">
-                    <h4 className="font-bold text-gray-800 flex items-center mb-2"><Globe className="w-4 h-4 mr-2" /> Навыки</h4>
-                    <div className="bg-gray-50 p-3 rounded text-sm text-gray-700 border border-gray-100">{selectedApp.skills || 'Навыки не указаны'}</div>
+                  <div className="border-t dark:border-gray-700 pt-4">
+                    <h4 className="font-bold text-gray-800 dark:text-gray-200 flex items-center mb-2"><Globe className="w-4 h-4 mr-2" /> Навыки</h4>
+                    <div className="bg-gray-50 dark:bg-gray-700/50 p-3 rounded text-sm text-gray-700 dark:text-gray-300 border border-gray-100 dark:border-gray-600">{selectedApp.skills || 'Навыки не указаны'}</div>
                   </div>
                 </div>
               </div>
-              <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                <button type="button" className="w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 sm:ml-3 sm:w-auto sm:text-sm" onClick={() => setSelectedApp(null)}>Закрыть</button>
+              <div className="bg-gray-50 dark:bg-gray-800/50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse border-t dark:border-gray-700">
+                <button type="button" className="w-full inline-flex justify-center rounded-md border border-gray-300 dark:border-gray-600 shadow-sm px-4 py-2 bg-white dark:bg-gray-800 text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 sm:ml-3 sm:w-auto sm:text-sm" onClick={() => setSelectedApp(null)}>Закрыть</button>
               </div>
             </div>
           </div>
