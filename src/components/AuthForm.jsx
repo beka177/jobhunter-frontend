@@ -54,7 +54,7 @@ const AuthForm = ({ isRegister = false, onSuccess, onNavigate }) => {
   return (
     <div className="flex items-center justify-center min-h-[80vh] px-4 relative pt-12 md:pt-0">
       <button 
-        onClick={() => onNavigate('home')} 
+        onClick={() => onNavigate('landing')} 
         className="absolute top-4 left-4 md:top-8 md:left-8 inline-flex items-center px-4 py-2 bg-white dark:bg-gray-800 border border-blue-600 dark:border-blue-400 text-blue-700 dark:text-blue-300 rounded-md hover:bg-blue-50 dark:hover:bg-gray-700 transition-colors font-medium shadow-sm"
       >
         <ArrowLeft className="h-5 w-5 mr-2" /> На главную

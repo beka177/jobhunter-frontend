@@ -1,10 +1,13 @@
 
 import React, { useState, useEffect } from 'react';
-import { Briefcase, Plus, LogOut, User, FileText, Bell, HelpCircle, List, Heart, ShieldAlert, Moon, Sun } from 'lucide-react';
+import { Briefcase, Plus, LogOut, User, FileText, Bell, HelpCircle, List, Heart, ShieldAlert, Moon, Sun, MapPin } from 'lucide-react';
 import { UserRole } from '../constants';
 
-const Navbar = ({ user, onLogout, onNavigate }) => {
+const CITIES = ['Астана', 'Алматы', 'Шымкент', 'Караганда', 'Актобе', 'Тараз', 'Павлодар', 'Оскемен', 'Семей', 'Все города'];
+
+const Navbar = ({ user, onLogout, onNavigate, globalCity, onCityChange }) => {
   const [isDark, setIsDark] = useState(false);
+  const [isCityDropdownOpen, setIsCityDropdownOpen] = useState(false);
 
   useEffect(() => {
     if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
@@ -40,6 +43,38 @@ const Navbar = ({ user, onLogout, onNavigate }) => {
 
           {/* Меню */}
           <div className="flex items-center space-x-3">
+            {/* Выбор города */}
+            <div className="relative hidden sm:block">
+              <button
+                onClick={() => setIsCityDropdownOpen(!isCityDropdownOpen)}
+                className="flex items-center px-3 py-2 rounded-md text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                title="Ваш город"
+              >
+                <MapPin className="h-5 w-5 mr-1" />
+                <span className="max-w-[100px] truncate">{globalCity === 'Все города' || !globalCity ? 'Все города' : globalCity}</span>
+              </button>
+              
+              {isCityDropdownOpen && (
+                <>
+                  <div className="fixed inset-0 z-40" onClick={() => setIsCityDropdownOpen(false)}></div>
+                  <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg border border-gray-100 dark:border-gray-700 z-50 py-1">
+                    {CITIES.map(c => (
+                      <button
+                        key={c}
+                        onClick={() => {
+                          onCityChange(c === 'Все города' ? '' : c);
+                          setIsCityDropdownOpen(false);
+                        }}
+                        className={`w-full text-left px-4 py-2 text-sm ${globalCity === c || (c === 'Все города' && !globalCity) ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'} transition-colors`}
+                      >
+                        {c}
+                      </button>
+                    ))}
+                  </div>
+                </>
+              )}
+            </div>
+
             {/* Переключатель темы */}
             <button
               onClick={toggleDarkMode}

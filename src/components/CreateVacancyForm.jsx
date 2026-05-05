@@ -4,6 +4,7 @@ import { API_URL } from '../constants';
 const CreateVacancyForm = ({ user, onSuccess, onCancel }) => {
   const [title, setTitle] = useState('');
   const [salary, setSalary] = useState('');
+  const [city, setCity] = useState(''); 
   const [description, setDescription] = useState('');
   const [image, setImage] = useState(''); // Новое поле для картинки
   const [loading, setLoading] = useState(false);
@@ -18,6 +19,7 @@ const CreateVacancyForm = ({ user, onSuccess, onCancel }) => {
         body: JSON.stringify({
           employer_id: user.id,
           title,
+          city,
           salary,
           description,
           image // Отправляем картинку
@@ -44,6 +46,10 @@ const CreateVacancyForm = ({ user, onSuccess, onCancel }) => {
         <div>
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Название должности</label>
           <input type="text" required value={title} onChange={e => setTitle(e.target.value)} className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-blue-500 focus:ring-blue-500 border p-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors" placeholder="Например: PHP Разработчик" />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Город</label>
+          <input type="text" value={city} onChange={e => setCity(e.target.value)} className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-blue-500 focus:ring-blue-500 border p-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors" placeholder="Например: Астана" />
         </div>
         <div>
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Ссылка на логотип/картинку (необязательно)</label>

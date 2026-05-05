@@ -3,7 +3,7 @@ import React, { useState, useMemo } from 'react';
 import { Trash2, Briefcase, Filter, X, Pencil, ChevronDown, Check, ChevronsUpDown, Heart } from 'lucide-react';
 import { UserRole, API_URL } from '../constants';
 
-const VacancyList = ({ vacancies, user, favorites = [], onToggleFavorite, onDelete, onEdit, onOpenVacancy }) => {
+const VacancyList = ({ vacancies, user, favorites = [], onToggleFavorite, onDelete, onEdit, onOpenVacancy, globalCity }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [minSalary, setMinSalary] = useState('');
   const [keywords, setKeywords] = useState('');
@@ -58,9 +58,11 @@ const VacancyList = ({ vacancies, user, favorites = [], onToggleFavorite, onDele
         else if (period === 'three_days') matchesPeriod = diffDays <= 3;
       }
 
-      return matchesTitle && matchesKeywords && matchesSalary && matchesPeriod;
+      const matchesCity = !globalCity || job.city === globalCity || !job.city;
+
+      return matchesTitle && matchesKeywords && matchesSalary && matchesPeriod && matchesCity;
     });
-  }, [vacancies, searchTerm, keywords, minSalary, period]);
+  }, [vacancies, searchTerm, keywords, minSalary, period, globalCity]);
 
   const sortedVacancies = useMemo(() => {
     const list = [...filteredVacancies];

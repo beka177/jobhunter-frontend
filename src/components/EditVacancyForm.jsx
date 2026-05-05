@@ -5,6 +5,7 @@ import { API_URL } from '../constants';
 const EditVacancyForm = ({ vacancyId, onSuccess, onCancel }) => {
   const [title, setTitle] = useState('');
   const [salary, setSalary] = useState('');
+  const [city, setCity] = useState('');
   const [description, setDescription] = useState('');
   const [image, setImage] = useState('');
   const [loading, setLoading] = useState(true);
@@ -18,6 +19,7 @@ const EditVacancyForm = ({ vacancyId, onSuccess, onCancel }) => {
           const data = await response.json();
           setTitle(data.title);
           setSalary(data.salary);
+          setCity(data.city || '');
           setDescription(data.description);
           setImage(data.image || '');
         }
@@ -41,6 +43,7 @@ const EditVacancyForm = ({ vacancyId, onSuccess, onCancel }) => {
         body: JSON.stringify({
           id: vacancyId,
           title,
+          city,
           salary,
           description,
           image
@@ -97,6 +100,17 @@ const EditVacancyForm = ({ vacancyId, onSuccess, onCancel }) => {
             onChange={e => setTitle(e.target.value)} 
             className="block w-full rounded-xl border-gray-300 dark:border-gray-600 shadow-sm focus:border-blue-500 focus:ring-blue-500 border p-4 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white font-medium transition-all" 
             placeholder="Напр: Ведущий дизайнер"
+          />
+        </div>
+        
+        <div>
+          <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 uppercase tracking-wide">Город</label>
+          <input 
+            type="text" 
+            value={city} 
+            onChange={e => setCity(e.target.value)} 
+            className="block w-full rounded-xl border-gray-300 dark:border-gray-600 shadow-sm focus:border-blue-500 focus:ring-blue-500 border p-4 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white font-medium transition-all" 
+            placeholder="Напр: Алматы"
           />
         </div>
         
