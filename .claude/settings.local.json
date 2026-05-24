@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(Get-ChildItem -Path \"c:\\\\Users\\\\user\\\\Desktop\\\\VISUAL2\\\\course\\\\jobhunter-Seitkali\" -Force)",
+      "Bash(Select-Object Name, PSIsContainer)",
+      "Bash(Get-ChildItem -Path \"c:\\\\OSPanel\\\\domains\\\\jobsearch\" -Force)",
+      "PowerShell(Test-Path \"c:\\\\Users\\\\user\\\\Desktop\\\\VISUAL2\\\\course\\\\jobhunter-Seitkali\"; ls \"c:\\\\Users\\\\user\\\\Desktop\\\\VISUAL2\\\\course\\\\jobhunter-Seitkali\" | ForEach-Object { $_.Name })",
+      "Bash(grep -E \"\\\\.\\(html|js|json|md\\)$\")"
+    ]
+  }
+}
