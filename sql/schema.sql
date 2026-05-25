@@ -70,6 +70,7 @@ CREATE TABLE `messages` (
   `conversation_id` int NOT NULL,
   `sender_id` int NOT NULL,
   `body` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `type` enum('text','system') DEFAULT 'text',
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   KEY `idx_conv` (`conversation_id`,`created_at`),

@@ -32,6 +32,26 @@ const ApplicationsList = ({ user, onNavigate, onOpenChat }) => {
     }
   };
 
+  const notifyChat = async (app, newStatus) => {
+    const body = newStatus === 'accepted'
+      ? `Ваш отклик на вакансию «${app.vacancy_title}» принят. Поздравляем!`
+      : `К сожалению, ваш отклик на вакансию «${app.vacancy_title}» отклонён.`;
+    try {
+      await fetch(`${API_URL}/messages.php?action=start`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          seeker_id: app.seeker_id,
+          employer_id: user.id,
+          vacancy_id: app.vacancy_id,
+          sender_id: user.id,
+          body,
+          type: 'system',
+        }),
+      });
+    } catch (e) { /* silent — не критично */ }
+  };
+
   const handleStatusChange = async (appId, newStatus) => {
     if (updatingId) return;
     setUpdatingId(appId);
@@ -46,9 +66,11 @@ const ApplicationsList = ({ user, onNavigate, onOpenChat }) => {
         setApplications(prev => prev.map(app =>
           app.id === appId ? { ...app, status: newStatus } : app
         ));
+        const targetApp = applications.find(a => a.id === appId);
         if (selectedApp && selectedApp.id === appId) {
           setSelectedApp(prev => ({ ...prev, status: newStatus }));
         }
+        if (targetApp) notifyChat(targetApp, newStatus);
         toast.success(newStatus === 'accepted' ? 'Кандидат принят' : 'Отклик отклонён');
       } else {
         const err = await response.json().catch(() => ({}));

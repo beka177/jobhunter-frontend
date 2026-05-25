@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { Search, MapPin, User, GraduationCap, Globe, X, Phone, Mail, Briefcase, MessageCircle } from 'lucide-react';
+import { Search, MapPin, User, GraduationCap, Globe, X, Phone, Mail, Briefcase, MessageCircle, ArrowUpDown } from 'lucide-react';
 import { useDebounce } from '../hooks.js';
 import { UserRole } from '../constants';
 
@@ -10,26 +10,55 @@ const SeekerList = ({ seekers, globalCity, user, onOpenChat }) => {
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
   const [eduLevel, setEduLevel] = useState('');
   const [genderFilter, setGenderFilter] = useState('');
+  const [citizenshipFilter, setCitizenshipFilter] = useState('');
+  const [workPermitFilter, setWorkPermitFilter] = useState('');
+  const [withResumeOnly, setWithResumeOnly] = useState(false);
+  const [sortBy, setSortBy] = useState('default');
 
   const debouncedSearch = useDebounce(searchTerm, 250);
 
+  const filtersActive = !!(eduLevel || genderFilter || citizenshipFilter || workPermitFilter || withResumeOnly);
+
+  const handleResetFilters = () => {
+    setEduLevel('');
+    setGenderFilter('');
+    setCitizenshipFilter('');
+    setWorkPermitFilter('');
+    setWithResumeOnly(false);
+  };
+
   const filteredSeekers = useMemo(() => {
-    return seekers.filter(s => {
+    const filtered = seekers.filter(s => {
       const searchStr = `${s.profession || ''} ${s.name || ''} ${s.first_name || ''} ${s.surname || ''} ${s.skills || ''} ${s.city || ''}`.toLowerCase();
       const matchesSearch = searchStr.includes(debouncedSearch.toLowerCase());
       const matchesCity = !globalCity || s.city === globalCity || !s.city;
       const matchesEdu = !eduLevel || s.education_level === eduLevel;
       const matchesGender = !genderFilter || s.gender === genderFilter;
-      return matchesSearch && matchesCity && matchesEdu && matchesGender;
+      const matchesCitizenship = !citizenshipFilter || s.citizenship === citizenshipFilter;
+      const matchesWorkPermit = !workPermitFilter || s.work_permit === workPermitFilter;
+      const matchesResume = !withResumeOnly || !!s.profession;
+      return matchesSearch && matchesCity && matchesEdu && matchesGender
+          && matchesCitizenship && matchesWorkPermit && matchesResume;
     });
-  }, [seekers, debouncedSearch, globalCity, eduLevel, genderFilter]);
+
+    const sorted = [...filtered];
+    const fullName = (s) => (`${s.surname || ''} ${s.first_name || ''}`.trim() || s.name || '').toLowerCase();
+    switch (sortBy) {
+      case 'name_asc':       sorted.sort((a, b) => fullName(a).localeCompare(fullName(b), 'ru')); break;
+      case 'name_desc':      sorted.sort((a, b) => fullName(b).localeCompare(fullName(a), 'ru')); break;
+      case 'profession_asc': sorted.sort((a, b) => (a.profession || 'я').localeCompare(b.profession || 'я', 'ru')); break;
+      case 'city_asc':       sorted.sort((a, b) => (a.city || 'я').localeCompare(b.city || 'я', 'ru')); break;
+      default: break;
+    }
+    return sorted;
+  }, [seekers, debouncedSearch, globalCity, eduLevel, genderFilter, citizenshipFilter, workPermitFilter, withResumeOnly, sortBy]);
 
   return (
     <div className="space-y-6">
       {/* Search Bar */}
       <div className="bg-white dark:bg-gray-800 p-5 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 sticky top-24 transition-colors z-10 flex flex-col gap-4">
-        <div className="flex gap-3">
-          <div className="relative flex-grow">
+        <div className="flex gap-3 flex-wrap">
+          <div className="relative flex-grow min-w-[200px]">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
               <Search className="h-5 w-5 text-gray-400" />
             </div>
@@ -41,41 +70,84 @@ const SeekerList = ({ seekers, globalCity, user, onOpenChat }) => {
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
-          <button 
+
+          <div className="relative">
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value)}
+              className="appearance-none pl-10 pr-8 py-3 rounded-lg border border-gray-200 dark:border-gray-700 text-sm font-medium bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 outline-none cursor-pointer"
+            >
+              <option value="default">По умолчанию</option>
+              <option value="name_asc">Имя А–Я</option>
+              <option value="name_desc">Имя Я–А</option>
+              <option value="profession_asc">Профессия А–Я</option>
+              <option value="city_asc">Город А–Я</option>
+            </select>
+            <ArrowUpDown className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+          </div>
+
+          <button
             onClick={() => setIsFiltersOpen(!isFiltersOpen)}
-            className={`px-4 py-3 rounded-lg border font-medium text-sm transition-colors whitespace-nowrap flex items-center ${isFiltersOpen ? 'bg-blue-50 border-blue-200 text-blue-700 dark:bg-blue-900/30 dark:border-blue-800 dark:text-blue-400' : 'bg-white border-gray-200 text-gray-700 hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-700'}`}
+            className={`px-4 py-3 rounded-lg border font-medium text-sm transition-colors whitespace-nowrap flex items-center ${isFiltersOpen || filtersActive ? 'bg-blue-50 border-blue-200 text-blue-700 dark:bg-blue-900/30 dark:border-blue-800 dark:text-blue-400' : 'bg-white border-gray-200 text-gray-700 hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-700'}`}
           >
-            Фильтры
+            Фильтры {filtersActive && <span className="ml-1.5 inline-flex items-center justify-center w-5 h-5 text-[10px] font-bold text-white bg-blue-600 rounded-full">!</span>}
           </button>
         </div>
 
         {isFiltersOpen && (
-          <div className="pt-4 border-t border-gray-100 dark:border-gray-700 grid grid-cols-1 md:grid-cols-2 gap-4 animate-in slide-in-from-top-2">
-            <div>
-              <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1.5 uppercase">Уровень образования</label>
-              <select 
-                value={eduLevel} 
-                onChange={(e) => setEduLevel(e.target.value)}
-                className="block w-full p-2.5 border border-gray-200 dark:border-gray-600 rounded-lg text-sm bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white outline-none"
-              >
-                <option value="">Любое образование</option>
-                <option value="Среднее">Среднее</option>
-                <option value="Среднее специальное">Среднее специальное</option>
-                <option value="Высшее">Высшее</option>
-                <option value="Магистратура">Магистратура</option>
-              </select>
+          <div className="pt-4 border-t border-gray-100 dark:border-gray-700 animate-in slide-in-from-top-2">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div>
+                <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1.5 uppercase">Образование</label>
+                <select value={eduLevel} onChange={(e) => setEduLevel(e.target.value)}
+                  className="block w-full p-2.5 border border-gray-200 dark:border-gray-600 rounded-lg text-sm bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white outline-none">
+                  <option value="">Любое</option>
+                  <option value="Среднее">Среднее</option>
+                  <option value="Среднее специальное">Среднее специальное</option>
+                  <option value="Высшее">Высшее</option>
+                  <option value="Магистратура">Магистратура</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1.5 uppercase">Пол</label>
+                <select value={genderFilter} onChange={(e) => setGenderFilter(e.target.value)}
+                  className="block w-full p-2.5 border border-gray-200 dark:border-gray-600 rounded-lg text-sm bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white outline-none">
+                  <option value="">Любой</option>
+                  <option value="male">Мужской</option>
+                  <option value="female">Женский</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1.5 uppercase">Гражданство</label>
+                <select value={citizenshipFilter} onChange={(e) => setCitizenshipFilter(e.target.value)}
+                  className="block w-full p-2.5 border border-gray-200 dark:border-gray-600 rounded-lg text-sm bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white outline-none">
+                  <option value="">Любое</option>
+                  <option value="Казахстан">Казахстан</option>
+                  <option value="Россия">Россия</option>
+                  <option value="Другое">Другое</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1.5 uppercase">Разрешение на работу</label>
+                <select value={workPermitFilter} onChange={(e) => setWorkPermitFilter(e.target.value)}
+                  className="block w-full p-2.5 border border-gray-200 dark:border-gray-600 rounded-lg text-sm bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white outline-none">
+                  <option value="">Любое</option>
+                  <option value="Казахстан">Казахстан</option>
+                  <option value="Россия">Россия</option>
+                  <option value="Не требуется">Не требуется</option>
+                </select>
+              </div>
             </div>
-            <div>
-              <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1.5 uppercase">Пол</label>
-              <select 
-                value={genderFilter} 
-                onChange={(e) => setGenderFilter(e.target.value)}
-                className="block w-full p-2.5 border border-gray-200 dark:border-gray-600 rounded-lg text-sm bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white outline-none"
-              >
-                <option value="">Любой</option>
-                <option value="male">Мужской</option>
-                <option value="female">Женский</option>
-              </select>
+            <div className="flex flex-wrap items-center justify-between gap-3 mt-4 pt-4 border-t border-gray-100 dark:border-gray-700">
+              <label className="flex items-center gap-2 cursor-pointer select-none">
+                <input type="checkbox" checked={withResumeOnly} onChange={(e) => setWithResumeOnly(e.target.checked)} className="w-4 h-4 rounded text-blue-600 focus:ring-blue-500" />
+                <span className="text-xs font-semibold text-gray-600 dark:text-gray-300">Только с заполненным резюме</span>
+              </label>
+              {filtersActive && (
+                <button onClick={handleResetFilters} className="text-xs font-bold text-gray-500 hover:text-red-500 dark:hover:text-red-400 uppercase flex items-center transition-colors">
+                  <X className="w-3 h-3 mr-1" /> Сбросить фильтры
+                </button>
+              )}
             </div>
           </div>
         )}

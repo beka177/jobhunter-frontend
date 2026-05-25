@@ -1,7 +1,13 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
-import { ArrowLeft, Send, User, MessageCircle, Briefcase, Loader2 } from 'lucide-react';
+import { ArrowLeft, Send, User, MessageCircle, Briefcase, Loader2, CheckCircle2, XCircle, Clock, Info } from 'lucide-react';
 import { API_URL, UserRole } from '../constants';
 import { useToast } from '../toast.jsx';
+
+const APPLICATION_STATUS_LABEL = {
+  pending:  { text: 'Ожидает',  cls: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400', Icon: Clock },
+  accepted: { text: 'Принят',   cls: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',     Icon: CheckCircle2 },
+  rejected: { text: 'Отклонён', cls: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',             Icon: XCircle },
+};
 
 const POLL_INTERVAL_MS = 5000;
 
@@ -207,9 +213,19 @@ const MessagesPage = ({ user, onNavigate, chatTarget, onChatTargetConsumed, onUn
                             <span className="text-[11px] text-gray-400 dark:text-gray-500 flex-shrink-0">{formatTime(c.last_message_at || c.updated_at)}</span>
                           </div>
                           {c.vacancy_title && (
-                            <p className="text-[11px] text-blue-600 dark:text-blue-400 truncate flex items-center mt-0.5">
-                              <Briefcase className="w-3 h-3 mr-1" />{c.vacancy_title}
-                            </p>
+                            <div className="flex items-center justify-between gap-2 mt-0.5">
+                              <p className="text-[11px] text-blue-600 dark:text-blue-400 truncate flex items-center min-w-0">
+                                <Briefcase className="w-3 h-3 mr-1 flex-shrink-0" /><span className="truncate">{c.vacancy_title}</span>
+                              </p>
+                              {c.application_status && APPLICATION_STATUS_LABEL[c.application_status] && (() => {
+                                const s = APPLICATION_STATUS_LABEL[c.application_status];
+                                return (
+                                  <span className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wide flex-shrink-0 ${s.cls}`}>
+                                    <s.Icon className="w-3 h-3" /> {s.text}
+                                  </span>
+                                );
+                              })()}
+                            </div>
                           )}
                           <div className="flex items-center justify-between mt-1 gap-2">
                             <p className={`truncate text-xs ${unread ? 'text-gray-900 dark:text-gray-100 font-medium' : 'text-gray-500 dark:text-gray-400'}`}>
@@ -262,6 +278,14 @@ const MessagesPage = ({ user, onNavigate, chatTarget, onChatTargetConsumed, onUn
                     </div>
                   )}
                 </div>
+                {selectedConv.application_status && APPLICATION_STATUS_LABEL[selectedConv.application_status] && (() => {
+                  const s = APPLICATION_STATUS_LABEL[selectedConv.application_status];
+                  return (
+                    <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold ${s.cls}`}>
+                      <s.Icon className="w-3.5 h-3.5" /> {s.text}
+                    </span>
+                  );
+                })()}
               </div>
 
               {/* Лента сообщений */}
@@ -272,6 +296,17 @@ const MessagesPage = ({ user, onNavigate, chatTarget, onChatTargetConsumed, onUn
                   <div className="text-center text-gray-400 dark:text-gray-500 py-10 text-sm">Напишите первое сообщение</div>
                 ) : (
                   messages.map(m => {
+                    if (m.type === 'system') {
+                      return (
+                        <div key={m.id} className="flex justify-center">
+                          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800/50 text-xs font-semibold max-w-[85%] text-center">
+                            <Info className="w-3.5 h-3.5 flex-shrink-0" />
+                            <span className="whitespace-pre-wrap">{m.body}</span>
+                            <span className="text-blue-400 dark:text-blue-500 font-normal flex-shrink-0">· {formatTime(m.created_at)}</span>
+                          </div>
+                        </div>
+                      );
+                    }
                     const mine = m.sender_id === user.id;
                     return (
                       <div key={m.id} className={`flex ${mine ? 'justify-end' : 'justify-start'}`}>
