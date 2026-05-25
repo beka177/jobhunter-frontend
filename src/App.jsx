@@ -241,15 +241,24 @@ function App() {
   // Determine the actual view to render
   const renderView = () => {
     if (currentPage === 'loading') return <div className="flex-grow flex items-center justify-center">Загрузка...</div>;
-    
-    const isAuthPage = currentPage === 'login' || currentPage === 'register';
-    
-    // Если пользователь не авторизован и пытается попасть на любую страницу кроме входа/регистрации,
-    // или если страница явно 'landing' -> Показываем LandingPage
-    if (!user && !isAuthPage) {
+
+    const isPublicPage = currentPage === 'login' || currentPage === 'register' || currentPage === 'help';
+
+    // Если пользователь не авторизован — показываем лендинг (кроме публичных страниц)
+    if (!user && !isPublicPage) {
       return <LandingPage onNavigate={setCurrentPage} onCityChange={handleCityChange} globalCity={globalCity} />;
     }
 
+    // Страница помощи доступна без авторизации (без навбара)
+    if (!user && currentPage === 'help') {
+      return (
+        <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col">
+          <HelpPage onNavigate={setCurrentPage} />
+        </div>
+      );
+    }
+
+    const isAuthPage = currentPage === 'login' || currentPage === 'register';
     if (currentPage === 'landing') return <LandingPage onNavigate={setCurrentPage} onCityChange={handleCityChange} globalCity={globalCity} />;
 
     return (

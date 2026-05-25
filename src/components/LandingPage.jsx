@@ -111,7 +111,6 @@ const TESTIMONIALS = [
 
 const LandingPage = ({ onNavigate, onCityChange, globalCity }) => {
   const [activeTab, setActiveTab] = useState('seeker');
-  const [email, setEmail] = useState('');
   const [isCityModalOpen, setIsCityModalOpen] = useState(false);
 
   const [recentVacancies, setRecentVacancies] = useState([]);
@@ -142,11 +141,6 @@ const LandingPage = ({ onNavigate, onCityChange, globalCity }) => {
     };
     fetchPreviews();
   }, []);
-
-  const handleContinue = (e) => {
-    e.preventDefault();
-    onNavigate('register');
-  };
 
   const selectCity = (city) => {
     onCityChange(city === 'Все города' ? '' : city);
@@ -206,15 +200,15 @@ const LandingPage = ({ onNavigate, onCityChange, globalCity }) => {
 
       {/* ============================ HERO ============================ */}
       <section className="relative w-full max-w-[1400px] mx-auto mt-4 px-4 sm:px-6 lg:px-8">
-        <div className="relative rounded-3xl overflow-hidden shadow-2xl h-[500px] sm:h-[560px]">
+        <div className="relative rounded-3xl overflow-hidden shadow-2xl h-[560px] sm:h-[600px]">
           <img
             src={activeTab === 'seeker'
-              ? 'https://images.unsplash.com/photo-1664575602554-2087b04935a5?q=80&w=2670&auto=format&fit=crop'
-              : 'https://images.unsplash.com/photo-1552664730-d307ca884978?q=80&w=2670&auto=format&fit=crop'}
+              ? 'https://images.unsplash.com/photo-1521737711867-e3b97375f902?q=80&w=2670&auto=format&fit=crop'
+              : 'https://images.unsplash.com/photo-1556761175-b413da4baf72?q=80&w=2670&auto=format&fit=crop'}
             alt="Hero"
             className="absolute inset-0 w-full h-full object-cover transition-opacity duration-500"
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/55 to-transparent"></div>
+          <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/60 to-black/20"></div>
 
           <div className="absolute inset-0 flex flex-col justify-center px-6 sm:px-12 md:px-16 lg:px-20 max-w-3xl">
             <div className="inline-flex items-center self-start gap-2 px-3 py-1 bg-white/15 backdrop-blur-sm rounded-full text-xs sm:text-sm text-white font-semibold mb-5 border border-white/20">
@@ -222,34 +216,38 @@ const LandingPage = ({ onNavigate, onCityChange, globalCity }) => {
               {activeTab === 'seeker' ? 'Свыше 3 000 актуальных вакансий' : 'Более 12 000 готовых резюме'}
             </div>
 
-            <h1 className="text-3xl sm:text-4xl md:text-5xl font-black text-white leading-tight mb-6 tracking-tight">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-black text-white leading-tight mb-5 tracking-tight">
               {activeTab === 'seeker'
                 ? 'Найдите работу мечты в Казахстане'
                 : 'Найдите лучших сотрудников быстро и просто'}
             </h1>
-            <p className="text-base sm:text-lg text-gray-200 mb-7 max-w-xl">
+            <p className="text-base sm:text-lg text-gray-200 mb-8 max-w-xl">
               {activeTab === 'seeker'
                 ? 'Тысячи вакансий от проверенных компаний. Откликайтесь в один клик — без анкет и звонков.'
                 : 'Размещайте вакансии бесплатно и находите подходящих кандидатов по навыкам, городу и опыту.'}
             </p>
 
-            <form onSubmit={handleContinue} className="flex flex-col sm:flex-row gap-3 max-w-2xl">
-              <input
-                type="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="Электронная почта"
-                className="flex-grow px-5 py-4 rounded-xl shadow-lg border-0 focus:ring-4 focus:ring-blue-500 outline-none text-base sm:text-lg text-gray-900 placeholder-gray-400 font-medium"
-              />
-              <button type="submit" className="inline-flex items-center justify-center px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-base sm:text-lg shadow-lg transition-colors whitespace-nowrap">
-                Продолжить <ArrowRight className="ml-2 w-5 h-5" />
+            <div className="flex flex-col sm:flex-row gap-3 max-w-2xl">
+              <button
+                onClick={() => onNavigate('register')}
+                className="inline-flex items-center justify-center px-7 py-4 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-base shadow-xl shadow-blue-900/30 transition-all transform hover:scale-105 active:scale-95"
+              >
+                {activeTab === 'seeker' ? 'Начать поиск работы' : 'Найти сотрудников'}
+                <ArrowRight className="ml-2 w-5 h-5" />
               </button>
-            </form>
+              <button
+                onClick={() => onNavigate('login')}
+                className="inline-flex items-center justify-center px-7 py-4 bg-white/10 hover:bg-white/20 text-white font-bold rounded-xl text-base border border-white/30 backdrop-blur-sm transition-all"
+              >
+                У меня уже есть аккаунт
+              </button>
+            </div>
 
-            <p className="mt-4 text-xs sm:text-sm text-gray-300 max-w-2xl">
-              Нажимая «Продолжить», вы соглашаетесь с условиями пользовательского соглашения.
-            </p>
+            <div className="mt-7 flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-gray-300">
+              <span className="flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4 text-green-400" /> Бесплатно</span>
+              <span className="flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4 text-green-400" /> Без анкет и звонков</span>
+              <span className="flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4 text-green-400" /> Регистрация за 30 секунд</span>
+            </div>
           </div>
         </div>
       </section>

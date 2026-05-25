@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Trash2, Users, Briefcase, ShieldAlert, Plus, X, BarChart3, Edit, Ban, CheckCircle2, Loader2 } from 'lucide-react';
+import { Trash2, Users, Briefcase, ShieldAlert, Plus, X, BarChart3, Edit, Ban, CheckCircle2, Loader2, MessageCircle, MapPin, TrendingUp, Heart, FileText, UserCheck, Clock, XCircle, Activity } from 'lucide-react';
 import { API_URL } from '../constants';
 import { useToast } from '../toast.jsx';
 
@@ -8,13 +8,22 @@ const AdminPanel = ({ user, onNavigate, onEditVacancy }) => {
   const [activeTab, setActiveTab] = useState('stats');
   const [users, setUsers] = useState([]);
   const [vacancies, setVacancies] = useState([]);
-  const [stats, setStats] = useState({ users: 0, vacancies: 0, applications: 0 });
+  const [conversations, setConversations] = useState([]);
+  const [stats, setStats] = useState({
+    users: 0, vacancies: 0, applications: 0,
+    roles: { seeker: 0, employer: 0, admin: 0 },
+    application_statuses: { pending: 0, accepted: 0, rejected: 0 },
+    banned_users: 0, favorites: 0, conversations: 0, messages: 0,
+    new_users_7d: 0, new_vacancies_7d: 0,
+    top_cities: [], top_employers: [],
+  });
   const [loading, setLoading] = useState(true);
   const [showAdminForm, setShowAdminForm] = useState(false);
   const [adminForm, setAdminForm] = useState({ name: '', email: '', password: '' });
   const [banModal, setBanModal] = useState({ show: false, userId: null });
   const [busyUserId, setBusyUserId] = useState(null);
   const [busyVacancyId, setBusyVacancyId] = useState(null);
+  const [busyConvId, setBusyConvId] = useState(null);
   const [submittingAdmin, setSubmittingAdmin] = useState(false);
 
   useEffect(() => {
@@ -34,11 +43,30 @@ const AdminPanel = ({ user, onNavigate, onEditVacancy }) => {
         if (tab === 'users') setUsers(data);
         if (tab === 'vacancies') setVacancies(data);
         if (tab === 'stats') setStats(data);
+        if (tab === 'conversations') setConversations(data);
       }
     } catch (error) {
       console.error('Ошибка загрузки данных:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleDeleteConversation = async (id) => {
+    if (!window.confirm('Удалить этот диалог? Все сообщения будут стёрты.')) return;
+    setBusyConvId(id);
+    try {
+      const response = await fetch(`${API_URL}/admin.php?action=conversation&id=${id}&admin_id=${user.id}`, { method: 'DELETE' });
+      if (response.ok) {
+        setConversations(prev => prev.filter(c => c.id !== id));
+        toast.success('Диалог удалён');
+      } else {
+        toast.error('Ошибка удаления');
+      }
+    } catch (e) {
+      toast.error('Ошибка сети');
+    } finally {
+      setBusyConvId(null);
     }
   };
 
@@ -140,68 +168,152 @@ const AdminPanel = ({ user, onNavigate, onEditVacancy }) => {
         </div>
       </div>
 
-      <div className="flex border-b border-gray-200 dark:border-gray-700">
-        <button
-          onClick={() => setActiveTab('stats')}
-          className={`flex-1 py-4 px-6 text-center font-bold text-sm uppercase tracking-wider transition-colors ${
-            activeTab === 'stats' ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 border-b-2 border-blue-600 dark:border-blue-500' : 'text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700/50'
-          }`}
-        >
-          <BarChart3 className="w-5 h-5 inline-block mr-2 mb-1" />
-          Статистика
-        </button>
-        <button
-          onClick={() => setActiveTab('users')}
-          className={`flex-1 py-4 px-6 text-center font-bold text-sm uppercase tracking-wider transition-colors ${
-            activeTab === 'users' ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 border-b-2 border-blue-600 dark:border-blue-500' : 'text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700/50'
-          }`}
-        >
-          <Users className="w-5 h-5 inline-block mr-2 mb-1" />
-          Пользователи
-        </button>
-        <button
-          onClick={() => setActiveTab('vacancies')}
-          className={`flex-1 py-4 px-6 text-center font-bold text-sm uppercase tracking-wider transition-colors ${
-            activeTab === 'vacancies' ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 border-b-2 border-blue-600 dark:border-blue-500' : 'text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700/50'
-          }`}
-        >
-          <Briefcase className="w-5 h-5 inline-block mr-2 mb-1" />
-          Вакансии
-        </button>
+      <div className="flex border-b border-gray-200 dark:border-gray-700 overflow-x-auto">
+        {[
+          { id: 'stats',         icon: BarChart3,    label: 'Статистика' },
+          { id: 'users',         icon: Users,        label: 'Пользователи' },
+          { id: 'vacancies',     icon: Briefcase,    label: 'Вакансии' },
+          { id: 'conversations', icon: MessageCircle, label: 'Сообщения' },
+        ].map(t => (
+          <button
+            key={t.id}
+            onClick={() => setActiveTab(t.id)}
+            className={`flex-1 min-w-[140px] py-4 px-4 text-center font-bold text-xs sm:text-sm uppercase tracking-wider transition-colors whitespace-nowrap ${
+              activeTab === t.id ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 border-b-2 border-blue-600 dark:border-blue-500' : 'text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700/50'
+            }`}
+          >
+            <t.icon className="w-5 h-5 inline-block mr-2 mb-1" />
+            {t.label}
+          </button>
+        ))}
       </div>
 
       <div className="p-8">
         {loading ? (
           <div className="text-center py-10 text-gray-500 dark:text-gray-400">Загрузка данных...</div>
         ) : activeTab === 'stats' ? (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="bg-blue-50 dark:bg-blue-900/20 p-6 rounded-2xl border border-blue-100 dark:border-blue-800/50 flex items-center">
-              <div className="p-4 bg-blue-500 rounded-full text-white mr-4">
-                <Users className="w-8 h-8" />
+          <div className="space-y-6">
+            {/* Главные карточки */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <StatCard color="blue"   icon={Users}        label="Пользователи" value={stats.users}    delta={stats.new_users_7d}     deltaLabel="за 7 дней" />
+              <StatCard color="green"  icon={Briefcase}    label="Вакансии"     value={stats.vacancies} delta={stats.new_vacancies_7d} deltaLabel="за 7 дней" />
+              <StatCard color="purple" icon={FileText}     label="Отклики"      value={stats.applications} />
+              <StatCard color="pink"   icon={MessageCircle} label="Диалоги"      value={stats.conversations} sub={`${stats.messages} сообщ.`} />
+            </div>
+
+            {/* Роли + статусы откликов */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl border border-gray-100 dark:border-gray-700">
+                <h3 className="font-bold text-gray-900 dark:text-white mb-4 flex items-center"><UserCheck className="w-5 h-5 mr-2 text-blue-500" /> Распределение по ролям</h3>
+                <DistributionBar items={[
+                  { label: 'Соискатели',    value: stats.roles.seeker,   color: 'bg-blue-500' },
+                  { label: 'Работодатели',  value: stats.roles.employer, color: 'bg-green-500' },
+                  { label: 'Администраторы', value: stats.roles.admin,    color: 'bg-red-500' },
+                ]} />
+                <div className="mt-4 pt-4 border-t border-gray-100 dark:border-gray-700 flex items-center justify-between text-sm">
+                  <span className="text-gray-600 dark:text-gray-400">Заблокированы:</span>
+                  <span className="font-bold text-red-600 dark:text-red-400">{stats.banned_users}</span>
+                </div>
               </div>
-              <div>
-                <p className="text-sm font-bold text-blue-600 dark:text-blue-400 uppercase">Пользователей</p>
-                <p className="text-4xl font-black text-gray-900 dark:text-white">{stats.users}</p>
+
+              <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl border border-gray-100 dark:border-gray-700">
+                <h3 className="font-bold text-gray-900 dark:text-white mb-4 flex items-center"><Activity className="w-5 h-5 mr-2 text-purple-500" /> Статусы откликов</h3>
+                <DistributionBar items={[
+                  { label: 'Ожидают',  value: stats.application_statuses.pending,  color: 'bg-yellow-500', icon: Clock },
+                  { label: 'Приняты',  value: stats.application_statuses.accepted, color: 'bg-green-500',  icon: CheckCircle2 },
+                  { label: 'Отклонены', value: stats.application_statuses.rejected, color: 'bg-red-500',    icon: XCircle },
+                ]} />
+                <div className="mt-4 pt-4 border-t border-gray-100 dark:border-gray-700 flex items-center justify-between text-sm">
+                  <span className="text-gray-600 dark:text-gray-400">В избранном:</span>
+                  <span className="font-bold text-pink-600 dark:text-pink-400 flex items-center"><Heart className="w-4 h-4 mr-1" /> {stats.favorites}</span>
+                </div>
               </div>
             </div>
-            <div className="bg-green-50 dark:bg-green-900/20 p-6 rounded-2xl border border-green-100 dark:border-green-800/50 flex items-center">
-              <div className="p-4 bg-green-500 rounded-full text-white mr-4">
-                <Briefcase className="w-8 h-8" />
+
+            {/* Топы */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl border border-gray-100 dark:border-gray-700">
+                <h3 className="font-bold text-gray-900 dark:text-white mb-4 flex items-center"><MapPin className="w-5 h-5 mr-2 text-orange-500" /> Топ городов по вакансиям</h3>
+                {stats.top_cities.length === 0 ? (
+                  <p className="text-sm text-gray-400 dark:text-gray-500 text-center py-4">Нет данных</p>
+                ) : (
+                  <ul className="space-y-2">
+                    {stats.top_cities.map((c, i) => (
+                      <li key={c.city} className="flex items-center justify-between py-1.5">
+                        <span className="flex items-center gap-3 text-sm">
+                          <span className="w-6 h-6 flex items-center justify-center rounded-full bg-orange-50 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400 font-bold text-xs">{i + 1}</span>
+                          <span className="font-medium text-gray-900 dark:text-white">{c.city}</span>
+                        </span>
+                        <span className="text-sm font-bold text-gray-500 dark:text-gray-400">{c.cnt}</span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
               </div>
-              <div>
-                <p className="text-sm font-bold text-green-600 dark:text-green-400 uppercase">Вакансий</p>
-                <p className="text-4xl font-black text-gray-900 dark:text-white">{stats.vacancies}</p>
+              <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl border border-gray-100 dark:border-gray-700">
+                <h3 className="font-bold text-gray-900 dark:text-white mb-4 flex items-center"><TrendingUp className="w-5 h-5 mr-2 text-emerald-500" /> Топ работодателей</h3>
+                {stats.top_employers.length === 0 ? (
+                  <p className="text-sm text-gray-400 dark:text-gray-500 text-center py-4">Нет данных</p>
+                ) : (
+                  <ul className="space-y-2">
+                    {stats.top_employers.map((e, i) => (
+                      <li key={e.id} className="flex items-center justify-between py-1.5">
+                        <span className="flex items-center gap-3 text-sm min-w-0">
+                          <span className="w-6 h-6 flex items-center justify-center rounded-full bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 font-bold text-xs flex-shrink-0">{i + 1}</span>
+                          <span className="font-medium text-gray-900 dark:text-white truncate">{e.name}</span>
+                        </span>
+                        <span className="text-sm font-bold text-gray-500 dark:text-gray-400 flex-shrink-0 ml-2">{e.vacancies_count}</span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
               </div>
             </div>
-            <div className="bg-purple-50 dark:bg-purple-900/20 p-6 rounded-2xl border border-purple-100 dark:border-purple-800/50 flex items-center">
-              <div className="p-4 bg-purple-500 rounded-full text-white mr-4">
-                <BarChart3 className="w-8 h-8" />
-              </div>
-              <div>
-                <p className="text-sm font-bold text-purple-600 dark:text-purple-400 uppercase">Откликов</p>
-                <p className="text-4xl font-black text-gray-900 dark:text-white">{stats.applications}</p>
-              </div>
-            </div>
+          </div>
+        ) : activeTab === 'conversations' ? (
+          <div className="overflow-x-auto">
+            <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">Все диалоги пользователей</h3>
+            {conversations.length === 0 ? (
+              <div className="text-center py-10 text-gray-500 dark:text-gray-400">Нет диалогов</div>
+            ) : (
+              <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                <thead className="bg-gray-50 dark:bg-gray-800/50">
+                  <tr>
+                    <th className="px-4 py-3 text-left text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">ID</th>
+                    <th className="px-4 py-3 text-left text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Соискатель</th>
+                    <th className="px-4 py-3 text-left text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Работодатель</th>
+                    <th className="px-4 py-3 text-left text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Вакансия</th>
+                    <th className="px-4 py-3 text-left text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Сообщений</th>
+                    <th className="px-4 py-3 text-left text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Последнее сообщение</th>
+                    <th className="px-4 py-3 text-left text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Обновлён</th>
+                    <th className="px-4 py-3 text-right text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Действия</th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                  {conversations.map(c => (
+                    <tr key={c.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+                      <td className="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">{c.id}</td>
+                      <td className="px-4 py-3 text-sm font-medium text-gray-900 dark:text-white">{c.seeker_name}</td>
+                      <td className="px-4 py-3 text-sm font-medium text-gray-900 dark:text-white">{c.employer_name}</td>
+                      <td className="px-4 py-3 text-sm text-blue-600 dark:text-blue-400 truncate max-w-[200px]">{c.vacancy_title || <span className="text-gray-400 dark:text-gray-500 italic">—</span>}</td>
+                      <td className="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">{c.messages_count}</td>
+                      <td className="px-4 py-3 text-sm text-gray-500 dark:text-gray-400 truncate max-w-[250px]">{c.last_message || <span className="italic">Пусто</span>}</td>
+                      <td className="px-4 py-3 text-sm text-gray-500 dark:text-gray-400 whitespace-nowrap">{new Date(c.updated_at).toLocaleString('ru-RU')}</td>
+                      <td className="px-4 py-3 text-right">
+                        <button
+                          onClick={() => handleDeleteConversation(c.id)}
+                          disabled={busyConvId === c.id}
+                          className="text-red-500 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 bg-red-50 dark:bg-red-900/20 hover:bg-red-100 dark:hover:bg-red-900/40 p-2 rounded-lg transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+                          title="Удалить диалог"
+                        >
+                          {busyConvId === c.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
           </div>
         ) : activeTab === 'users' ? (
           <div className="overflow-x-auto">
@@ -377,5 +489,63 @@ const AdminPanel = ({ user, onNavigate, onEditVacancy }) => {
     </div>
   );
 };
+
+const STAT_PALETTE = {
+  blue:   { bg: 'bg-blue-50 dark:bg-blue-900/20',     iconBg: 'bg-blue-500',   text: 'text-blue-600 dark:text-blue-400',     border: 'border-blue-100 dark:border-blue-800/40' },
+  green:  { bg: 'bg-green-50 dark:bg-green-900/20',   iconBg: 'bg-green-500',  text: 'text-green-600 dark:text-green-400',   border: 'border-green-100 dark:border-green-800/40' },
+  purple: { bg: 'bg-purple-50 dark:bg-purple-900/20', iconBg: 'bg-purple-500', text: 'text-purple-600 dark:text-purple-400', border: 'border-purple-100 dark:border-purple-800/40' },
+  pink:   { bg: 'bg-pink-50 dark:bg-pink-900/20',     iconBg: 'bg-pink-500',   text: 'text-pink-600 dark:text-pink-400',     border: 'border-pink-100 dark:border-pink-800/40' },
+};
+
+function StatCard({ color, icon: Icon, label, value, delta, deltaLabel, sub }) {
+  const p = STAT_PALETTE[color] || STAT_PALETTE.blue;
+  return (
+    <div className={`${p.bg} p-5 rounded-2xl border ${p.border}`}>
+      <div className="flex items-center justify-between mb-2">
+        <div className={`p-2.5 ${p.iconBg} rounded-xl text-white shadow-md`}>
+          <Icon className="w-5 h-5" />
+        </div>
+        {delta != null && delta > 0 && (
+          <span className="inline-flex items-center text-xs font-bold text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/30 px-2 py-1 rounded-full">
+            +{delta} <span className="ml-1 font-medium text-green-500 dark:text-green-500/80">{deltaLabel}</span>
+          </span>
+        )}
+      </div>
+      <p className={`text-xs font-bold uppercase tracking-wider ${p.text}`}>{label}</p>
+      <p className="text-3xl sm:text-4xl font-black text-gray-900 dark:text-white mt-1">{value}</p>
+      {sub && <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{sub}</p>}
+    </div>
+  );
+}
+
+function DistributionBar({ items }) {
+  const total = items.reduce((s, i) => s + (i.value || 0), 0);
+  return (
+    <div className="space-y-3">
+      <div className="flex h-3 rounded-full overflow-hidden bg-gray-100 dark:bg-gray-700">
+        {items.map((it, idx) => {
+          const pct = total > 0 ? (it.value / total) * 100 : 0;
+          if (pct === 0) return null;
+          return <div key={idx} className={it.color} style={{ width: `${pct}%` }} title={`${it.label}: ${it.value}`} />;
+        })}
+      </div>
+      <ul className="space-y-2">
+        {items.map((it, idx) => {
+          const pct = total > 0 ? Math.round((it.value / total) * 100) : 0;
+          return (
+            <li key={idx} className="flex items-center justify-between text-sm">
+              <span className="flex items-center gap-2">
+                <span className={`w-3 h-3 rounded-full ${it.color}`}></span>
+                {it.icon && <it.icon className="w-4 h-4 text-gray-400 dark:text-gray-500" />}
+                <span className="text-gray-700 dark:text-gray-300">{it.label}</span>
+              </span>
+              <span className="text-gray-900 dark:text-white font-bold">{it.value} <span className="text-gray-400 dark:text-gray-500 font-normal">({pct}%)</span></span>
+            </li>
+          );
+        })}
+      </ul>
+    </div>
+  );
+}
 
 export default AdminPanel;
