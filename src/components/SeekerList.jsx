@@ -1,24 +1,28 @@
-import React, { useState } from 'react';
-import { Search, MapPin, User, GraduationCap, Globe, X, Phone, Mail, Briefcase } from 'lucide-react';
+import React, { useMemo, useState } from 'react';
+import { Search, MapPin, User, GraduationCap, Globe, X, Phone, Mail, Briefcase, MessageCircle } from 'lucide-react';
+import { useDebounce } from '../hooks.js';
+import { UserRole } from '../constants';
 
-const SeekerList = ({ seekers, globalCity }) => {
+const SeekerList = ({ seekers, globalCity, user, onOpenChat }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedSeeker, setSelectedSeeker] = useState(null);
-  
-  // Extra filters
+
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
   const [eduLevel, setEduLevel] = useState('');
   const [genderFilter, setGenderFilter] = useState('');
 
-  const filteredSeekers = seekers.filter(s => {
-    const searchStr = `${s.profession || ''} ${s.name || ''} ${s.first_name || ''} ${s.surname || ''} ${s.skills || ''} ${s.city || ''}`.toLowerCase();
-    const matchesSearch = searchStr.includes(searchTerm.toLowerCase());
-    const matchesCity = !globalCity || s.city === globalCity || !s.city;
-    const matchesEdu = !eduLevel || s.education_level === eduLevel;
-    const matchesGender = !genderFilter || s.gender === genderFilter;
-    
-    return matchesSearch && matchesCity && matchesEdu && matchesGender;
-  });
+  const debouncedSearch = useDebounce(searchTerm, 250);
+
+  const filteredSeekers = useMemo(() => {
+    return seekers.filter(s => {
+      const searchStr = `${s.profession || ''} ${s.name || ''} ${s.first_name || ''} ${s.surname || ''} ${s.skills || ''} ${s.city || ''}`.toLowerCase();
+      const matchesSearch = searchStr.includes(debouncedSearch.toLowerCase());
+      const matchesCity = !globalCity || s.city === globalCity || !s.city;
+      const matchesEdu = !eduLevel || s.education_level === eduLevel;
+      const matchesGender = !genderFilter || s.gender === genderFilter;
+      return matchesSearch && matchesCity && matchesEdu && matchesGender;
+    });
+  }, [seekers, debouncedSearch, globalCity, eduLevel, genderFilter]);
 
   return (
     <div className="space-y-6">
@@ -261,8 +265,17 @@ const SeekerList = ({ seekers, globalCity }) => {
                   )}
                 </div>
               </div>
-              <div className="bg-gray-50 dark:bg-gray-800/80 px-4 py-4 sm:px-6 sm:flex sm:flex-row-reverse border-t dark:border-gray-700">
-                <button type="button" className="w-full inline-flex justify-center rounded-xl border border-gray-300 dark:border-gray-600 shadow-sm px-6 py-2.5 bg-white dark:bg-gray-800 text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 sm:ml-3 sm:w-auto sm:text-sm transition-colors" onClick={() => setSelectedSeeker(null)}>Закрыть</button>
+              <div className="bg-gray-50 dark:bg-gray-800/80 px-4 py-4 sm:px-6 sm:flex sm:flex-row-reverse gap-2 border-t dark:border-gray-700">
+                <button type="button" className="w-full inline-flex justify-center rounded-xl border border-gray-300 dark:border-gray-600 shadow-sm px-6 py-2.5 bg-white dark:bg-gray-800 text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 sm:w-auto sm:text-sm transition-colors" onClick={() => setSelectedSeeker(null)}>Закрыть</button>
+                {user && user.role === UserRole.EMPLOYER && onOpenChat && (
+                  <button
+                    type="button"
+                    onClick={() => { onOpenChat(selectedSeeker.id, 'seeker', null); setSelectedSeeker(null); }}
+                    className="w-full inline-flex items-center justify-center rounded-xl border border-transparent shadow-sm px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-base font-bold text-white sm:w-auto sm:text-sm transition-colors"
+                  >
+                    <MessageCircle className="w-4 h-4 mr-2" /> Написать кандидату
+                  </button>
+                )}
               </div>
             </div>
           </div>

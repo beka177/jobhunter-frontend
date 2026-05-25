@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { ArrowLeft, Save, Loader2 } from 'lucide-react';
 import { API_URL } from '../constants';
+import { useToast } from '../toast.jsx';
 
 const EditVacancyForm = ({ vacancyId, onSuccess, onCancel }) => {
+  const toast = useToast();
   const [title, setTitle] = useState('');
   const [salary, setSalary] = useState('');
   const [city, setCity] = useState('');
@@ -24,12 +26,13 @@ const EditVacancyForm = ({ vacancyId, onSuccess, onCancel }) => {
           setImage(data.image || '');
         }
       } catch (error) {
-        alert('Ошибка загрузки данных вакансии');
+        toast.error('Ошибка загрузки данных вакансии');
       } finally {
         setLoading(false);
       }
     };
     fetchVacancy();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [vacancyId]);
 
   const handleSubmit = async (e) => {
@@ -51,14 +54,14 @@ const EditVacancyForm = ({ vacancyId, onSuccess, onCancel }) => {
       });
 
       if (response.ok) {
-        alert('Вакансия успешно обновлена!');
+        toast.success('Вакансия успешно обновлена!');
         onSuccess();
       } else {
-        const err = await response.json();
-        alert(`Ошибка: ${err.message}`);
+        const err = await response.json().catch(() => ({}));
+        toast.error(`Ошибка: ${err.message || 'не удалось обновить'}`);
       }
     } catch (error) {
-      alert('Ошибка сети: проверьте подключение к Backend');
+      toast.error('Ошибка сети: проверьте подключение к Backend');
     } finally {
       setSaving(false);
     }

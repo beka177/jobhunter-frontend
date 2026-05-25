@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { ArrowLeft, Save } from 'lucide-react';
+import { ArrowLeft, Save, Loader2 } from 'lucide-react';
 import { API_URL } from '../constants';
+import { useToast } from '../toast.jsx';
 
 const ResumeForm = ({ user, onSuccess, onNavigate }) => {
+  const toast = useToast();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     surname: '', first_name: '', patronymic: '',
@@ -53,13 +55,13 @@ const ResumeForm = ({ user, onSuccess, onNavigate }) => {
       });
 
       if (response.ok) {
-        alert('Резюме успешно сохранено!');
+        toast.success('Резюме успешно сохранено!');
         if (onSuccess) onSuccess();
       } else {
-        alert('Ошибка сохранения');
+        toast.error('Ошибка сохранения');
       }
     } catch (error) {
-      alert('Ошибка сети');
+      toast.error('Ошибка сети');
     } finally {
       setLoading(false);
     }
@@ -208,8 +210,8 @@ const ResumeForm = ({ user, onSuccess, onNavigate }) => {
           </div>
 
           <div className="flex justify-end pt-4">
-            <button type="submit" disabled={loading} className="inline-flex items-center px-8 py-3 text-lg font-bold text-white bg-blue-600 rounded-lg hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 shadow-md transition-all transform hover:scale-105 disabled:opacity-50 disabled:scale-100">
-              <Save className="h-5 w-5 mr-2" />
+            <button type="submit" disabled={loading} className="inline-flex items-center px-8 py-3 text-lg font-bold text-white bg-blue-600 rounded-lg hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 shadow-md transition-all transform hover:scale-105 disabled:opacity-50 disabled:scale-100 disabled:cursor-not-allowed">
+              {loading ? <Loader2 className="h-5 w-5 mr-2 animate-spin" /> : <Save className="h-5 w-5 mr-2" />}
               {loading ? 'Сохранение...' : 'Сохранить резюме'}
             </button>
           </div>

@@ -1,9 +1,13 @@
 
 import React, { useState, useMemo } from 'react';
-import { Trash2, Briefcase, Filter, X, Pencil, ChevronDown, Check, ChevronsUpDown, Heart } from 'lucide-react';
+import { Trash2, Briefcase, Filter, X, Pencil, ChevronDown, Check, ChevronsUpDown, Heart, Loader2 } from 'lucide-react';
 import { UserRole, API_URL } from '../constants';
+import { useToast } from '../toast.jsx';
+import { useDebounce } from '../hooks.js';
 
 const VacancyList = ({ vacancies, user, favorites = [], onToggleFavorite, onDelete, onEdit, onOpenVacancy, globalCity }) => {
+  const toast = useToast();
+  const [applyingId, setApplyingId] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [minSalary, setMinSalary] = useState('');
   const [keywords, setKeywords] = useState('');
@@ -13,11 +17,13 @@ const VacancyList = ({ vacancies, user, favorites = [], onToggleFavorite, onDele
   const [period, setPeriod] = useState('all'); // 'all', 'month', 'week', 'three_days'
   const [isPeriodOpen, setIsPeriodOpen] = useState(false);
 
-  // Обновленные опции сортировки согласно финальному запросу
+  const debouncedSearch = useDebounce(searchTerm, 250);
+  const debouncedKeywords = useDebounce(keywords, 250);
+
   const sortOptions = [
     { id: 'date_desc', label: 'По дате' },
     { id: 'salary_asc', label: 'По возрастанию зарплаты' },
-    { id: 'salary_desc', label: 'По убыванию зарплат' },
+    { id: 'salary_desc', label: 'По убыванию зарплаты' },
   ];
 
   const periodOptions = [
@@ -35,9 +41,9 @@ const VacancyList = ({ vacancies, user, favorites = [], onToggleFavorite, onDele
 
   const filteredVacancies = useMemo(() => {
     return vacancies.filter((job) => {
-      const matchesTitle = job.title.toLowerCase().includes(searchTerm.toLowerCase());
-      const matchesKeywords = keywords 
-        ? job.description.toLowerCase().includes(keywords.toLowerCase()) 
+      const matchesTitle = job.title.toLowerCase().includes(debouncedSearch.toLowerCase());
+      const matchesKeywords = debouncedKeywords
+        ? job.description.toLowerCase().includes(debouncedKeywords.toLowerCase())
         : true;
 
       let matchesSalary = true;
@@ -52,7 +58,7 @@ const VacancyList = ({ vacancies, user, favorites = [], onToggleFavorite, onDele
         const jobDate = new Date(job.created_at);
         const now = new Date();
         const diffDays = (now - jobDate) / (1000 * 60 * 60 * 24);
-        
+
         if (period === 'month') matchesPeriod = diffDays <= 30;
         else if (period === 'week') matchesPeriod = diffDays <= 7;
         else if (period === 'three_days') matchesPeriod = diffDays <= 3;
@@ -62,7 +68,7 @@ const VacancyList = ({ vacancies, user, favorites = [], onToggleFavorite, onDele
 
       return matchesTitle && matchesKeywords && matchesSalary && matchesPeriod && matchesCity;
     });
-  }, [vacancies, searchTerm, keywords, minSalary, period, globalCity]);
+  }, [vacancies, debouncedSearch, debouncedKeywords, minSalary, period, globalCity]);
 
   const sortedVacancies = useMemo(() => {
     const list = [...filteredVacancies];
@@ -88,10 +94,12 @@ const VacancyList = ({ vacancies, user, favorites = [], onToggleFavorite, onDele
   };
 
   const handleApplyQuick = async (e, vacancyId) => {
-    e.stopPropagation(); 
-    if (!user) { alert('Войдите в систему'); return; }
+    e.stopPropagation();
+    if (!user) { toast.info('Войдите в систему'); return; }
     if (user.role === UserRole.EMPLOYER) return;
+    if (applyingId) return;
 
+    setApplyingId(vacancyId);
     try {
       const response = await fetch(`${API_URL}/applications.php`, {
         method: 'POST',
@@ -99,11 +107,17 @@ const VacancyList = ({ vacancies, user, favorites = [], onToggleFavorite, onDele
         body: JSON.stringify({ vacancy_id: vacancyId, seeker_id: user.id })
       });
       if (response.status === 409) {
-        alert('Вы уже откликнулись на эту вакансию ранее.');
+        toast.info('Вы уже откликнулись на эту вакансию ранее');
       } else if (response.ok) {
-        alert('Вы успешно откликнулись!');
+        toast.success('Вы успешно откликнулись!');
+      } else {
+        toast.error('Не удалось отправить отклик');
       }
-    } catch (error) { alert('Ошибка сети'); }
+    } catch (error) {
+      toast.error('Ошибка сети');
+    } finally {
+      setApplyingId(null);
+    }
   };
 
   return (
@@ -237,16 +251,16 @@ const VacancyList = ({ vacancies, user, favorites = [], onToggleFavorite, onDele
                    </div>
                 </div>
                 {user?.role === UserRole.EMPLOYER && String(user.id) === String(job.employer_id) && (
-                    <div className="flex flex-col space-y-1 ml-4 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <button 
-                      onClick={(e) => { e.stopPropagation(); onEdit(job.id); }} 
+                    <div className="flex flex-col space-y-1 ml-4 opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity">
+                    <button
+                      onClick={(e) => { e.stopPropagation(); onEdit(job.id); }}
                       className="text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 p-2 transition-colors rounded-xl hover:bg-blue-50 dark:hover:bg-blue-900/30"
                       title="Редактировать"
                     >
                       <Pencil className="h-5 w-5" />
                     </button>
-                    <button 
-                      onClick={(e) => { e.stopPropagation(); onDelete(job.id); }} 
+                    <button
+                      onClick={(e) => { e.stopPropagation(); onDelete(job.id); }}
                       className="text-gray-400 hover:text-red-500 dark:hover:text-red-400 p-2 transition-colors rounded-xl hover:bg-red-50 dark:hover:bg-red-900/30"
                       title="Удалить"
                     >
@@ -267,11 +281,13 @@ const VacancyList = ({ vacancies, user, favorites = [], onToggleFavorite, onDele
               <div className="mt-6 flex items-center justify-between border-t border-gray-50 dark:border-gray-700 pt-4">
                 <span className="text-[11px] font-bold text-gray-300 dark:text-gray-500 uppercase tracking-widest">{new Date(job.created_at).toLocaleDateString()}</span>
                 {(!user || user.role === UserRole.SEEKER) && (
-                   <button 
-                    onClick={(e) => handleApplyQuick(e, job.id)} 
-                    className="px-8 py-2.5 text-sm font-black rounded-xl text-white bg-blue-500 hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700 shadow-lg shadow-blue-100 dark:shadow-none transition-all transform hover:scale-[1.03] active:scale-95"
+                   <button
+                    onClick={(e) => handleApplyQuick(e, job.id)}
+                    disabled={applyingId === job.id}
+                    className="inline-flex items-center px-8 py-2.5 text-sm font-black rounded-xl text-white bg-blue-500 hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700 shadow-lg shadow-blue-100 dark:shadow-none transition-all transform hover:scale-[1.03] active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed disabled:scale-100"
                    >
-                     Откликнуться
+                     {applyingId === job.id && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+                     {applyingId === job.id ? 'Отправка...' : 'Откликнуться'}
                    </button>
                 )}
               </div>

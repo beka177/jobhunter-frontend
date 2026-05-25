@@ -1,10 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { Trash2, Briefcase } from 'lucide-react';
+import { Trash2, Briefcase, Loader2 } from 'lucide-react';
 import { API_URL } from '../constants';
+import { useToast } from '../toast.jsx';
 
 const FavoritesList = ({ user, onNavigate, onOpenVacancy }) => {
+  const toast = useToast();
   const [favorites, setFavorites] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [removingId, setRemovingId] = useState(null);
 
   const fetchFavorites = async () => {
     try {
@@ -27,14 +30,19 @@ const FavoritesList = ({ user, onNavigate, onOpenVacancy }) => {
   const handleRemove = async (e, vacancyId) => {
     e.stopPropagation();
     if (!window.confirm('Удалить из избранного?')) return;
+    if (removingId) return;
 
+    setRemovingId(vacancyId);
     try {
       await fetch(`${API_URL}/favorites.php?user_id=${user.id}&vacancy_id=${vacancyId}`, {
         method: 'DELETE'
       });
       setFavorites(prev => prev.filter(v => v.id !== vacancyId));
+      toast.success('Удалено из избранного');
     } catch (error) {
-      alert('Ошибка при удалении');
+      toast.error('Ошибка при удалении');
+    } finally {
+      setRemovingId(null);
     }
   };
 
@@ -81,12 +89,13 @@ const FavoritesList = ({ user, onNavigate, onOpenVacancy }) => {
                    </div>
                 </div>
                 
-                <button 
+                <button
                   onClick={(e) => handleRemove(e, job.id)}
-                  className="p-2 text-gray-400 dark:text-gray-500 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-full transition-all"
+                  disabled={removingId === job.id}
+                  className="p-2 text-gray-400 dark:text-gray-500 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-full transition-all disabled:opacity-60 disabled:cursor-not-allowed"
                   title="Удалить из избранного"
                 >
-                  <Trash2 className="w-5 h-5" />
+                  {removingId === job.id ? <Loader2 className="w-5 h-5 animate-spin" /> : <Trash2 className="w-5 h-5" />}
                 </button>
               </div>
             </div>

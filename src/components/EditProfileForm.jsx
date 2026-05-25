@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
-import { User, Mail, Lock, Save, X, Camera, ArrowLeft } from 'lucide-react';
+import { User, Mail, Lock, Save, X, Camera, ArrowLeft, Loader2 } from 'lucide-react';
 import { API_URL } from '../constants';
+import { useToast } from '../toast.jsx';
 
 const EditProfileForm = ({ user, onUpdate, onCancel }) => {
+  const toast = useToast();
   const [name, setName] = useState(user.name || '');
   const [email, setEmail] = useState(user.email || '');
   const [avatar, setAvatar] = useState(user.avatar || '');
@@ -39,7 +41,7 @@ const EditProfileForm = ({ user, onUpdate, onCancel }) => {
 
       if (response.ok) {
         onUpdate(data.user);
-        alert('Профиль успешно обновлен!');
+        toast.success('Профиль успешно обновлён!');
       } else {
         setError(data.error || 'Ошибка обновления профиля');
       }
@@ -177,9 +179,9 @@ const EditProfileForm = ({ user, onUpdate, onCancel }) => {
           <button
             type="submit"
             disabled={loading}
-            className="inline-flex items-center px-6 py-2 border border-transparent text-sm font-medium rounded-lg shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+            className="inline-flex items-center px-6 py-2 border border-transparent text-sm font-medium rounded-lg shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <Save className="w-4 h-4 mr-2" />
+            {loading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Save className="w-4 h-4 mr-2" />}
             {loading ? 'Сохранение...' : 'Сохранить изменения'}
           </button>
         </div>

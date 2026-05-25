@@ -1,7 +1,10 @@
 import React, { useState } from 'react';
+import { Loader2 } from 'lucide-react';
 import { API_URL } from '../constants';
+import { useToast } from '../toast.jsx';
 
 const CreateVacancyForm = ({ user, onSuccess, onCancel }) => {
+  const toast = useToast();
   const [title, setTitle] = useState('');
   const [salary, setSalary] = useState('');
   const [city, setCity] = useState(''); 
@@ -26,14 +29,15 @@ const CreateVacancyForm = ({ user, onSuccess, onCancel }) => {
         })
       });
       if (response.ok) {
+        toast.success('Вакансия создана');
         onSuccess();
       } else {
-        const err = await response.json();
-        alert(`Ошибка: ${err.message}`);
+        const err = await response.json().catch(() => ({}));
+        toast.error(`Ошибка: ${err.message || 'не удалось создать'}`);
       }
     } catch (error) {
       console.error(error);
-      alert('Ошибка сети: не удалось подключиться к серверу.');
+      toast.error('Ошибка сети: не удалось подключиться к серверу');
     } finally {
       setLoading(false);
     }
@@ -65,7 +69,8 @@ const CreateVacancyForm = ({ user, onSuccess, onCancel }) => {
         </div>
         <div className="flex justify-end space-x-3">
           <button type="button" onClick={onCancel} className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">Отмена</button>
-          <button type="submit" disabled={loading} className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 disabled:opacity-50 transition-colors">
+          <button type="submit" disabled={loading} className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+            {loading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
             {loading ? 'Создание...' : 'Создать'}
           </button>
         </div>

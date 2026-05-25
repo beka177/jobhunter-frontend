@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { API_URL, UserRole } from './constants';
 import { ArrowLeft } from 'lucide-react';
+import { useToast } from './toast.jsx';
 
 // Импорт компонентов из отдельных файлов
 import Navbar from './components/Navbar';
@@ -20,8 +21,10 @@ import FavoritesList from './components/FavoritesList';
 import EditProfileForm from './components/EditProfileForm';
 import AdminPanel from './components/AdminPanel';
 import SeekerList from './components/SeekerList';
+import MessagesPage from './components/MessagesPage';
 
 function App() {
+  const toast = useToast();
   const [currentPage, setCurrentPage] = useState('loading');
   const [globalCity, setGlobalCity] = useState(localStorage.getItem('jobsearch_city') || 'Астана');
   const [selectedVacancyId, setSelectedVacancyId] = useState(null); 
@@ -34,6 +37,32 @@ function App() {
   const [isConnected, setIsConnected] = useState(false);
   const [connectionError, setConnectionError] = useState('');
   const [favorites, setFavorites] = useState([]);
+  const [chatTarget, setChatTarget] = useState(null);
+  const [unreadMessages, setUnreadMessages] = useState(0);
+
+  const refreshUnread = useCallback(async () => {
+    if (!user) { setUnreadMessages(0); return; }
+    try {
+      const r = await fetch(`${API_URL}/messages.php?action=unread&user_id=${user.id}`);
+      if (r.ok) {
+        const data = await r.json();
+        setUnreadMessages(Number(data.unread) || 0);
+      }
+    } catch (e) { /* ignore */ }
+  }, [user]);
+
+  useEffect(() => {
+    if (!user) return;
+    refreshUnread();
+    const id = setInterval(refreshUnread, 30000);
+    return () => clearInterval(id);
+  }, [user, refreshUnread]);
+
+  const openChatWith = (otherUserId, otherUserRole, vacancyId) => {
+    if (!user) return;
+    setChatTarget({ otherUserId, otherUserRole, vacancyId });
+    setCurrentPage('messages');
+  };
 
   const fetchFavorites = useCallback(async (userId) => {
     if (!userId) return;
@@ -60,7 +89,7 @@ function App() {
 
   const toggleFavorite = async (vacancyId) => {
     if (!user) {
-      alert('Войдите, чтобы добавить в избранное');
+      toast.info('Войдите, чтобы добавить в избранное');
       return;
     }
     
@@ -187,9 +216,14 @@ function App() {
   const handleDeleteVacancy = async (id) => {
     if (!window.confirm('Вы уверены?')) return;
     try {
-      await fetch(`${API_URL}/vacancies.php?id=${id}`, { method: 'DELETE' });
-      fetchVacancies();
-    } catch (e) { alert('Ошибка удаления'); }
+      const r = await fetch(`${API_URL}/vacancies.php?id=${id}`, { method: 'DELETE' });
+      if (r.ok) {
+        toast.success('Вакансия удалена');
+        fetchVacancies();
+      } else {
+        toast.error('Не удалось удалить вакансию');
+      }
+    } catch (e) { toast.error('Ошибка сети при удалении'); }
   };
 
   const handleOpenVacancy = (id) => {
@@ -215,20 +249,11 @@ function App() {
       return <LandingPage onNavigate={setCurrentPage} onCityChange={handleCityChange} globalCity={globalCity} />;
     }
 
-    // Если запрошен логин или регистрация (даже если пользователь уже авторизован, но обычно авторизованный туда не нажимает)
-    if (currentPage === 'landing' && user) {
-        // Если авторизован, но просит лэндинг (нелогично, перекидываем на home)
-        // Но чтобы не мудрить стейт-переходы, покажем home.
-        // Ниже обработается как home, просто поменяем currentPage по смыслу.
-        // Или позволим смотреть Navbar, но внутри будет пусто.
-        // Безопаснее:
-    }
-
     if (currentPage === 'landing') return <LandingPage onNavigate={setCurrentPage} onCityChange={handleCityChange} globalCity={globalCity} />;
 
     return (
       <>
-        <Navbar user={user} onLogout={handleLogout} onNavigate={setCurrentPage} globalCity={globalCity} onCityChange={handleCityChange} />
+        <Navbar user={user} onLogout={handleLogout} onNavigate={setCurrentPage} globalCity={globalCity} onCityChange={handleCityChange} unreadMessages={unreadMessages} />
 
         <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full flex-grow">
           {!isConnected && (currentPage === 'home' || !currentPage) && (
@@ -255,7 +280,7 @@ function App() {
                     <span className="block mt-2 text-sm">Пожалуйста, убедитесь, что вы скопировали файл <b>seekers.php</b> в папку <b>OSPanel/domains/jobsearch/api/</b></span>
                   </div>
                 ) : (
-                  <SeekerList seekers={seekers} globalCity={globalCity} />
+                  <SeekerList seekers={seekers} globalCity={globalCity} user={user} onOpenChat={openChatWith} />
                 )
               ) : (
                 loadingVacancies ? (
@@ -311,13 +336,24 @@ function App() {
       )}
 
       {currentPage === 'vacancy-details' && selectedVacancyId && (
-          <VacancyDetails 
-              vacancyId={selectedVacancyId} 
-              user={user} 
+          <VacancyDetails
+              vacancyId={selectedVacancyId}
+              user={user}
               favorites={favorites}
               onToggleFavorite={toggleFavorite}
               onNavigate={setCurrentPage}
               onEdit={handleEditVacancy}
+              onOpenChat={openChatWith}
+          />
+      )}
+
+      {currentPage === 'messages' && user && (user.role === UserRole.SEEKER || user.role === UserRole.EMPLOYER) && (
+          <MessagesPage
+              user={user}
+              onNavigate={setCurrentPage}
+              chatTarget={chatTarget}
+              onChatTargetConsumed={() => setChatTarget(null)}
+              onUnreadRefresh={refreshUnread}
           />
       )}
 
@@ -366,11 +402,11 @@ function App() {
       )}
 
       {currentPage === 'applications' && user && user.role === UserRole.EMPLOYER && (
-        <ApplicationsList user={user} onNavigate={setCurrentPage} />
+        <ApplicationsList user={user} onNavigate={setCurrentPage} onOpenChat={openChatWith} />
       )}
 
       {currentPage === 'resume' && user && user.role === UserRole.SEEKER && (
-        <ResumeForm user={user} onSuccess={() => alert('Резюме обновлено')} onNavigate={setCurrentPage} />
+        <ResumeForm user={user} onSuccess={() => toast.success('Резюме обновлено')} onNavigate={setCurrentPage} />
       )}
 
       {currentPage === 'seeker-applications' && user && user.role === UserRole.SEEKER && (

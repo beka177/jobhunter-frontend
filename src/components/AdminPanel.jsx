@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Trash2, Users, Briefcase, ShieldAlert, Plus, X, BarChart3, Edit, Ban, CheckCircle2 } from 'lucide-react';
+import { Trash2, Users, Briefcase, ShieldAlert, Plus, X, BarChart3, Edit, Ban, CheckCircle2, Loader2 } from 'lucide-react';
 import { API_URL } from '../constants';
+import { useToast } from '../toast.jsx';
 
 const AdminPanel = ({ user, onNavigate, onEditVacancy }) => {
+  const toast = useToast();
   const [activeTab, setActiveTab] = useState('stats');
   const [users, setUsers] = useState([]);
   const [vacancies, setVacancies] = useState([]);
@@ -11,6 +13,9 @@ const AdminPanel = ({ user, onNavigate, onEditVacancy }) => {
   const [showAdminForm, setShowAdminForm] = useState(false);
   const [adminForm, setAdminForm] = useState({ name: '', email: '', password: '' });
   const [banModal, setBanModal] = useState({ show: false, userId: null });
+  const [busyUserId, setBusyUserId] = useState(null);
+  const [busyVacancyId, setBusyVacancyId] = useState(null);
+  const [submittingAdmin, setSubmittingAdmin] = useState(false);
 
   useEffect(() => {
     if (user?.role !== 'admin') {
@@ -37,55 +42,71 @@ const AdminPanel = ({ user, onNavigate, onEditVacancy }) => {
     }
   };
 
-  const handleBanUser = async (duration) => {
+  const handleBanUser = async (duration, userIdOverride = null) => {
+    const targetId = userIdOverride ?? banModal.userId;
+    if (!targetId) return;
+    setBusyUserId(targetId);
     try {
       const response = await fetch(`${API_URL}/admin.php?action=ban_user&admin_id=${user.id}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id: banModal.userId, duration })
+        body: JSON.stringify({ id: targetId, duration })
       });
       if (response.ok) {
         setBanModal({ show: false, userId: null });
+        toast.success(duration === 'unban' ? 'Пользователь разблокирован' : 'Пользователь заблокирован');
         fetchData('users');
       } else {
-        alert('Ошибка блокировки');
+        toast.error('Ошибка блокировки');
       }
     } catch (error) {
-      alert('Ошибка сети');
+      toast.error('Ошибка сети');
+    } finally {
+      setBusyUserId(null);
     }
   };
 
   const handleDeleteUser = async (id) => {
     if (!window.confirm('Вы уверены, что хотите удалить этого пользователя? Все его вакансии и отклики также будут удалены.')) return;
+    setBusyUserId(id);
     try {
       const response = await fetch(`${API_URL}/admin.php?action=user&id=${id}&admin_id=${user.id}`, { method: 'DELETE' });
       if (response.ok) {
         setUsers(users.filter(u => u.id !== id));
+        toast.success('Пользователь удалён');
       } else {
-        const data = await response.json();
-        alert(data.error || 'Ошибка удаления');
+        const data = await response.json().catch(() => ({}));
+        toast.error(data.error || 'Ошибка удаления');
       }
     } catch (error) {
-      alert('Ошибка сети');
+      toast.error('Ошибка сети');
+    } finally {
+      setBusyUserId(null);
     }
   };
 
   const handleDeleteVacancy = async (id) => {
     if (!window.confirm('Вы уверены, что хотите удалить эту вакансию?')) return;
+    setBusyVacancyId(id);
     try {
       const response = await fetch(`${API_URL}/admin.php?action=vacancy&id=${id}&admin_id=${user.id}`, { method: 'DELETE' });
       if (response.ok) {
         setVacancies(vacancies.filter(v => v.id !== id));
+        toast.success('Вакансия удалена');
       } else {
-        alert('Ошибка удаления');
+        toast.error('Ошибка удаления');
       }
     } catch (error) {
-      alert('Ошибка сети');
+      toast.error('Ошибка сети');
+    } finally {
+      setBusyVacancyId(null);
     }
   };
 
   const handleCreateAdmin = async (e) => {
     e.preventDefault();
+    if (submittingAdmin) return;
+    setSubmittingAdmin(true);
     try {
       const response = await fetch(`${API_URL}/admin.php?action=create_admin&admin_id=${user.id}`, {
         method: 'POST',
@@ -96,13 +117,15 @@ const AdminPanel = ({ user, onNavigate, onEditVacancy }) => {
         setShowAdminForm(false);
         setAdminForm({ name: '', email: '', password: '' });
         fetchData('users');
-        alert('Администратор успешно добавлен!');
+        toast.success('Администратор успешно добавлен!');
       } else {
-        const data = await response.json();
-        alert(data.error || 'Ошибка создания');
+        const data = await response.json().catch(() => ({}));
+        toast.error(data.error || 'Ошибка создания');
       }
     } catch (error) {
-      alert('Ошибка сети');
+      toast.error('Ошибка сети');
+    } finally {
+      setSubmittingAdmin(false);
     }
   };
 
@@ -227,8 +250,9 @@ const AdminPanel = ({ user, onNavigate, onEditVacancy }) => {
                       onChange={e => setAdminForm({...adminForm, password: e.target.value})}
                       className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
                     />
-                    <button type="submit" className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium">
-                      Создать
+                    <button type="submit" disabled={submittingAdmin} className="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium disabled:opacity-60 disabled:cursor-not-allowed">
+                      {submittingAdmin && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+                      {submittingAdmin ? 'Создание...' : 'Создать'}
                     </button>
                   </div>
                 </form>
@@ -277,16 +301,16 @@ const AdminPanel = ({ user, onNavigate, onEditVacancy }) => {
                       {u.id !== user.id && (
                         <div className="flex justify-end space-x-2">
                           {u.banned_until ? (
-                            <button onClick={() => handleBanUser('unban', u.id)} className="text-green-600 dark:text-green-400 hover:text-green-900 dark:hover:text-green-300 bg-green-50 dark:bg-green-900/20 hover:bg-green-100 dark:hover:bg-green-900/40 p-2 rounded-lg transition-colors" title="Разблокировать">
-                              <CheckCircle2 className="w-5 h-5" />
+                            <button onClick={() => handleBanUser('unban', u.id)} disabled={busyUserId === u.id} className="text-green-600 dark:text-green-400 hover:text-green-900 dark:hover:text-green-300 bg-green-50 dark:bg-green-900/20 hover:bg-green-100 dark:hover:bg-green-900/40 p-2 rounded-lg transition-colors disabled:opacity-60 disabled:cursor-not-allowed" title="Разблокировать">
+                              {busyUserId === u.id ? <Loader2 className="w-5 h-5 animate-spin" /> : <CheckCircle2 className="w-5 h-5" />}
                             </button>
                           ) : (
-                            <button onClick={() => setBanModal({ show: true, userId: u.id })} className="text-orange-500 dark:text-orange-400 hover:text-orange-700 dark:hover:text-orange-300 bg-orange-50 dark:bg-orange-900/20 hover:bg-orange-100 dark:hover:bg-orange-900/40 p-2 rounded-lg transition-colors" title="Заблокировать">
+                            <button onClick={() => setBanModal({ show: true, userId: u.id })} disabled={busyUserId === u.id} className="text-orange-500 dark:text-orange-400 hover:text-orange-700 dark:hover:text-orange-300 bg-orange-50 dark:bg-orange-900/20 hover:bg-orange-100 dark:hover:bg-orange-900/40 p-2 rounded-lg transition-colors disabled:opacity-60 disabled:cursor-not-allowed" title="Заблокировать">
                               <Ban className="w-5 h-5" />
                             </button>
                           )}
-                          <button onClick={() => handleDeleteUser(u.id)} className="text-red-500 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 bg-red-50 dark:bg-red-900/20 hover:bg-red-100 dark:hover:bg-red-900/40 p-2 rounded-lg transition-colors" title="Удалить">
-                            <Trash2 className="w-5 h-5" />
+                          <button onClick={() => handleDeleteUser(u.id)} disabled={busyUserId === u.id} className="text-red-500 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 bg-red-50 dark:bg-red-900/20 hover:bg-red-100 dark:hover:bg-red-900/40 p-2 rounded-lg transition-colors disabled:opacity-60 disabled:cursor-not-allowed" title="Удалить">
+                            {busyUserId === u.id ? <Loader2 className="w-5 h-5 animate-spin" /> : <Trash2 className="w-5 h-5" />}
                           </button>
                         </div>
                       )}
@@ -337,8 +361,8 @@ const AdminPanel = ({ user, onNavigate, onEditVacancy }) => {
                         <button onClick={() => onEditVacancy(v.id)} className="text-blue-500 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 bg-blue-50 dark:bg-blue-900/20 hover:bg-blue-100 dark:hover:bg-blue-900/40 p-2 rounded-lg transition-colors" title="Редактировать">
                           <Edit className="w-5 h-5" />
                         </button>
-                        <button onClick={() => handleDeleteVacancy(v.id)} className="text-red-500 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 bg-red-50 dark:bg-red-900/20 hover:bg-red-100 dark:hover:bg-red-900/40 p-2 rounded-lg transition-colors" title="Удалить">
-                          <Trash2 className="w-5 h-5" />
+                        <button onClick={() => handleDeleteVacancy(v.id)} disabled={busyVacancyId === v.id} className="text-red-500 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 bg-red-50 dark:bg-red-900/20 hover:bg-red-100 dark:hover:bg-red-900/40 p-2 rounded-lg transition-colors disabled:opacity-60 disabled:cursor-not-allowed" title="Удалить">
+                          {busyVacancyId === v.id ? <Loader2 className="w-5 h-5 animate-spin" /> : <Trash2 className="w-5 h-5" />}
                         </button>
                       </div>
                     </td>

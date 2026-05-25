@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
-import { AlertCircle, ArrowLeft } from 'lucide-react';
+import { AlertCircle, ArrowLeft, Loader2 } from 'lucide-react';
 import { API_URL, UserRole } from '../constants';
+import { useToast } from '../toast.jsx';
 
 const AuthForm = ({ isRegister = false, onSuccess, onNavigate }) => {
+  const toast = useToast();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
@@ -36,7 +38,7 @@ const AuthForm = ({ isRegister = false, onSuccess, onNavigate }) => {
 
       if (response.ok) {
         if (isRegister) {
-          alert('Регистрация успешна! Теперь войдите.');
+          toast.success('Регистрация успешна! Теперь войдите.');
           onNavigate('login');
         } else {
           onSuccess(data.user);
@@ -77,11 +79,11 @@ const AuthForm = ({ isRegister = false, onSuccess, onNavigate }) => {
         </div>
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           {error && (
-            <div className="bg-red-50 border-l-4 border-red-400 p-4 rounded-r">
+            <div className="bg-red-50 dark:bg-red-900/30 border-l-4 border-red-400 dark:border-red-500 p-4 rounded-r">
               <div className="flex">
-                <AlertCircle className="h-5 w-5 text-red-500" />
+                <AlertCircle className="h-5 w-5 text-red-500 dark:text-red-400" />
                 <div className="ml-3">
-                  <p className="text-sm font-medium text-red-700">{error}</p>
+                  <p className="text-sm font-medium text-red-700 dark:text-red-300">{error}</p>
                 </div>
               </div>
             </div>
@@ -115,7 +117,8 @@ const AuthForm = ({ isRegister = false, onSuccess, onNavigate }) => {
           </div>
 
           <div>
-            <button type="submit" disabled={loading} className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-bold rounded-lg text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 transition-all transform hover:scale-[1.02]">
+            <button type="submit" disabled={loading} className="group relative w-full flex items-center justify-center py-3 px-4 border border-transparent text-sm font-bold rounded-lg text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all transform hover:scale-[1.02] disabled:scale-100">
+              {loading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
               {loading ? 'Загрузка...' : (isRegister ? 'Зарегистрироваться' : 'Войти')}
             </button>
           </div>

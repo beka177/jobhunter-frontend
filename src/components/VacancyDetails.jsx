@@ -1,11 +1,14 @@
 
 import React, { useState, useEffect } from 'react';
-import { ArrowLeft, Building, Calendar, User, Pencil, Briefcase, DollarSign, Heart } from 'lucide-react';
+import { ArrowLeft, Building, Calendar, User, Pencil, Briefcase, DollarSign, Heart, Loader2, MessageCircle } from 'lucide-react';
 import { API_URL, UserRole } from '../constants';
+import { useToast } from '../toast.jsx';
 
-const VacancyDetails = ({ vacancyId, user, favorites = [], onToggleFavorite, onNavigate, onEdit }) => {
+const VacancyDetails = ({ vacancyId, user, favorites = [], onToggleFavorite, onNavigate, onEdit, onOpenChat }) => {
+  const toast = useToast();
   const [vacancy, setVacancy] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [applying, setApplying] = useState(false);
 
   useEffect(() => {
     const fetchVacancy = async () => {
@@ -26,14 +29,16 @@ const VacancyDetails = ({ vacancyId, user, favorites = [], onToggleFavorite, onN
 
   const handleApply = async () => {
     if (!user) {
-      alert('Пожалуйста, войдите в систему, чтобы откликнуться.');
+      toast.info('Пожалуйста, войдите в систему, чтобы откликнуться');
       return;
     }
     if (user.role === UserRole.EMPLOYER) {
-      alert('Работодатели не могут откликаться на вакансии.');
+      toast.info('Работодатели не могут откликаться на вакансии');
       return;
     }
+    if (applying) return;
 
+    setApplying(true);
     try {
       const response = await fetch(`${API_URL}/applications.php`, {
         method: 'POST',
@@ -45,17 +50,19 @@ const VacancyDetails = ({ vacancyId, user, favorites = [], onToggleFavorite, onN
       });
 
       if (response.status === 409) {
-        alert('Вы уже откликнулись на эту вакансию ранее.');
+        toast.info('Вы уже откликнулись на эту вакансию ранее');
         return;
       }
 
       if (response.ok) {
-        alert('Вы успешно откликнулись на вакансию!');
+        toast.success('Вы успешно откликнулись на вакансию!');
       } else {
-        alert('Ошибка при отклике');
+        toast.error('Ошибка при отклике');
       }
     } catch (error) {
-      alert('Ошибка сети');
+      toast.error('Ошибка сети');
+    } finally {
+      setApplying(false);
     }
   };
 
@@ -147,19 +154,31 @@ const VacancyDetails = ({ vacancyId, user, favorites = [], onToggleFavorite, onN
 
           {/* Кнопка отклика */}
           {(!user || user.role === UserRole.SEEKER) && (
-            <div className="mt-12 flex justify-center gap-4">
-              <button 
-                onClick={handleApply} 
-                className="w-full md:w-auto px-12 py-5 text-xl font-black text-white bg-blue-600 rounded-2xl hover:bg-blue-700 shadow-2xl transition-all transform hover:scale-105 active:scale-95 focus:ring-4 focus:ring-blue-200"
+            <div className="mt-12 flex flex-wrap justify-center gap-4">
+              <button
+                onClick={handleApply}
+                disabled={applying}
+                className="inline-flex items-center justify-center w-full sm:w-auto px-10 py-5 text-xl font-black text-white bg-blue-600 rounded-2xl hover:bg-blue-700 shadow-2xl transition-all transform hover:scale-105 active:scale-95 focus:ring-4 focus:ring-blue-200 disabled:opacity-60 disabled:cursor-not-allowed disabled:scale-100"
               >
-                Откликнуться сейчас
+                {applying && <Loader2 className="w-5 h-5 mr-2 animate-spin" />}
+                {applying ? 'Отправка...' : 'Откликнуться сейчас'}
               </button>
+
+              {user && user.role === UserRole.SEEKER && onOpenChat && (
+                <button
+                  onClick={() => onOpenChat(vacancy.employer_id, 'employer', vacancy.id)}
+                  className="inline-flex items-center justify-center px-6 py-5 text-base font-bold rounded-2xl border-2 border-blue-200 dark:border-blue-700 text-blue-700 dark:text-blue-300 bg-white dark:bg-gray-800 hover:bg-blue-50 dark:hover:bg-blue-900/30 transition-all transform hover:scale-105 active:scale-95"
+                >
+                  <MessageCircle className="w-5 h-5 mr-2" /> Написать работодателю
+                </button>
+              )}
+
               {user && (
-                <button 
+                <button
                   onClick={() => onToggleFavorite(vacancy.id)}
                   className={`px-6 py-5 rounded-2xl border-2 transition-all transform hover:scale-105 active:scale-95 ${
-                    favorites.includes(vacancy.id) 
-                      ? 'border-red-500 bg-red-50 dark:bg-red-900/30 text-red-500' 
+                    favorites.includes(vacancy.id)
+                      ? 'border-red-500 bg-red-50 dark:bg-red-900/30 text-red-500'
                       : 'border-gray-200 dark:border-gray-600 text-gray-400 dark:text-gray-500 hover:border-red-300 dark:hover:border-red-400 hover:text-red-400'
                   }`}
                   title={favorites.includes(vacancy.id) ? "Убрать из избранного" : "В избранное"}

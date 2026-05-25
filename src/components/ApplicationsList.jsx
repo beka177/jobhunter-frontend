@@ -1,11 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import { FileText, User, Mail, Calendar, CheckCircle, XCircle, Clock, ArrowLeft, Eye, X, GraduationCap, MapPin, Phone, Globe } from 'lucide-react';
+import { FileText, User, Mail, Calendar, CheckCircle, XCircle, Clock, ArrowLeft, Eye, X, GraduationCap, MapPin, Phone, Globe, Loader2, MessageCircle } from 'lucide-react';
 import { API_URL, UserRole } from '../constants';
+import { useToast } from '../toast.jsx';
 
-const ApplicationsList = ({ user, onNavigate }) => {
+const ApplicationsList = ({ user, onNavigate, onOpenChat }) => {
+  const toast = useToast();
   const [applications, setApplications] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedApp, setSelectedApp] = useState(null);
+  const [updatingId, setUpdatingId] = useState(null);
 
   useEffect(() => {
     if (!user || user.role !== UserRole.EMPLOYER) {
@@ -30,26 +33,31 @@ const ApplicationsList = ({ user, onNavigate }) => {
   };
 
   const handleStatusChange = async (appId, newStatus) => {
+    if (updatingId) return;
+    setUpdatingId(appId);
     try {
       const response = await fetch(`${API_URL}/applications.php`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id: appId, status: newStatus })
       });
-      
+
       if (response.ok) {
-        setApplications(prev => prev.map(app => 
+        setApplications(prev => prev.map(app =>
           app.id === appId ? { ...app, status: newStatus } : app
         ));
         if (selectedApp && selectedApp.id === appId) {
           setSelectedApp(prev => ({ ...prev, status: newStatus }));
         }
+        toast.success(newStatus === 'accepted' ? 'Кандидат принят' : 'Отклик отклонён');
       } else {
-        const err = await response.json();
-        alert('Ошибка обновления статуса: ' + (err.message || 'Неизвестная ошибка'));
+        const err = await response.json().catch(() => ({}));
+        toast.error('Ошибка обновления статуса: ' + (err.message || 'Неизвестная ошибка'));
       }
     } catch (error) {
-      alert('Ошибка сети. Проверьте консоль.');
+      toast.error('Ошибка сети');
+    } finally {
+      setUpdatingId(null);
     }
   };
 
@@ -121,18 +129,33 @@ const ApplicationsList = ({ user, onNavigate }) => {
                         Посмотреть резюме
                       </button>
 
+                      {onOpenChat && (
+                        <button
+                          onClick={() => onOpenChat(app.seeker_id, 'seeker', app.vacancy_id)}
+                          className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-bold rounded-md text-white bg-blue-600 hover:bg-blue-700 shadow-sm"
+                          title="Написать кандидату"
+                        >
+                          <MessageCircle className="w-4 h-4 mr-2" />
+                          Написать
+                        </button>
+                      )}
+
                       {app.status === 'pending' && (
                         <>
                           <button
                             onClick={() => handleStatusChange(app.id, 'accepted')}
-                            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-bold rounded-md text-white bg-green-600 hover:bg-green-700 shadow-sm"
+                            disabled={updatingId === app.id}
+                            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-bold rounded-md text-white bg-green-600 hover:bg-green-700 shadow-sm disabled:opacity-60 disabled:cursor-not-allowed"
                           >
+                            {updatingId === app.id && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
                             Принять
                           </button>
                           <button
                              onClick={() => handleStatusChange(app.id, 'rejected')}
-                            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-bold rounded-md text-white bg-red-600 hover:bg-red-700 shadow-sm"
+                            disabled={updatingId === app.id}
+                            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-bold rounded-md text-white bg-red-600 hover:bg-red-700 shadow-sm disabled:opacity-60 disabled:cursor-not-allowed"
                           >
+                            {updatingId === app.id && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
                             Отказать
                           </button>
                         </>

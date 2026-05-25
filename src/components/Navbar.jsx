@@ -1,11 +1,9 @@
 
 import React, { useState, useEffect } from 'react';
-import { Briefcase, Plus, LogOut, User, FileText, Bell, HelpCircle, List, Heart, ShieldAlert, Moon, Sun, MapPin } from 'lucide-react';
-import { UserRole } from '../constants';
+import { Briefcase, Plus, LogOut, User, FileText, Bell, HelpCircle, List, Heart, ShieldAlert, Moon, Sun, MapPin, MessageCircle } from 'lucide-react';
+import { UserRole, CITIES } from '../constants';
 
-const CITIES = ['Астана', 'Алматы', 'Шымкент', 'Караганда', 'Актобе', 'Тараз', 'Павлодар', 'Оскемен', 'Семей', 'Все города'];
-
-const Navbar = ({ user, onLogout, onNavigate, globalCity, onCityChange }) => {
+const Navbar = ({ user, onLogout, onNavigate, globalCity, onCityChange, unreadMessages = 0 }) => {
   const [isDark, setIsDark] = useState(false);
   const [isCityDropdownOpen, setIsCityDropdownOpen] = useState(false);
 
@@ -96,6 +94,21 @@ const Navbar = ({ user, onLogout, onNavigate, globalCity, onCityChange }) => {
 
             {user ? (
               <>
+                {(user.role === UserRole.SEEKER || user.role === UserRole.EMPLOYER) && (
+                  <button
+                    onClick={() => onNavigate('messages')}
+                    className="relative p-2 rounded-full text-gray-500 hover:text-blue-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-blue-400 dark:hover:bg-gray-700 transition-colors"
+                    title="Сообщения"
+                  >
+                    <MessageCircle className="h-5 w-5" />
+                    {unreadMessages > 0 && (
+                      <span className="absolute -top-0.5 -right-0.5 inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 text-[10px] font-bold text-white bg-red-500 rounded-full ring-2 ring-white dark:ring-gray-800">
+                        {unreadMessages > 99 ? '99+' : unreadMessages}
+                      </span>
+                    )}
+                  </button>
+                )}
+
                 <div className="flex items-center text-gray-600 dark:text-gray-300 hidden lg:flex text-sm font-medium border-r dark:border-gray-600 pr-4 mr-2 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg p-1 transition-colors" onClick={() => onNavigate('edit-profile')} title="Редактировать профиль">
                   {user.avatar ? (
                       <img src={user.avatar} alt="Avatar" className="w-8 h-8 rounded-full object-cover mr-2 border border-gray-200 dark:border-gray-600" />
