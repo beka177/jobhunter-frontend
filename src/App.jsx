@@ -22,6 +22,7 @@ import EditProfileForm from './components/EditProfileForm';
 import AdminPanel from './components/AdminPanel';
 import SeekerList from './components/SeekerList';
 import MessagesPage from './components/MessagesPage';
+import AIChatWidget from './components/AIChatWidget';
 
 function App() {
   const toast = useToast();
@@ -422,6 +423,7 @@ function App() {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col font-sans text-gray-900 dark:text-gray-100 transition-colors duration-200">
       {renderView()}
+      {currentPage !== 'loading' && <AIChatWidget user={user} />}
     </div>
   );
 }
