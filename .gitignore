@@ -22,3 +22,8 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Local workflow notes
+CLAUDE.md
+AUDIT.md
+.claude/
