@@ -6,72 +6,30 @@ import {
   Quote, ArrowRight, Sparkles, Globe, Mail, Phone, Github
 } from 'lucide-react';
 import { API_URL, CITIES } from '../constants';
+import { useT } from '../i18n.jsx';
 
 const FEATURES = [
-  {
-    icon: Zap,
-    title: 'Быстрый отклик',
-    desc: 'Откликайтесь на вакансии в один клик — без долгих форм и переписок.',
-    iconBg: 'bg-blue-500',
-    cardBg: 'bg-blue-50 dark:bg-blue-900/20',
-    border: 'border-blue-100 dark:border-blue-800/40',
-  },
-  {
-    icon: Shield,
-    title: 'Проверенные компании',
-    desc: 'Работодатели проходят модерацию — мы убираем подозрительные объявления.',
-    iconBg: 'bg-green-500',
-    cardBg: 'bg-green-50 dark:bg-green-900/20',
-    border: 'border-green-100 dark:border-green-800/40',
-  },
-  {
-    icon: TrendingUp,
-    title: 'Удобные фильтры',
-    desc: 'Ищите по зарплате, городу, дате публикации и ключевым навыкам.',
-    iconBg: 'bg-purple-500',
-    cardBg: 'bg-purple-50 dark:bg-purple-900/20',
-    border: 'border-purple-100 dark:border-purple-800/40',
-  },
-  {
-    icon: Heart,
-    title: 'Избранное',
-    desc: 'Сохраняйте интересные вакансии, чтобы вернуться и откликнуться позже.',
-    iconBg: 'bg-pink-500',
-    cardBg: 'bg-pink-50 dark:bg-pink-900/20',
-    border: 'border-pink-100 dark:border-pink-800/40',
-  },
+  { icon: Zap,        titleKey: 'landing.feature1.title', descKey: 'landing.feature1.desc', iconBg: 'bg-blue-500',   cardBg: 'bg-blue-50 dark:bg-blue-900/20',     border: 'border-blue-100 dark:border-blue-800/40' },
+  { icon: Shield,     titleKey: 'landing.feature2.title', descKey: 'landing.feature2.desc', iconBg: 'bg-green-500',  cardBg: 'bg-green-50 dark:bg-green-900/20',   border: 'border-green-100 dark:border-green-800/40' },
+  { icon: TrendingUp, titleKey: 'landing.feature3.title', descKey: 'landing.feature3.desc', iconBg: 'bg-purple-500', cardBg: 'bg-purple-50 dark:bg-purple-900/20', border: 'border-purple-100 dark:border-purple-800/40' },
+  { icon: Heart,      titleKey: 'landing.feature4.title', descKey: 'landing.feature4.desc', iconBg: 'bg-pink-500',   cardBg: 'bg-pink-50 dark:bg-pink-900/20',     border: 'border-pink-100 dark:border-pink-800/40' },
 ];
 
 const STEPS = [
-  {
-    num: '01',
-    icon: User,
-    title: 'Регистрация',
-    desc: 'Создайте аккаунт за 30 секунд — выберите роль соискателя или работодателя.',
-  },
-  {
-    num: '02',
-    icon: FileText,
-    title: 'Заполните профиль',
-    desc: 'Составьте резюме или опубликуйте вакансию — добавьте опыт, навыки и контакты.',
-  },
-  {
-    num: '03',
-    icon: CheckCircle2,
-    title: 'Получайте отклики',
-    desc: 'Откликайтесь на интересные предложения и отслеживайте статус ваших заявок.',
-  },
+  { num: '01', icon: User,         titleKey: 'landing.step1.title', descKey: 'landing.step1.desc' },
+  { num: '02', icon: FileText,     titleKey: 'landing.step2.title', descKey: 'landing.step2.desc' },
+  { num: '03', icon: CheckCircle2, titleKey: 'landing.step3.title', descKey: 'landing.step3.desc' },
 ];
 
 const CATEGORIES = [
-  { icon: Code2, name: 'IT и разработка', count: 1250, accent: 'blue' },
-  { icon: Megaphone, name: 'Маркетинг и PR', count: 420, accent: 'pink' },
-  { icon: ShoppingBag, name: 'Продажи', count: 890, accent: 'green' },
-  { icon: Palette, name: 'Дизайн', count: 180, accent: 'purple' },
-  { icon: Wrench, name: 'Строительство', count: 630, accent: 'orange' },
-  { icon: Stethoscope, name: 'Медицина', count: 210, accent: 'red' },
-  { icon: Truck, name: 'Логистика и склад', count: 340, accent: 'indigo' },
-  { icon: BookOpen, name: 'Образование', count: 290, accent: 'teal' },
+  { icon: Code2,       nameKey: 'landing.cat.it',           count: 1250, accent: 'blue' },
+  { icon: Megaphone,   nameKey: 'landing.cat.marketing',    count: 420,  accent: 'pink' },
+  { icon: ShoppingBag, nameKey: 'landing.cat.sales',        count: 890,  accent: 'green' },
+  { icon: Palette,     nameKey: 'landing.cat.design',       count: 180,  accent: 'purple' },
+  { icon: Wrench,      nameKey: 'landing.cat.construction', count: 630,  accent: 'orange' },
+  { icon: Stethoscope, nameKey: 'landing.cat.medicine',     count: 210,  accent: 'red' },
+  { icon: Truck,       nameKey: 'landing.cat.logistics',    count: 340,  accent: 'indigo' },
+  { icon: BookOpen,    nameKey: 'landing.cat.education',    count: 290,  accent: 'teal' },
 ];
 
 const CATEGORY_COLORS = {
@@ -86,32 +44,16 @@ const CATEGORY_COLORS = {
 };
 
 const TESTIMONIALS = [
-  {
-    name: 'Айгерим Нурланова',
-    role: 'Frontend-разработчик',
-    avatar: 'https://i.pravatar.cc/120?img=47',
-    text: 'Нашла работу мечты за две недели. Очень удобный интерфейс — откликаешься в один клик и сразу видишь статус.',
-    rating: 5,
-  },
-  {
-    name: 'Данияр Касымов',
-    role: 'Менеджер по продажам',
-    avatar: 'https://i.pravatar.cc/120?img=12',
-    text: 'Пользуюсь JobSearch уже полгода. Получаю достойные предложения почти каждую неделю — фильтры реально работают.',
-    rating: 5,
-  },
-  {
-    name: 'Алия Бекова',
-    role: 'HR-менеджер',
-    avatar: 'https://i.pravatar.cc/120?img=23',
-    text: 'Со стороны работодателя — отличный инструмент. База кандидатов с детальными резюме и удобной фильтрацией.',
-    rating: 5,
-  },
+  { name: 'Айгерим Нурланова', roleKey: 'landing.testimonials.1.role', avatar: 'https://i.pravatar.cc/120?img=47', textKey: 'landing.testimonials.1.text', rating: 5 },
+  { name: 'Данияр Касымов',    roleKey: 'landing.testimonials.2.role', avatar: 'https://i.pravatar.cc/120?img=12', textKey: 'landing.testimonials.2.text', rating: 5 },
+  { name: 'Алия Бекова',       roleKey: 'landing.testimonials.3.role', avatar: 'https://i.pravatar.cc/120?img=23', textKey: 'landing.testimonials.3.text', rating: 5 },
 ];
 
 const LandingPage = ({ onNavigate, onCityChange, globalCity }) => {
+  const { t, lang, setLang } = useT();
   const [activeTab, setActiveTab] = useState('seeker');
   const [isCityModalOpen, setIsCityModalOpen] = useState(false);
+  const [isLangOpen, setIsLangOpen] = useState(false);
 
   const [recentVacancies, setRecentVacancies] = useState([]);
   const [recentSeekers, setRecentSeekers] = useState([]);
@@ -164,36 +106,57 @@ const LandingPage = ({ onNavigate, onCityChange, globalCity }) => {
               <button
                 onClick={() => setActiveTab('seeker')}
                 className={`px-4 py-1.5 text-sm font-medium rounded-md transition-all ${activeTab === 'seeker' ? 'bg-white dark:bg-gray-700 shadow text-gray-900 dark:text-white' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}
-              >Ищу работу</button>
+              >{t('landing.tab.seeker')}</button>
               <button
                 onClick={() => setActiveTab('employer')}
                 className={`px-4 py-1.5 text-sm font-medium rounded-md transition-all ${activeTab === 'employer' ? 'bg-white dark:bg-gray-700 shadow text-gray-900 dark:text-white' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}
-              >Ищу сотрудника</button>
+              >{t('landing.tab.employer')}</button>
             </div>
 
             <button className="hidden lg:flex items-center text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400" onClick={() => onNavigate('help')}>
-              Помощь
+              {t('nav.help')}
             </button>
           </div>
 
           <div className="flex items-center space-x-3 sm:space-x-4">
+            {/* Переключатель языка */}
+            <div className="relative">
+              <button
+                onClick={() => setIsLangOpen(!isLangOpen)}
+                className="flex items-center px-2 py-2 rounded-md text-sm font-bold text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors uppercase"
+                title="Language / Тіл"
+              >
+                <Globe className="h-4 w-4 mr-1" />
+                {lang === 'kk' ? 'KZ' : 'RU'}
+              </button>
+              {isLangOpen && (
+                <>
+                  <div className="fixed inset-0 z-40" onClick={() => setIsLangOpen(false)}></div>
+                  <div className="absolute right-0 mt-2 w-40 bg-white dark:bg-gray-800 rounded-md shadow-lg border border-gray-100 dark:border-gray-700 z-50 py-1">
+                    <button onClick={() => { setLang('ru'); setIsLangOpen(false); }} className={`w-full text-left px-4 py-2 text-sm ${lang === 'ru' ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'}`}>{t('lang.ru')}</button>
+                    <button onClick={() => { setLang('kk'); setIsLangOpen(false); }} className={`w-full text-left px-4 py-2 text-sm ${lang === 'kk' ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'}`}>{t('lang.kk')}</button>
+                  </div>
+                </>
+              )}
+            </div>
+
             <button
               onClick={() => setIsCityModalOpen(true)}
               className="hidden sm:flex items-center text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
             >
               <MapPin className="h-4 w-4 mr-1 text-gray-400 dark:text-gray-500" />
-              {globalCity || 'Все города'}
+              {globalCity || t('common.all_cities')}
             </button>
 
             <button
               onClick={() => onNavigate('login')}
               className="px-4 sm:px-5 py-2 text-sm font-bold text-gray-700 dark:text-gray-200 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-full transition-colors"
-            >Войти</button>
+            >{t('nav.login')}</button>
 
             <button
               onClick={() => onNavigate('register')}
               className="hidden md:block px-5 py-2 text-sm font-bold text-white bg-gray-900 dark:bg-blue-600 hover:bg-black dark:hover:bg-blue-700 rounded-full transition-colors shadow-lg shadow-gray-200 dark:shadow-blue-900/30"
-            >Зарегистрироваться</button>
+            >{t('nav.register')}</button>
           </div>
         </div>
       </header>
@@ -213,18 +176,14 @@ const LandingPage = ({ onNavigate, onCityChange, globalCity }) => {
           <div className="absolute inset-0 flex flex-col justify-center px-6 sm:px-12 md:px-16 lg:px-20 max-w-3xl">
             <div className="inline-flex items-center self-start gap-2 px-3 py-1 bg-white/15 backdrop-blur-sm rounded-full text-xs sm:text-sm text-white font-semibold mb-5 border border-white/20">
               <Sparkles className="w-3.5 h-3.5" />
-              {activeTab === 'seeker' ? 'Свыше 3 000 актуальных вакансий' : 'Более 12 000 готовых резюме'}
+              {t(activeTab === 'seeker' ? 'landing.badge.seeker' : 'landing.badge.employer')}
             </div>
 
             <h1 className="text-3xl sm:text-4xl md:text-5xl font-black text-white leading-tight mb-5 tracking-tight">
-              {activeTab === 'seeker'
-                ? 'Найдите работу мечты в Казахстане'
-                : 'Найдите лучших сотрудников быстро и просто'}
+              {t(activeTab === 'seeker' ? 'landing.hero.title.seeker' : 'landing.hero.title.employer')}
             </h1>
             <p className="text-base sm:text-lg text-gray-200 mb-8 max-w-xl">
-              {activeTab === 'seeker'
-                ? 'Тысячи вакансий от проверенных компаний. Откликайтесь в один клик — без анкет и звонков.'
-                : 'Размещайте вакансии бесплатно и находите подходящих кандидатов по навыкам, городу и опыту.'}
+              {t(activeTab === 'seeker' ? 'landing.hero.desc.seeker' : 'landing.hero.desc.employer')}
             </p>
 
             <div className="flex flex-col sm:flex-row gap-3 max-w-2xl">
@@ -232,21 +191,21 @@ const LandingPage = ({ onNavigate, onCityChange, globalCity }) => {
                 onClick={() => onNavigate('register')}
                 className="inline-flex items-center justify-center px-7 py-4 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-base shadow-xl shadow-blue-900/30 transition-all transform hover:scale-105 active:scale-95"
               >
-                {activeTab === 'seeker' ? 'Начать поиск работы' : 'Найти сотрудников'}
+                {t(activeTab === 'seeker' ? 'landing.cta.start_seeker' : 'landing.cta.start_employer')}
                 <ArrowRight className="ml-2 w-5 h-5" />
               </button>
               <button
                 onClick={() => onNavigate('login')}
                 className="inline-flex items-center justify-center px-7 py-4 bg-white/10 hover:bg-white/20 text-white font-bold rounded-xl text-base border border-white/30 backdrop-blur-sm transition-all"
               >
-                У меня уже есть аккаунт
+                {t('landing.cta.have_account')}
               </button>
             </div>
 
             <div className="mt-7 flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-gray-300">
-              <span className="flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4 text-green-400" /> Бесплатно</span>
-              <span className="flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4 text-green-400" /> Без анкет и звонков</span>
-              <span className="flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4 text-green-400" /> Регистрация за 30 секунд</span>
+              <span className="flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4 text-green-400" /> {t('landing.cta.free')}</span>
+              <span className="flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4 text-green-400" /> {t('landing.cta.no_forms')}</span>
+              <span className="flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4 text-green-400" /> {t('landing.cta.quick_signup')}</span>
             </div>
           </div>
         </div>
@@ -256,19 +215,19 @@ const LandingPage = ({ onNavigate, onCityChange, globalCity }) => {
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-10 mb-4 w-full">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
           {[
-            { label: 'Резюме', value: '12 400', icon: User, color: 'text-blue-600 dark:text-blue-400' },
-            { label: 'Вакансий', value: '3 150', icon: Briefcase, color: 'text-green-600 dark:text-green-400' },
-            { label: 'Компаний', value: '420', icon: Globe, color: 'text-purple-600 dark:text-purple-400' },
-            { label: 'Городов', value: '10', icon: MapPin, color: 'text-pink-600 dark:text-pink-400' },
+            { labelKey: 'landing.stats.resumes',   value: '12 400', icon: User,      color: 'text-blue-600 dark:text-blue-400' },
+            { labelKey: 'landing.stats.vacancies', value: '3 150',  icon: Briefcase, color: 'text-green-600 dark:text-green-400' },
+            { labelKey: 'landing.stats.companies', value: '420',    icon: Globe,     color: 'text-purple-600 dark:text-purple-400' },
+            { labelKey: 'landing.stats.cities',    value: '10',     icon: MapPin,    color: 'text-pink-600 dark:text-pink-400' },
           ].map((s) => (
-            <div key={s.label} className="bg-white dark:bg-gray-800 p-5 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm">
+            <div key={s.labelKey} className="bg-white dark:bg-gray-800 p-5 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm">
               <div className="flex items-center gap-4">
                 <div className={`p-3 rounded-xl bg-gray-50 dark:bg-gray-700 ${s.color}`}>
                   <s.icon className="w-6 h-6" />
                 </div>
                 <div>
                   <div className="text-2xl sm:text-3xl font-black text-gray-900 dark:text-white">{s.value}</div>
-                  <div className="text-sm text-gray-500 dark:text-gray-400 font-medium">{s.label}</div>
+                  <div className="text-sm text-gray-500 dark:text-gray-400 font-medium">{t(s.labelKey)}</div>
                 </div>
               </div>
             </div>
@@ -279,19 +238,19 @@ const LandingPage = ({ onNavigate, onCityChange, globalCity }) => {
       {/* ============================ FEATURES ============================ */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-20 w-full">
         <div className="text-center max-w-2xl mx-auto mb-12">
-          <span className="inline-block px-3 py-1 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-full text-xs font-bold uppercase tracking-wider mb-3">Преимущества</span>
-          <h2 className="text-3xl sm:text-4xl font-black text-gray-900 dark:text-white tracking-tight">Почему именно JobSearch</h2>
-          <p className="mt-4 text-base sm:text-lg text-gray-500 dark:text-gray-400">Платформа, которая делает поиск работы и сотрудников простым и быстрым.</p>
+          <span className="inline-block px-3 py-1 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-full text-xs font-bold uppercase tracking-wider mb-3">{t('landing.features.badge')}</span>
+          <h2 className="text-3xl sm:text-4xl font-black text-gray-900 dark:text-white tracking-tight">{t('landing.features.title')}</h2>
+          <p className="mt-4 text-base sm:text-lg text-gray-500 dark:text-gray-400">{t('landing.features.subtitle')}</p>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {FEATURES.map((f) => (
-            <div key={f.title} className={`p-6 rounded-2xl border ${f.cardBg} ${f.border} hover:shadow-lg transition-all hover:-translate-y-1`}>
+            <div key={f.titleKey} className={`p-6 rounded-2xl border ${f.cardBg} ${f.border} hover:shadow-lg transition-all hover:-translate-y-1`}>
               <div className={`w-12 h-12 rounded-xl ${f.iconBg} flex items-center justify-center text-white mb-4 shadow-md`}>
                 <f.icon className="w-6 h-6" />
               </div>
-              <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">{f.title}</h3>
-              <p className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed">{f.desc}</p>
+              <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">{t(f.titleKey)}</h3>
+              <p className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed">{t(f.descKey)}</p>
             </div>
           ))}
         </div>
@@ -301,9 +260,9 @@ const LandingPage = ({ onNavigate, onCityChange, globalCity }) => {
       <section className="bg-gray-50 dark:bg-gray-800/50 py-16 lg:py-20 border-y border-gray-100 dark:border-gray-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-2xl mx-auto mb-12">
-            <span className="inline-block px-3 py-1 bg-green-50 dark:bg-green-900/30 text-green-600 dark:text-green-400 rounded-full text-xs font-bold uppercase tracking-wider mb-3">3 простых шага</span>
-            <h2 className="text-3xl sm:text-4xl font-black text-gray-900 dark:text-white tracking-tight">Как это работает</h2>
-            <p className="mt-4 text-base sm:text-lg text-gray-500 dark:text-gray-400">От регистрации до первого отклика — несколько минут.</p>
+            <span className="inline-block px-3 py-1 bg-green-50 dark:bg-green-900/30 text-green-600 dark:text-green-400 rounded-full text-xs font-bold uppercase tracking-wider mb-3">{t('landing.steps.badge')}</span>
+            <h2 className="text-3xl sm:text-4xl font-black text-gray-900 dark:text-white tracking-tight">{t('landing.steps.title')}</h2>
+            <p className="mt-4 text-base sm:text-lg text-gray-500 dark:text-gray-400">{t('landing.steps.subtitle')}</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 relative">
@@ -315,8 +274,8 @@ const LandingPage = ({ onNavigate, onCityChange, globalCity }) => {
                     <s.icon className="w-6 h-6" />
                   </div>
                 </div>
-                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">{s.title}</h3>
-                <p className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed">{s.desc}</p>
+                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">{t(s.titleKey)}</h3>
+                <p className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed">{t(s.descKey)}</p>
                 {idx < STEPS.length - 1 && (
                   <ChevronRight className="hidden md:block absolute -right-5 top-1/2 -translate-y-1/2 w-8 h-8 text-gray-200 dark:text-gray-700" />
                 )}
@@ -329,23 +288,23 @@ const LandingPage = ({ onNavigate, onCityChange, globalCity }) => {
       {/* ============================ CATEGORIES ============================ */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-20 w-full">
         <div className="text-center max-w-2xl mx-auto mb-12">
-          <span className="inline-block px-3 py-1 bg-purple-50 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 rounded-full text-xs font-bold uppercase tracking-wider mb-3">Категории</span>
-          <h2 className="text-3xl sm:text-4xl font-black text-gray-900 dark:text-white tracking-tight">Популярные сферы</h2>
-          <p className="mt-4 text-base sm:text-lg text-gray-500 dark:text-gray-400">Выберите направление и посмотрите актуальные вакансии.</p>
+          <span className="inline-block px-3 py-1 bg-purple-50 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 rounded-full text-xs font-bold uppercase tracking-wider mb-3">{t('landing.categories.badge')}</span>
+          <h2 className="text-3xl sm:text-4xl font-black text-gray-900 dark:text-white tracking-tight">{t('landing.categories.title')}</h2>
+          <p className="mt-4 text-base sm:text-lg text-gray-500 dark:text-gray-400">{t('landing.categories.subtitle')}</p>
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
           {CATEGORIES.map((c) => (
             <button
-              key={c.name}
+              key={c.nameKey}
               onClick={handleExploreClick}
               className="group text-left bg-white dark:bg-gray-800 p-5 rounded-2xl border border-gray-100 dark:border-gray-700 hover:shadow-md hover:border-gray-200 dark:hover:border-gray-600 transition-all"
             >
               <div className={`inline-flex p-3 rounded-xl border transition-colors ${CATEGORY_COLORS[c.accent]}`}>
                 <c.icon className="w-6 h-6" />
               </div>
-              <h3 className="mt-4 text-base font-bold text-gray-900 dark:text-white">{c.name}</h3>
-              <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{c.count.toLocaleString('ru-RU')} вакансий</p>
+              <h3 className="mt-4 text-base font-bold text-gray-900 dark:text-white">{t(c.nameKey)}</h3>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{c.count.toLocaleString('ru-RU')} {t('landing.cat.vacancies_count')}</p>
             </button>
           ))}
         </div>
@@ -355,13 +314,13 @@ const LandingPage = ({ onNavigate, onCityChange, globalCity }) => {
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-20 w-full">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4 mb-10">
           <div>
-            <span className="inline-block px-3 py-1 bg-teal-50 dark:bg-teal-900/30 text-teal-600 dark:text-teal-400 rounded-full text-xs font-bold uppercase tracking-wider mb-3">Свежие</span>
+            <span className="inline-block px-3 py-1 bg-teal-50 dark:bg-teal-900/30 text-teal-600 dark:text-teal-400 rounded-full text-xs font-bold uppercase tracking-wider mb-3">{t('landing.recent.badge')}</span>
             <h2 className="text-3xl sm:text-4xl font-black text-gray-900 dark:text-white tracking-tight">
-              {activeTab === 'seeker' ? 'Новые вакансии' : 'Новые кандидаты'}
+              {t(activeTab === 'seeker' ? 'landing.recent.title.seeker' : 'landing.recent.title.employer')}
             </h2>
           </div>
           <button onClick={handleExploreClick} className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-bold flex items-center transition-colors">
-            Смотреть все <ChevronRight className="w-5 h-5 ml-1" />
+            {t('landing.recent.see_all')} <ChevronRight className="w-5 h-5 ml-1" />
           </button>
         </div>
 
@@ -373,16 +332,16 @@ const LandingPage = ({ onNavigate, onCityChange, globalCity }) => {
                   <img src={vacancy.image} alt={vacancy.title} className="w-full h-40 object-cover rounded-xl mb-4 group-hover:opacity-90 transition-opacity" />
                 )}
                 <h3 className="text-xl font-bold text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors line-clamp-2">{vacancy.title}</h3>
-                <p className="text-lg font-bold text-gray-900 dark:text-white mt-2">{vacancy.salary || 'Зарплата не указана'}</p>
+                <p className="text-lg font-bold text-gray-900 dark:text-white mt-2">{vacancy.salary || t('landing.recent.salary_unspecified')}</p>
                 <p className="text-gray-500 dark:text-gray-400 text-sm mt-1 mb-4 flex-grow">{vacancy.employer_name}</p>
                 <div className="flex items-center text-sm text-gray-600 dark:text-gray-300 mt-auto pt-4 border-t border-gray-100 dark:border-gray-700">
                   <MapPin className="w-4 h-4 mr-2 text-gray-400 dark:text-gray-500" />
-                  <span>{vacancy.city || 'Не указан'}</span>
+                  <span>{vacancy.city || t('common.not_specified')}</span>
                 </div>
               </div>
             ))}
             {recentVacancies.length === 0 && (
-              <div className="col-span-3 text-center py-12 text-gray-500 dark:text-gray-400">Пока нет доступных вакансий...</div>
+              <div className="col-span-3 text-center py-12 text-gray-500 dark:text-gray-400">{t('landing.recent.no_vacancies')}</div>
             )}
           </div>
         ) : (
@@ -401,13 +360,13 @@ const LandingPage = ({ onNavigate, onCityChange, globalCity }) => {
                     <h3 className="text-lg font-bold text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors line-clamp-1">
                       {seeker.first_name || seeker.surname ? `${seeker.first_name} ${seeker.surname}` : seeker.name}
                     </h3>
-                    <p className="text-blue-600 dark:text-blue-400 font-medium text-sm line-clamp-1">{seeker.profession || 'Профессия не указана'}</p>
+                    <p className="text-blue-600 dark:text-blue-400 font-medium text-sm line-clamp-1">{seeker.profession || t('landing.recent.profession_unspecified')}</p>
                   </div>
                 </div>
                 <div className="space-y-2 mt-auto pt-4 border-t border-gray-100 dark:border-gray-700">
                   <div className="flex items-center text-sm text-gray-600 dark:text-gray-300">
                     <MapPin className="w-4 h-4 mr-2 text-gray-400 dark:text-gray-500" />
-                    <span className="truncate">{seeker.city || 'Не указан'}</span>
+                    <span className="truncate">{seeker.city || t('common.not_specified')}</span>
                   </div>
                   {seeker.education_level && (
                     <div className="flex items-center text-sm text-gray-600 dark:text-gray-300">
@@ -419,7 +378,7 @@ const LandingPage = ({ onNavigate, onCityChange, globalCity }) => {
               </div>
             ))}
             {recentSeekers.length === 0 && (
-              <div className="col-span-3 text-center py-12 text-gray-500 dark:text-gray-400">Пока нет доступных кандидатов...</div>
+              <div className="col-span-3 text-center py-12 text-gray-500 dark:text-gray-400">{t('landing.recent.no_seekers')}</div>
             )}
           </div>
         )}
@@ -429,26 +388,26 @@ const LandingPage = ({ onNavigate, onCityChange, globalCity }) => {
       <section className="bg-gray-50 dark:bg-gray-800/50 py-16 lg:py-20 border-y border-gray-100 dark:border-gray-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-2xl mx-auto mb-12">
-            <span className="inline-block px-3 py-1 bg-pink-50 dark:bg-pink-900/30 text-pink-600 dark:text-pink-400 rounded-full text-xs font-bold uppercase tracking-wider mb-3">Отзывы</span>
-            <h2 className="text-3xl sm:text-4xl font-black text-gray-900 dark:text-white tracking-tight">Что говорят пользователи</h2>
-            <p className="mt-4 text-base sm:text-lg text-gray-500 dark:text-gray-400">Тысячи людей уже нашли работу или сотрудников через JobSearch.</p>
+            <span className="inline-block px-3 py-1 bg-pink-50 dark:bg-pink-900/30 text-pink-600 dark:text-pink-400 rounded-full text-xs font-bold uppercase tracking-wider mb-3">{t('landing.testimonials.badge')}</span>
+            <h2 className="text-3xl sm:text-4xl font-black text-gray-900 dark:text-white tracking-tight">{t('landing.testimonials.title')}</h2>
+            <p className="mt-4 text-base sm:text-lg text-gray-500 dark:text-gray-400">{t('landing.testimonials.subtitle')}</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {TESTIMONIALS.map((t) => (
-              <div key={t.name} className="bg-white dark:bg-gray-800 p-7 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm hover:shadow-md transition-shadow relative">
+            {TESTIMONIALS.map((tm) => (
+              <div key={tm.name} className="bg-white dark:bg-gray-800 p-7 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm hover:shadow-md transition-shadow relative">
                 <Quote className="absolute top-5 right-5 w-10 h-10 text-blue-50 dark:text-blue-900/30" />
                 <div className="flex items-center gap-1 mb-4">
-                  {Array.from({ length: t.rating }).map((_, i) => (
+                  {Array.from({ length: tm.rating }).map((_, i) => (
                     <Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
                   ))}
                 </div>
-                <p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-6 relative">{t.text}</p>
+                <p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-6 relative">{t(tm.textKey)}</p>
                 <div className="flex items-center gap-3 pt-4 border-t border-gray-100 dark:border-gray-700">
-                  <img src={t.avatar} alt={t.name} className="w-12 h-12 rounded-full object-cover border border-gray-200 dark:border-gray-600" />
+                  <img src={tm.avatar} alt={tm.name} className="w-12 h-12 rounded-full object-cover border border-gray-200 dark:border-gray-600" />
                   <div>
-                    <div className="font-bold text-gray-900 dark:text-white">{t.name}</div>
-                    <div className="text-sm text-gray-500 dark:text-gray-400">{t.role}</div>
+                    <div className="font-bold text-gray-900 dark:text-white">{tm.name}</div>
+                    <div className="text-sm text-gray-500 dark:text-gray-400">{t(tm.roleKey)}</div>
                   </div>
                 </div>
               </div>
@@ -466,17 +425,17 @@ const LandingPage = ({ onNavigate, onCityChange, globalCity }) => {
           <div className="relative grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
             <div className="text-white">
               <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black leading-tight mb-4 tracking-tight">
-                Готовы найти работу мечты?
+                {t('landing.cta_banner.title')}
               </h2>
               <p className="text-base sm:text-lg text-blue-100 mb-8 max-w-xl">
-                Создайте бесплатный аккаунт прямо сейчас и начните откликаться на вакансии или искать сотрудников уже сегодня.
+                {t('landing.cta_banner.desc')}
               </p>
               <div className="flex flex-col sm:flex-row gap-3">
                 <button onClick={() => onNavigate('register')} className="inline-flex items-center justify-center px-7 py-3.5 bg-white text-blue-700 font-bold rounded-xl hover:bg-gray-100 transition-colors shadow-lg">
-                  Зарегистрироваться <ArrowRight className="ml-2 w-5 h-5" />
+                  {t('landing.cta_banner.signup')} <ArrowRight className="ml-2 w-5 h-5" />
                 </button>
                 <button onClick={() => onNavigate('login')} className="inline-flex items-center justify-center px-7 py-3.5 bg-white/10 text-white font-bold rounded-xl hover:bg-white/20 backdrop-blur border border-white/20 transition-colors">
-                  У меня уже есть аккаунт
+                  {t('landing.cta_banner.login')}
                 </button>
               </div>
             </div>
@@ -485,20 +444,20 @@ const LandingPage = ({ onNavigate, onCityChange, globalCity }) => {
               <div className="relative">
                 <img
                   src="https://images.unsplash.com/photo-1551836022-d5d88e9218df?q=80&w=600&auto=format&fit=crop"
-                  alt="Команда"
+                  alt="Team"
                   className="rounded-2xl shadow-2xl w-80 h-80 object-cover border-4 border-white/20"
                 />
                 <div className="absolute -bottom-4 -left-4 bg-white p-4 rounded-2xl shadow-2xl flex items-center gap-3">
                   <div className="p-2 bg-green-500 rounded-lg text-white"><CheckCircle2 className="w-5 h-5" /></div>
                   <div>
-                    <div className="text-sm font-bold text-gray-900">Принят на работу!</div>
-                    <div className="text-xs text-gray-500">2 минуты назад</div>
+                    <div className="text-sm font-bold text-gray-900">{t('landing.cta_banner.hired')}</div>
+                    <div className="text-xs text-gray-500">{t('landing.cta_banner.hired_time')}</div>
                   </div>
                 </div>
                 <div className="absolute -top-4 -right-4 bg-white p-4 rounded-2xl shadow-2xl flex items-center gap-3">
                   <div className="p-2 bg-blue-500 rounded-lg text-white"><Sparkles className="w-5 h-5" /></div>
                   <div>
-                    <div className="text-sm font-bold text-gray-900">+5 новых откликов</div>
+                    <div className="text-sm font-bold text-gray-900">{t('landing.cta_banner.new_apps')}</div>
                   </div>
                 </div>
               </div>
@@ -517,7 +476,7 @@ const LandingPage = ({ onNavigate, onCityChange, globalCity }) => {
                 <span className="ml-2 text-xl font-black">JobSearch</span>
               </div>
               <p className="text-sm text-gray-400 leading-relaxed max-w-md">
-                Платформа для поиска работы и сотрудников в Казахстане. Курсовая работа по разработке веб-приложения на React и PHP.
+                {t('landing.footer.about')}
               </p>
               <div className="mt-5 flex items-center gap-3">
                 <a href="#" onClick={(e) => e.preventDefault()} className="p-2 bg-gray-800 hover:bg-gray-700 rounded-lg transition-colors" title="GitHub">
@@ -533,27 +492,27 @@ const LandingPage = ({ onNavigate, onCityChange, globalCity }) => {
             </div>
 
             <div>
-              <h4 className="text-white font-bold mb-4 uppercase text-xs tracking-wider">Соискателям</h4>
+              <h4 className="text-white font-bold mb-4 uppercase text-xs tracking-wider">{t('landing.footer.for_seekers')}</h4>
               <ul className="space-y-2 text-sm">
-                <li><button onClick={() => onNavigate('register')} className="hover:text-white transition-colors">Создать резюме</button></li>
-                <li><button onClick={() => onNavigate('register')} className="hover:text-white transition-colors">Поиск вакансий</button></li>
-                <li><button onClick={() => onNavigate('help')} className="hover:text-white transition-colors">Помощь</button></li>
+                <li><button onClick={() => onNavigate('register')} className="hover:text-white transition-colors">{t('landing.footer.create_resume')}</button></li>
+                <li><button onClick={() => onNavigate('register')} className="hover:text-white transition-colors">{t('landing.footer.search_vacancies')}</button></li>
+                <li><button onClick={() => onNavigate('help')} className="hover:text-white transition-colors">{t('landing.footer.help')}</button></li>
               </ul>
             </div>
 
             <div>
-              <h4 className="text-white font-bold mb-4 uppercase text-xs tracking-wider">Работодателям</h4>
+              <h4 className="text-white font-bold mb-4 uppercase text-xs tracking-wider">{t('landing.footer.for_employers')}</h4>
               <ul className="space-y-2 text-sm">
-                <li><button onClick={() => onNavigate('register')} className="hover:text-white transition-colors">Разместить вакансию</button></li>
-                <li><button onClick={() => onNavigate('register')} className="hover:text-white transition-colors">База резюме</button></li>
-                <li><button onClick={() => onNavigate('help')} className="hover:text-white transition-colors">Поддержка</button></li>
+                <li><button onClick={() => onNavigate('register')} className="hover:text-white transition-colors">{t('landing.footer.post_vacancy')}</button></li>
+                <li><button onClick={() => onNavigate('register')} className="hover:text-white transition-colors">{t('landing.footer.search_resumes')}</button></li>
+                <li><button onClick={() => onNavigate('help')} className="hover:text-white transition-colors">{t('landing.footer.support')}</button></li>
               </ul>
             </div>
           </div>
 
           <div className="mt-10 pt-6 border-t border-gray-800 flex flex-col sm:flex-row justify-between items-center gap-3 text-sm text-gray-500">
-            <p>© 2026 JobSearch — Курсовая работа</p>
-            <p>Frontend: React + Vite | Backend: PHP + MySQL</p>
+            <p>{t('landing.footer.copyright')}</p>
+            <p>{t('footer.stack')}</p>
           </div>
         </div>
       </footer>
@@ -563,7 +522,7 @@ const LandingPage = ({ onNavigate, onCityChange, globalCity }) => {
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
           <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden animate-in zoom-in-95 duration-200">
             <div className="px-6 py-4 border-b border-gray-100 dark:border-gray-700 flex justify-between items-center">
-              <h3 className="text-xl font-bold text-gray-900 dark:text-white">Выберите ваш город</h3>
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white">{t('landing.city_modal.title')}</h3>
               <button onClick={() => setIsCityModalOpen(false)} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
                 <Plus className="w-6 h-6 rotate-45" />
               </button>
@@ -576,7 +535,7 @@ const LandingPage = ({ onNavigate, onCityChange, globalCity }) => {
                     onClick={() => selectCity(city)}
                     className={`py-2.5 px-3 text-sm font-medium rounded-xl text-center transition-all ${globalCity === city ? 'bg-blue-600 text-white shadow-md' : 'bg-gray-50 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-blue-50 dark:hover:bg-blue-900/40 hover:text-blue-600 dark:hover:text-blue-400 border border-gray-100 dark:border-gray-600'}`}
                   >
-                    {city}
+                    {city === 'Все города' ? t('common.all_cities') : city}
                   </button>
                 ))}
               </div>

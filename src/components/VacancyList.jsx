@@ -4,9 +4,11 @@ import { Trash2, Briefcase, Filter, X, Pencil, ChevronDown, Check, ChevronsUpDow
 import { UserRole, API_URL } from '../constants';
 import { useToast } from '../toast.jsx';
 import { useDebounce } from '../hooks.js';
+import { useT } from '../i18n.jsx';
 
 const VacancyList = ({ vacancies, user, favorites = [], onToggleFavorite, onDelete, onEdit, onOpenVacancy, globalCity }) => {
   const toast = useToast();
+  const { t } = useT();
   const [applyingId, setApplyingId] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [minSalary, setMinSalary] = useState('');
@@ -25,19 +27,19 @@ const VacancyList = ({ vacancies, user, favorites = [], onToggleFavorite, onDele
   const debouncedEmployer = useDebounce(employerFilter, 250);
 
   const sortOptions = [
-    { id: 'date_desc',   label: 'Сначала новые' },
-    { id: 'date_asc',    label: 'Сначала старые' },
-    { id: 'salary_desc', label: 'Зарплата: по убыванию' },
-    { id: 'salary_asc',  label: 'Зарплата: по возрастанию' },
-    { id: 'title_asc',   label: 'По алфавиту А–Я' },
-    { id: 'title_desc',  label: 'По алфавиту Я–А' },
+    { id: 'date_desc',   label: t('vlist.sort.date_desc') },
+    { id: 'date_asc',    label: t('vlist.sort.date_asc') },
+    { id: 'salary_desc', label: t('vlist.sort.salary_desc') },
+    { id: 'salary_asc',  label: t('vlist.sort.salary_asc') },
+    { id: 'title_asc',   label: t('vlist.sort.title_asc') },
+    { id: 'title_desc',  label: t('vlist.sort.title_desc') },
   ];
 
   const periodOptions = [
-    { id: 'all', label: 'За всё время' },
-    { id: 'month', label: 'За месяц' },
-    { id: 'week', label: 'За неделю' },
-    { id: 'three_days', label: 'За три дня' },
+    { id: 'all',        label: t('vlist.period.all') },
+    { id: 'month',      label: t('vlist.period.month') },
+    { id: 'week',       label: t('vlist.period.week') },
+    { id: 'three_days', label: t('vlist.period.three_days') },
   ];
 
   const parseSalary = (salaryStr) => {
@@ -114,7 +116,7 @@ const VacancyList = ({ vacancies, user, favorites = [], onToggleFavorite, onDele
 
   const handleApplyQuick = async (e, vacancyId) => {
     e.stopPropagation();
-    if (!user) { toast.info('Войдите в систему'); return; }
+    if (!user) { toast.info(t('vlist.toast.login_first')); return; }
     if (user.role === UserRole.EMPLOYER) return;
     if (applyingId) return;
 
@@ -126,14 +128,14 @@ const VacancyList = ({ vacancies, user, favorites = [], onToggleFavorite, onDele
         body: JSON.stringify({ vacancy_id: vacancyId, seeker_id: user.id })
       });
       if (response.status === 409) {
-        toast.info('Вы уже откликнулись на эту вакансию ранее');
+        toast.info(t('vlist.toast.already_applied'));
       } else if (response.ok) {
-        toast.success('Вы успешно откликнулись!');
+        toast.success(t('vlist.toast.applied'));
       } else {
-        toast.error('Не удалось отправить отклик');
+        toast.error(t('vlist.toast.apply_fail'));
       }
     } catch (error) {
-      toast.error('Ошибка сети');
+      toast.error(t('common.network_error'));
     } finally {
       setApplyingId(null);
     }
@@ -145,39 +147,39 @@ const VacancyList = ({ vacancies, user, favorites = [], onToggleFavorite, onDele
       <div className="lg:col-span-1 space-y-6">
         <div className="bg-white dark:bg-gray-800 p-5 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 sticky top-24 transition-colors">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="font-bold text-gray-900 dark:text-white flex items-center text-sm"><Filter className="w-4 h-4 mr-2" /> Фильтры</h3>
+            <h3 className="font-bold text-gray-900 dark:text-white flex items-center text-sm"><Filter className="w-4 h-4 mr-2" /> {t('common.filters')}</h3>
             {filtersActive && (
               <button onClick={handleResetFilters} className="text-[10px] text-gray-400 hover:text-red-500 dark:hover:text-red-400 font-bold uppercase flex items-center transition-colors">
-                <X className="w-3 h-3 mr-1" /> Сбросить
+                <X className="w-3 h-3 mr-1" /> {t('common.reset')}
               </button>
             )}
           </div>
           <div className="space-y-4">
             <div>
-              <label className="block font-semibold text-gray-500 dark:text-gray-400 mb-1 uppercase tracking-wider text-[9px]">Поиск</label>
-              <input type="text" className="block w-full p-2.5 border border-gray-200 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-800 focus:border-blue-300 dark:focus:border-blue-500 outline-none transition-all" placeholder="Должность..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
+              <label className="block font-semibold text-gray-500 dark:text-gray-400 mb-1 uppercase tracking-wider text-[9px]">{t('common.search')}</label>
+              <input type="text" className="block w-full p-2.5 border border-gray-200 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-800 focus:border-blue-300 dark:focus:border-blue-500 outline-none transition-all" placeholder={t('vlist.filter.search')} value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
             </div>
             <div className="grid grid-cols-2 gap-2">
               <div>
-                <label className="block font-semibold text-gray-500 dark:text-gray-400 mb-1 uppercase tracking-wider text-[9px]">Зарплата от</label>
+                <label className="block font-semibold text-gray-500 dark:text-gray-400 mb-1 uppercase tracking-wider text-[9px]">{t('vlist.filter.salary_from')}</label>
                 <input type="number" className="block w-full p-2.5 border border-gray-200 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-800 focus:border-blue-300 dark:focus:border-blue-500 outline-none transition-all" placeholder="0" value={minSalary} onChange={(e) => setMinSalary(e.target.value)} />
               </div>
               <div>
-                <label className="block font-semibold text-gray-500 dark:text-gray-400 mb-1 uppercase tracking-wider text-[9px]">До</label>
+                <label className="block font-semibold text-gray-500 dark:text-gray-400 mb-1 uppercase tracking-wider text-[9px]">{t('vlist.filter.salary_to')}</label>
                 <input type="number" className="block w-full p-2.5 border border-gray-200 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-800 focus:border-blue-300 dark:focus:border-blue-500 outline-none transition-all" placeholder="∞" value={maxSalary} onChange={(e) => setMaxSalary(e.target.value)} />
               </div>
             </div>
             <div>
-              <label className="block font-semibold text-gray-500 dark:text-gray-400 mb-1 uppercase tracking-wider text-[9px]">Работодатель</label>
-              <input type="text" className="block w-full p-2.5 border border-gray-200 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-800 focus:border-blue-300 dark:focus:border-blue-500 outline-none transition-all" placeholder="Название компании..." value={employerFilter} onChange={(e) => setEmployerFilter(e.target.value)} />
+              <label className="block font-semibold text-gray-500 dark:text-gray-400 mb-1 uppercase tracking-wider text-[9px]">{t('vlist.filter.employer')}</label>
+              <input type="text" className="block w-full p-2.5 border border-gray-200 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-800 focus:border-blue-300 dark:focus:border-blue-500 outline-none transition-all" placeholder={t('vlist.filter.employer_placeholder')} value={employerFilter} onChange={(e) => setEmployerFilter(e.target.value)} />
             </div>
             <div>
-              <label className="block font-semibold text-gray-500 dark:text-gray-400 mb-1 uppercase tracking-wider text-[9px]">Навыки в описании</label>
-              <input type="text" className="block w-full p-2.5 border border-gray-200 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-800 focus:border-blue-300 dark:focus:border-blue-500 outline-none transition-all" placeholder="JS, React..." value={keywords} onChange={(e) => setKeywords(e.target.value)} />
+              <label className="block font-semibold text-gray-500 dark:text-gray-400 mb-1 uppercase tracking-wider text-[9px]">{t('vlist.filter.skills')}</label>
+              <input type="text" className="block w-full p-2.5 border border-gray-200 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-800 focus:border-blue-300 dark:focus:border-blue-500 outline-none transition-all" placeholder={t('vlist.filter.skills_placeholder')} value={keywords} onChange={(e) => setKeywords(e.target.value)} />
             </div>
             <label className="flex items-center gap-2 cursor-pointer select-none">
               <input type="checkbox" checked={withImageOnly} onChange={(e) => setWithImageOnly(e.target.checked)} className="w-4 h-4 rounded text-blue-600 focus:ring-blue-500" />
-              <span className="text-xs font-semibold text-gray-600 dark:text-gray-300">Только с изображением</span>
+              <span className="text-xs font-semibold text-gray-600 dark:text-gray-300">{t('vlist.filter.with_image')}</span>
             </label>
           </div>
         </div>
@@ -190,7 +192,7 @@ const VacancyList = ({ vacancies, user, favorites = [], onToggleFavorite, onDele
         <div className="flex items-center justify-between mb-2 bg-white dark:bg-gray-800 px-4 py-3 rounded-xl border border-gray-100 dark:border-gray-700 shadow-sm transition-colors">
           <div className="flex items-center space-x-6">
             <span className="text-xs text-gray-400 font-bold uppercase tracking-widest">
-              Найдено: <span className="text-gray-900 dark:text-white">{sortedVacancies.length}</span>
+              {t('common.found')}: <span className="text-gray-900 dark:text-white">{sortedVacancies.length}</span>
             </span>
             
             {/* Сортировка */}
@@ -288,24 +290,24 @@ const VacancyList = ({ vacancies, user, favorites = [], onToggleFavorite, onDele
                     <button
                       onClick={(e) => { e.stopPropagation(); onEdit(job.id); }}
                       className="text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 p-2 transition-colors rounded-xl hover:bg-blue-50 dark:hover:bg-blue-900/30"
-                      title="Редактировать"
+                      title={t('vlist.edit_title')}
                     >
                       <Pencil className="h-5 w-5" />
                     </button>
                     <button
                       onClick={(e) => { e.stopPropagation(); onDelete(job.id); }}
                       className="text-gray-400 hover:text-red-500 dark:hover:text-red-400 p-2 transition-colors rounded-xl hover:bg-red-50 dark:hover:bg-red-900/30"
-                      title="Удалить"
+                      title={t('vlist.delete_title')}
                     >
                       <Trash2 className="h-5 w-5" />
                     </button>
                   </div>
                 )}
                 {user?.role === UserRole.SEEKER && (
-                  <button 
+                  <button
                     onClick={(e) => { e.stopPropagation(); onToggleFavorite(job.id); }}
                     className={`ml-4 p-2 rounded-full transition-colors ${favorites.includes(job.id) ? 'text-red-500 bg-red-50 dark:bg-red-900/30' : 'text-gray-300 dark:text-gray-500 hover:text-red-400 dark:hover:text-red-400 hover:bg-gray-50 dark:hover:bg-gray-700'}`}
-                    title={favorites.includes(job.id) ? "Убрать из избранного" : "В избранное"}
+                    title={favorites.includes(job.id) ? t('vlist.fav_remove') : t('vlist.fav_add')}
                   >
                     <Heart className={`h-6 w-6 ${favorites.includes(job.id) ? 'fill-current' : ''}`} />
                   </button>
@@ -320,7 +322,7 @@ const VacancyList = ({ vacancies, user, favorites = [], onToggleFavorite, onDele
                     className="inline-flex items-center px-8 py-2.5 text-sm font-black rounded-xl text-white bg-blue-500 hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700 shadow-lg shadow-blue-100 dark:shadow-none transition-all transform hover:scale-[1.03] active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed disabled:scale-100"
                    >
                      {applyingId === job.id && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-                     {applyingId === job.id ? 'Отправка...' : 'Откликнуться'}
+                     {applyingId === job.id ? t('vlist.applying') : t('vlist.apply')}
                    </button>
                 )}
               </div>
@@ -333,8 +335,8 @@ const VacancyList = ({ vacancies, user, favorites = [], onToggleFavorite, onDele
              <div className="bg-gray-50 dark:bg-gray-700 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6">
                 <Briefcase className="w-10 h-10 text-gray-200 dark:text-gray-500" />
              </div>
-             <p className="text-gray-400 dark:text-gray-500 font-bold text-lg">Ничего не нашли</p>
-             <button onClick={handleResetFilters} className="mt-4 text-blue-400 dark:text-blue-500 font-bold hover:text-blue-500 dark:hover:text-blue-400 transition-colors">Сбросить всё</button>
+             <p className="text-gray-400 dark:text-gray-500 font-bold text-lg">{t('common.nothing_found')}</p>
+             <button onClick={handleResetFilters} className="mt-4 text-blue-400 dark:text-blue-500 font-bold hover:text-blue-500 dark:hover:text-blue-400 transition-colors">{t('common.reset_all')}</button>
           </div>
         )}
       </div>

@@ -1,17 +1,18 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Sparkles, X, Send, Loader2, RotateCcw } from 'lucide-react';
 import { API_URL } from '../constants';
-
-const SUGGESTIONS = [
-  'Как откликнуться на вакансию?',
-  'Как создать резюме?',
-  'Как работают фильтры поиска?',
-  'Что делает работодатель в админке?',
-];
+import { useT } from '../i18n.jsx';
 
 const STORAGE_KEY = 'jobsearch_ai_chat';
 
 const AIChatWidget = ({ user }) => {
+  const { t, lang } = useT();
+  const SUGGESTIONS = [
+    t('ai.suggestion.apply'),
+    t('ai.suggestion.resume'),
+    t('ai.suggestion.filters'),
+    t('ai.suggestion.admin'),
+  ];
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState(() => {
     try {
@@ -53,17 +54,18 @@ const AIChatWidget = ({ user }) => {
         body: JSON.stringify({
           messages: next.slice(-20),
           user_role: user?.role || null,
+          lang,
         }),
       });
       const data = await r.json().catch(() => ({}));
       if (!r.ok) {
         const errText = data?.error?.message || data?.error || `HTTP ${r.status}`;
-        setMessages(m => [...m, { role: 'model', text: `⚠️ Не удалось получить ответ: ${typeof errText === 'string' ? errText : 'неизвестная ошибка'}` }]);
+        setMessages(m => [...m, { role: 'model', text: `${t('ai.api_error_prefix')} ${typeof errText === 'string' ? errText : t('ai.api_error_unknown')}` }]);
       } else {
         setMessages(m => [...m, { role: 'model', text: data.reply || '...' }]);
       }
     } catch (e) {
-      setMessages(m => [...m, { role: 'model', text: '⚠️ Ошибка сети. Проверьте, что бэкенд (OSPanel) запущен.' }]);
+      setMessages(m => [...m, { role: 'model', text: t('ai.network_error') }]);
     } finally {
       setSending(false);
     }
@@ -71,7 +73,7 @@ const AIChatWidget = ({ user }) => {
 
   const clearChat = () => {
     if (!messages.length) return;
-    if (!window.confirm('Очистить историю чата с ИИ?')) return;
+    if (!window.confirm(t('msg.confirm_clear'))) return;
     setMessages([]);
     try { localStorage.removeItem(STORAGE_KEY); } catch (e) { /* ignore */ }
   };
@@ -83,13 +85,13 @@ const AIChatWidget = ({ user }) => {
         <button
           onClick={() => setOpen(true)}
           className="fixed bottom-6 right-6 z-40 group flex items-center gap-2 px-5 py-3.5 bg-gradient-to-br from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white rounded-full shadow-2xl shadow-blue-500/30 hover:shadow-blue-500/50 transition-all transform hover:scale-105 active:scale-95"
-          title="Спросить ИИ-помощника"
+          title={t('ai.button')}
         >
           <span className="relative flex">
             <Sparkles className="w-5 h-5" />
             <span className="absolute -top-1 -right-1 w-2 h-2 bg-green-400 rounded-full ring-2 ring-blue-600 animate-pulse" />
           </span>
-          <span className="text-sm font-bold hidden sm:inline">ИИ-помощник</span>
+          <span className="text-sm font-bold hidden sm:inline">{t('ai.button')}</span>
         </button>
       )}
 
@@ -103,22 +105,22 @@ const AIChatWidget = ({ user }) => {
                 <Sparkles className="w-4 h-4" />
               </div>
               <div className="min-w-0">
-                <div className="font-bold text-sm truncate">ИИ-помощник</div>
-                <div className="text-[11px] text-blue-100 truncate">Подскажу по сайту JobSearch</div>
+                <div className="font-bold text-sm truncate">{t('ai.title')}</div>
+                <div className="text-[11px] text-blue-100 truncate">{t('ai.subtitle')}</div>
               </div>
             </div>
             <div className="flex items-center gap-1 flex-shrink-0">
               <button
                 onClick={clearChat}
                 className="p-1.5 hover:bg-white/15 rounded-lg transition-colors"
-                title="Очистить историю"
+                title={t('ai.clear_title')}
               >
                 <RotateCcw className="w-4 h-4" />
               </button>
               <button
                 onClick={() => setOpen(false)}
                 className="p-1.5 hover:bg-white/15 rounded-lg transition-colors"
-                title="Свернуть"
+                title={t('msg.collapse')}
               >
                 <X className="w-4 h-4" />
               </button>
@@ -132,8 +134,8 @@ const AIChatWidget = ({ user }) => {
                 <div className="inline-flex p-4 rounded-2xl bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 mb-3">
                   <Sparkles className="w-7 h-7" />
                 </div>
-                <p className="text-sm text-gray-600 dark:text-gray-300 font-medium mb-1">Здравствуйте! Чем помочь?</p>
-                <p className="text-xs text-gray-400 dark:text-gray-500 mb-5">Я знаю всё о функциях сайта.</p>
+                <p className="text-sm text-gray-600 dark:text-gray-300 font-medium mb-1">{t('ai.greeting')}</p>
+                <p className="text-xs text-gray-400 dark:text-gray-500 mb-5">{t('ai.greeting_sub')}</p>
                 <div className="space-y-2">
                   {SUGGESTIONS.map((s) => (
                     <button
@@ -185,7 +187,7 @@ const AIChatWidget = ({ user }) => {
                 }
               }}
               rows={1}
-              placeholder="Спросите что-нибудь о сайте..."
+              placeholder={t('ai.input_placeholder')}
               className="flex-1 resize-none px-3 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-200 dark:focus:ring-blue-800 focus:border-blue-300 dark:focus:border-blue-500 outline-none transition-all max-h-24"
             />
             <button
@@ -197,7 +199,7 @@ const AIChatWidget = ({ user }) => {
             </button>
           </form>
           <div className="text-[10px] text-center text-gray-400 dark:text-gray-500 pb-2 px-3">
-            Powered by Google Gemini
+            {t('ai.powered_by')}
           </div>
         </div>
       )}

@@ -2,8 +2,10 @@ import React, { useMemo, useState } from 'react';
 import { Search, MapPin, User, GraduationCap, Globe, X, Phone, Mail, Briefcase, MessageCircle, ArrowUpDown } from 'lucide-react';
 import { useDebounce } from '../hooks.js';
 import { UserRole } from '../constants';
+import { useT } from '../i18n.jsx';
 
 const SeekerList = ({ seekers, globalCity, user, onOpenChat }) => {
+  const { t } = useT();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedSeeker, setSelectedSeeker] = useState(null);
 
@@ -65,7 +67,7 @@ const SeekerList = ({ seekers, globalCity, user, onOpenChat }) => {
             <input
               type="text"
               className="block w-full pl-10 p-3 border border-gray-200 dark:border-gray-600 rounded-lg text-sm bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-800 focus:border-blue-300 dark:focus:border-blue-500 outline-none transition-all"
-              placeholder="Поиск по профессии, навыкам, имени или городу..."
+              placeholder={t('slist.search_placeholder')}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
@@ -77,11 +79,11 @@ const SeekerList = ({ seekers, globalCity, user, onOpenChat }) => {
               onChange={(e) => setSortBy(e.target.value)}
               className="appearance-none pl-10 pr-8 py-3 rounded-lg border border-gray-200 dark:border-gray-700 text-sm font-medium bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 outline-none cursor-pointer"
             >
-              <option value="default">По умолчанию</option>
-              <option value="name_asc">Имя А–Я</option>
-              <option value="name_desc">Имя Я–А</option>
-              <option value="profession_asc">Профессия А–Я</option>
-              <option value="city_asc">Город А–Я</option>
+              <option value="default">{t('slist.sort.default')}</option>
+              <option value="name_asc">{t('slist.sort.name_asc')}</option>
+              <option value="name_desc">{t('slist.sort.name_desc')}</option>
+              <option value="profession_asc">{t('slist.sort.profession_asc')}</option>
+              <option value="city_asc">{t('slist.sort.city_asc')}</option>
             </select>
             <ArrowUpDown className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
           </div>
@@ -90,7 +92,7 @@ const SeekerList = ({ seekers, globalCity, user, onOpenChat }) => {
             onClick={() => setIsFiltersOpen(!isFiltersOpen)}
             className={`px-4 py-3 rounded-lg border font-medium text-sm transition-colors whitespace-nowrap flex items-center ${isFiltersOpen || filtersActive ? 'bg-blue-50 border-blue-200 text-blue-700 dark:bg-blue-900/30 dark:border-blue-800 dark:text-blue-400' : 'bg-white border-gray-200 text-gray-700 hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-700'}`}
           >
-            Фильтры {filtersActive && <span className="ml-1.5 inline-flex items-center justify-center w-5 h-5 text-[10px] font-bold text-white bg-blue-600 rounded-full">!</span>}
+            {t('common.filters')} {filtersActive && <span className="ml-1.5 inline-flex items-center justify-center w-5 h-5 text-[10px] font-bold text-white bg-blue-600 rounded-full">!</span>}
           </button>
         </div>
 
@@ -98,54 +100,54 @@ const SeekerList = ({ seekers, globalCity, user, onOpenChat }) => {
           <div className="pt-4 border-t border-gray-100 dark:border-gray-700 animate-in slide-in-from-top-2">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               <div>
-                <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1.5 uppercase">Образование</label>
+                <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1.5 uppercase">{t('slist.filter.education')}</label>
                 <select value={eduLevel} onChange={(e) => setEduLevel(e.target.value)}
                   className="block w-full p-2.5 border border-gray-200 dark:border-gray-600 rounded-lg text-sm bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white outline-none">
-                  <option value="">Любое</option>
-                  <option value="Среднее">Среднее</option>
-                  <option value="Среднее специальное">Среднее специальное</option>
-                  <option value="Высшее">Высшее</option>
-                  <option value="Магистратура">Магистратура</option>
+                  <option value="">{t('slist.filter.any')}</option>
+                  <option value="Среднее">{t('slist.edu.secondary')}</option>
+                  <option value="Среднее специальное">{t('slist.edu.secondary_special')}</option>
+                  <option value="Высшее">{t('slist.edu.higher')}</option>
+                  <option value="Магистратура">{t('slist.edu.master')}</option>
                 </select>
               </div>
               <div>
-                <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1.5 uppercase">Пол</label>
+                <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1.5 uppercase">{t('slist.filter.gender')}</label>
                 <select value={genderFilter} onChange={(e) => setGenderFilter(e.target.value)}
                   className="block w-full p-2.5 border border-gray-200 dark:border-gray-600 rounded-lg text-sm bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white outline-none">
-                  <option value="">Любой</option>
-                  <option value="male">Мужской</option>
-                  <option value="female">Женский</option>
+                  <option value="">{t('slist.filter.any_m')}</option>
+                  <option value="male">{t('slist.field.gender_male')}</option>
+                  <option value="female">{t('slist.field.gender_female')}</option>
                 </select>
               </div>
               <div>
-                <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1.5 uppercase">Гражданство</label>
+                <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1.5 uppercase">{t('slist.filter.citizenship')}</label>
                 <select value={citizenshipFilter} onChange={(e) => setCitizenshipFilter(e.target.value)}
                   className="block w-full p-2.5 border border-gray-200 dark:border-gray-600 rounded-lg text-sm bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white outline-none">
-                  <option value="">Любое</option>
-                  <option value="Казахстан">Казахстан</option>
-                  <option value="Россия">Россия</option>
-                  <option value="Другое">Другое</option>
+                  <option value="">{t('slist.filter.any')}</option>
+                  <option value="Казахстан">{t('slist.cit.kz')}</option>
+                  <option value="Россия">{t('slist.cit.ru')}</option>
+                  <option value="Другое">{t('slist.cit.other')}</option>
                 </select>
               </div>
               <div>
-                <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1.5 uppercase">Разрешение на работу</label>
+                <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1.5 uppercase">{t('slist.filter.work_permit')}</label>
                 <select value={workPermitFilter} onChange={(e) => setWorkPermitFilter(e.target.value)}
                   className="block w-full p-2.5 border border-gray-200 dark:border-gray-600 rounded-lg text-sm bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white outline-none">
-                  <option value="">Любое</option>
-                  <option value="Казахстан">Казахстан</option>
-                  <option value="Россия">Россия</option>
-                  <option value="Не требуется">Не требуется</option>
+                  <option value="">{t('slist.filter.any')}</option>
+                  <option value="Казахстан">{t('slist.permit.kz')}</option>
+                  <option value="Россия">{t('slist.permit.ru')}</option>
+                  <option value="Не требуется">{t('slist.permit.none')}</option>
                 </select>
               </div>
             </div>
             <div className="flex flex-wrap items-center justify-between gap-3 mt-4 pt-4 border-t border-gray-100 dark:border-gray-700">
               <label className="flex items-center gap-2 cursor-pointer select-none">
                 <input type="checkbox" checked={withResumeOnly} onChange={(e) => setWithResumeOnly(e.target.checked)} className="w-4 h-4 rounded text-blue-600 focus:ring-blue-500" />
-                <span className="text-xs font-semibold text-gray-600 dark:text-gray-300">Только с заполненным резюме</span>
+                <span className="text-xs font-semibold text-gray-600 dark:text-gray-300">{t('slist.filter.with_resume')}</span>
               </label>
               {filtersActive && (
                 <button onClick={handleResetFilters} className="text-xs font-bold text-gray-500 hover:text-red-500 dark:hover:text-red-400 uppercase flex items-center transition-colors">
-                  <X className="w-3 h-3 mr-1" /> Сбросить фильтры
+                  <X className="w-3 h-3 mr-1" /> {t('slist.reset_filters')}
                 </button>
               )}
             </div>
@@ -159,8 +161,8 @@ const SeekerList = ({ seekers, globalCity, user, onOpenChat }) => {
           <div className="bg-gray-50 dark:bg-gray-700 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6">
             <Search className="w-10 h-10 text-gray-400 dark:text-gray-500" />
           </div>
-          <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Кандидаты не найдены</h3>
-          <p className="text-gray-500 dark:text-gray-400">Попробуйте изменить параметры поиска</p>
+          <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">{t('slist.empty.title')}</h3>
+          <p className="text-gray-500 dark:text-gray-400">{t('slist.empty.subtitle')}</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -182,7 +184,7 @@ const SeekerList = ({ seekers, globalCity, user, onOpenChat }) => {
                   <h3 className="text-lg font-bold text-gray-900 dark:text-white truncate group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
                     {seeker.first_name || seeker.surname ? `${seeker.first_name} ${seeker.surname}` : seeker.name}
                   </h3>
-                  <p className="text-blue-600 dark:text-blue-400 font-medium text-sm truncate">{seeker.profession || 'Профессия не указана'}</p>
+                  <p className="text-blue-600 dark:text-blue-400 font-medium text-sm truncate">{seeker.profession || t('landing.recent.profession_unspecified')}</p>
                 </div>
               </div>
               
@@ -231,7 +233,7 @@ const SeekerList = ({ seekers, globalCity, user, onOpenChat }) => {
             <div className="inline-block align-bottom bg-white dark:bg-gray-800 rounded-2xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full border border-gray-100 dark:border-gray-700">
               <div className="bg-white dark:bg-gray-800 px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                 <div className="flex justify-between items-start mb-5 border-b dark:border-gray-700 pb-4">
-                  <h3 className="text-2xl font-bold text-gray-900 dark:text-white">Резюме кандидата</h3>
+                  <h3 className="text-2xl font-bold text-gray-900 dark:text-white">{t('slist.modal.title')}</h3>
                   <button onClick={() => setSelectedSeeker(null)} className="text-gray-400 hover:text-gray-500 dark:hover:text-gray-300 bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 p-2 rounded-full transition-colors">
                     <X className="h-5 w-5" />
                   </button>
@@ -251,19 +253,19 @@ const SeekerList = ({ seekers, globalCity, user, onOpenChat }) => {
                       <p className="text-2xl font-bold text-gray-900 dark:text-white">
                         {selectedSeeker.first_name || selectedSeeker.surname ? `${selectedSeeker.first_name} ${selectedSeeker.surname}` : selectedSeeker.name}
                       </p>
-                      <p className="text-lg text-blue-600 dark:text-blue-400 font-medium mt-1">{selectedSeeker.profession || 'Профессия не указана'}</p>
+                      <p className="text-lg text-blue-600 dark:text-blue-400 font-medium mt-1">{selectedSeeker.profession || t('landing.recent.profession_unspecified')}</p>
                     </div>
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                      <div className="bg-gray-50 dark:bg-gray-700/50 p-4 rounded-xl border border-gray-100 dark:border-gray-600">
-                        <span className="text-xs text-gray-500 dark:text-gray-400 block mb-1 uppercase tracking-wider font-bold">Город</span>
+                        <span className="text-xs text-gray-500 dark:text-gray-400 block mb-1 uppercase tracking-wider font-bold">{t('common.city')}</span>
                         <span className="font-semibold text-gray-900 dark:text-white flex items-center">
-                           <MapPin className="w-4 h-4 mr-2 text-blue-500" /> {selectedSeeker.city || 'Не указан'}
+                           <MapPin className="w-4 h-4 mr-2 text-blue-500" /> {selectedSeeker.city || t('common.not_specified')}
                         </span>
                      </div>
                      <div className="bg-gray-50 dark:bg-gray-700/50 p-4 rounded-xl border border-gray-100 dark:border-gray-600">
-                        <span className="text-xs text-gray-500 dark:text-gray-400 block mb-1 uppercase tracking-wider font-bold">Контакты</span>
+                        <span className="text-xs text-gray-500 dark:text-gray-400 block mb-1 uppercase tracking-wider font-bold">{t('slist.section.contacts')}</span>
                         <div className="space-y-1">
                           <span className="font-semibold text-gray-900 dark:text-white flex items-center text-sm">
                              <Mail className="w-4 h-4 mr-2 text-blue-500" /> {selectedSeeker.email}
@@ -279,19 +281,19 @@ const SeekerList = ({ seekers, globalCity, user, onOpenChat }) => {
 
                   <div className="border-t dark:border-gray-700 pt-5">
                     <h4 className="font-bold text-gray-900 dark:text-white flex items-center mb-4 text-lg">
-                      <User className="w-5 h-5 mr-2 text-blue-500" /> Личные данные
+                      <User className="w-5 h-5 mr-2 text-blue-500" /> {t('slist.section.personal')}
                     </h4>
                     <div className="grid grid-cols-2 gap-4 text-sm">
                         <div className="bg-gray-50 dark:bg-gray-700/30 p-3 rounded-lg">
-                          <span className="text-gray-500 dark:text-gray-400 block text-xs mb-1">Пол</span>
-                          <span className="font-medium text-gray-900 dark:text-white">{selectedSeeker.gender === 'male' ? 'Мужской' : selectedSeeker.gender === 'female' ? 'Женский' : '-'}</span>
+                          <span className="text-gray-500 dark:text-gray-400 block text-xs mb-1">{t('slist.filter.gender')}</span>
+                          <span className="font-medium text-gray-900 dark:text-white">{selectedSeeker.gender === 'male' ? t('slist.field.gender_male') : selectedSeeker.gender === 'female' ? t('slist.field.gender_female') : '-'}</span>
                         </div>
                         <div className="bg-gray-50 dark:bg-gray-700/30 p-3 rounded-lg">
-                          <span className="text-gray-500 dark:text-gray-400 block text-xs mb-1">Дата рождения</span>
+                          <span className="text-gray-500 dark:text-gray-400 block text-xs mb-1">{t('slist.field.birthday')}</span>
                           <span className="font-medium text-gray-900 dark:text-white">{selectedSeeker.birthday || '-'}</span>
                         </div>
                         <div className="bg-gray-50 dark:bg-gray-700/30 p-3 rounded-lg col-span-2">
-                          <span className="text-gray-500 dark:text-gray-400 block text-xs mb-1">Гражданство</span>
+                          <span className="text-gray-500 dark:text-gray-400 block text-xs mb-1">{t('slist.field.citizenship')}</span>
                           <span className="font-medium text-gray-900 dark:text-white">{selectedSeeker.citizenship || '-'}</span>
                         </div>
                     </div>
@@ -299,21 +301,21 @@ const SeekerList = ({ seekers, globalCity, user, onOpenChat }) => {
 
                   <div className="border-t dark:border-gray-700 pt-5">
                     <h4 className="font-bold text-gray-900 dark:text-white flex items-center mb-4 text-lg">
-                      <GraduationCap className="w-5 h-5 mr-2 text-blue-500" /> Образование
+                      <GraduationCap className="w-5 h-5 mr-2 text-blue-500" /> {t('slist.section.education')}
                     </h4>
                     <div className="bg-gray-50 dark:bg-gray-700/30 p-4 rounded-xl border border-gray-100 dark:border-gray-600">
-                      <p className="text-base font-bold text-gray-900 dark:text-white mb-1">{selectedSeeker.education_level || 'Не указано'}</p>
+                      <p className="text-base font-bold text-gray-900 dark:text-white mb-1">{selectedSeeker.education_level || t('slist.field.education_not_specified')}</p>
                       {selectedSeeker.education_institution && <p className="text-sm text-gray-800 dark:text-gray-200 font-medium">{selectedSeeker.education_institution}</p>}
                       {selectedSeeker.education_faculty && <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">{selectedSeeker.education_faculty}</p>}
                       {selectedSeeker.education_specialty && <p className="text-sm text-gray-600 dark:text-gray-400">{selectedSeeker.education_specialty}</p>}
-                      {selectedSeeker.education_year && <p className="text-sm text-gray-500 dark:text-gray-500 mt-2">Год окончания: {selectedSeeker.education_year}</p>}
+                      {selectedSeeker.education_year && <p className="text-sm text-gray-500 dark:text-gray-500 mt-2">{t('slist.field.education_year')}: {selectedSeeker.education_year}</p>}
                     </div>
                   </div>
 
                   {selectedSeeker.skills && (
                     <div className="border-t dark:border-gray-700 pt-5">
                       <h4 className="font-bold text-gray-900 dark:text-white flex items-center mb-4 text-lg">
-                        <Globe className="w-5 h-5 mr-2 text-blue-500" /> Навыки
+                        <Globe className="w-5 h-5 mr-2 text-blue-500" /> {t('slist.section.skills')}
                       </h4>
                       <div className="flex flex-wrap gap-2">
                         {selectedSeeker.skills.split(',').map((skill, idx) => (
@@ -328,7 +330,7 @@ const SeekerList = ({ seekers, globalCity, user, onOpenChat }) => {
                   {selectedSeeker.about && (
                     <div className="border-t dark:border-gray-700 pt-5">
                       <h4 className="font-bold text-gray-900 dark:text-white flex items-center mb-4 text-lg">
-                        <Briefcase className="w-5 h-5 mr-2 text-blue-500" /> О себе
+                        <Briefcase className="w-5 h-5 mr-2 text-blue-500" /> {t('slist.section.about')}
                       </h4>
                       <div className="bg-gray-50 dark:bg-gray-700/30 p-4 rounded-xl text-sm text-gray-700 dark:text-gray-300 border border-gray-100 dark:border-gray-600 whitespace-pre-wrap">
                         {selectedSeeker.about}
@@ -338,14 +340,14 @@ const SeekerList = ({ seekers, globalCity, user, onOpenChat }) => {
                 </div>
               </div>
               <div className="bg-gray-50 dark:bg-gray-800/80 px-4 py-4 sm:px-6 sm:flex sm:flex-row-reverse gap-2 border-t dark:border-gray-700">
-                <button type="button" className="w-full inline-flex justify-center rounded-xl border border-gray-300 dark:border-gray-600 shadow-sm px-6 py-2.5 bg-white dark:bg-gray-800 text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 sm:w-auto sm:text-sm transition-colors" onClick={() => setSelectedSeeker(null)}>Закрыть</button>
+                <button type="button" className="w-full inline-flex justify-center rounded-xl border border-gray-300 dark:border-gray-600 shadow-sm px-6 py-2.5 bg-white dark:bg-gray-800 text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 sm:w-auto sm:text-sm transition-colors" onClick={() => setSelectedSeeker(null)}>{t('common.close')}</button>
                 {user && user.role === UserRole.EMPLOYER && onOpenChat && (
                   <button
                     type="button"
                     onClick={() => { onOpenChat(selectedSeeker.id, 'seeker', null); setSelectedSeeker(null); }}
                     className="w-full inline-flex items-center justify-center rounded-xl border border-transparent shadow-sm px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-base font-bold text-white sm:w-auto sm:text-sm transition-colors"
                   >
-                    <MessageCircle className="w-4 h-4 mr-2" /> Написать кандидату
+                    <MessageCircle className="w-4 h-4 mr-2" /> {t('slist.modal.write')}
                   </button>
                 )}
               </div>

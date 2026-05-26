@@ -2,9 +2,11 @@ import React, { useEffect, useState } from 'react';
 import { Trash2, Briefcase, Loader2 } from 'lucide-react';
 import { API_URL } from '../constants';
 import { useToast } from '../toast.jsx';
+import { useT } from '../i18n.jsx';
 
 const FavoritesList = ({ user, onNavigate, onOpenVacancy }) => {
   const toast = useToast();
+  const { t } = useT();
   const [favorites, setFavorites] = useState([]);
   const [loading, setLoading] = useState(true);
   const [removingId, setRemovingId] = useState(null);
@@ -29,7 +31,7 @@ const FavoritesList = ({ user, onNavigate, onOpenVacancy }) => {
 
   const handleRemove = async (e, vacancyId) => {
     e.stopPropagation();
-    if (!window.confirm('Удалить из избранного?')) return;
+    if (!window.confirm(t('fav.confirm_remove'))) return;
     if (removingId) return;
 
     setRemovingId(vacancyId);
@@ -38,31 +40,31 @@ const FavoritesList = ({ user, onNavigate, onOpenVacancy }) => {
         method: 'DELETE'
       });
       setFavorites(prev => prev.filter(v => v.id !== vacancyId));
-      toast.success('Удалено из избранного');
+      toast.success(t('fav.toast.removed'));
     } catch (error) {
-      toast.error('Ошибка при удалении');
+      toast.error(t('fav.toast.remove_error'));
     } finally {
       setRemovingId(null);
     }
   };
 
-  if (loading) return <div className="text-center py-10">Загрузка избранного...</div>;
+  if (loading) return <div className="text-center py-10">{t('fav.loading')}</div>;
 
   return (
     <div className="max-w-4xl mx-auto">
-      <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-8">Избранные вакансии</h1>
-      
+      <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-8">{t('fav.title')}</h1>
+
       {favorites.length === 0 ? (
         <div className="text-center py-16 bg-white dark:bg-gray-800 rounded-3xl border border-dashed border-gray-200 dark:border-gray-700">
           <div className="bg-red-50 dark:bg-red-900/20 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6">
             <Briefcase className="w-10 h-10 text-red-200 dark:text-red-800/50" />
           </div>
-          <p className="text-gray-400 dark:text-gray-500 font-bold text-lg">Список избранного пуст</p>
-          <button 
-            onClick={() => onNavigate('home')} 
+          <p className="text-gray-400 dark:text-gray-500 font-bold text-lg">{t('fav.empty')}</p>
+          <button
+            onClick={() => onNavigate('home')}
             className="mt-4 text-blue-500 dark:text-blue-400 font-bold hover:text-blue-600 dark:hover:text-blue-300 transition-colors"
           >
-            Найти вакансии
+            {t('fav.find_vacancies')}
           </button>
         </div>
       ) : (
@@ -93,7 +95,7 @@ const FavoritesList = ({ user, onNavigate, onOpenVacancy }) => {
                   onClick={(e) => handleRemove(e, job.id)}
                   disabled={removingId === job.id}
                   className="p-2 text-gray-400 dark:text-gray-500 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-full transition-all disabled:opacity-60 disabled:cursor-not-allowed"
-                  title="Удалить из избранного"
+                  title={t('fav.remove_title')}
                 >
                   {removingId === job.id ? <Loader2 className="w-5 h-5 animate-spin" /> : <Trash2 className="w-5 h-5" />}
                 </button>

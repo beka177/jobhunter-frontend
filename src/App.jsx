@@ -3,6 +3,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { API_URL, UserRole } from './constants';
 import { ArrowLeft } from 'lucide-react';
 import { useToast } from './toast.jsx';
+import { useT } from './i18n.jsx';
 
 // Импорт компонентов из отдельных файлов
 import Navbar from './components/Navbar';
@@ -26,6 +27,7 @@ import AIChatWidget from './components/AIChatWidget';
 
 function App() {
   const toast = useToast();
+  const { t } = useT();
   const [currentPage, setCurrentPage] = useState('loading');
   const [globalCity, setGlobalCity] = useState(localStorage.getItem('jobsearch_city') || 'Астана');
   const [selectedVacancyId, setSelectedVacancyId] = useState(null); 
@@ -90,7 +92,7 @@ function App() {
 
   const toggleFavorite = async (vacancyId) => {
     if (!user) {
-      toast.info('Войдите, чтобы добавить в избранное');
+      toast.info(t('vlist.toast.fav_login'));
       return;
     }
     
@@ -215,16 +217,16 @@ function App() {
   };
 
   const handleDeleteVacancy = async (id) => {
-    if (!window.confirm('Вы уверены?')) return;
+    if (!window.confirm(t('vlist.confirm_delete'))) return;
     try {
       const r = await fetch(`${API_URL}/vacancies.php?id=${id}`, { method: 'DELETE' });
       if (r.ok) {
-        toast.success('Вакансия удалена');
+        toast.success(t('vlist.toast.deleted'));
         fetchVacancies();
       } else {
-        toast.error('Не удалось удалить вакансию');
+        toast.error(t('vlist.toast.delete_fail'));
       }
-    } catch (e) { toast.error('Ошибка сети при удалении'); }
+    } catch (e) { toast.error(t('vlist.toast.delete_net')); }
   };
 
   const handleOpenVacancy = (id) => {
@@ -240,7 +242,7 @@ function App() {
 
   // Determine the actual view to render
   const renderView = () => {
-    if (currentPage === 'loading') return <div className="flex-grow flex items-center justify-center">Загрузка...</div>;
+    if (currentPage === 'loading') return <div className="flex-grow flex items-center justify-center">{t('common.loading')}</div>;
 
     const isPublicPage = currentPage === 'login' || currentPage === 'register' || currentPage === 'help';
 
@@ -268,8 +270,8 @@ function App() {
         <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full flex-grow">
           {!isConnected && (currentPage === 'home' || !currentPage) && (
              <div className="bg-red-100 dark:bg-red-900/30 border border-red-400 dark:border-red-800/50 text-red-700 dark:text-red-400 px-4 py-3 rounded relative mb-6">
-              <strong className="font-bold">Нет связи с сервером!</strong>
-              <span className="block sm:inline"> Проверьте OSPanel.</span>
+              <strong className="font-bold">{t('nav.no_server')}</strong>
+              <span className="block sm:inline"> {t('nav.check_ospanel')}</span>
             </div>
           )}
 
@@ -277,24 +279,24 @@ function App() {
             <>
               <div className="mb-8 text-center">
                 <h1 className="text-4xl font-extrabold text-gray-900 dark:text-white tracking-tight sm:text-5xl mb-2">
-                  {user?.role === UserRole.EMPLOYER ? 'База резюме' : 'Найди работу мечты'}
+                  {user?.role === UserRole.EMPLOYER ? t('home.title.employer') : t('home.title.seeker')}
                 </h1>
               </div>
               {user?.role === UserRole.EMPLOYER ? (
                 loadingSeekers ? (
-                  <div className="text-center py-10 dark:text-gray-400">Загрузка кандидатов...</div>
+                  <div className="text-center py-10 dark:text-gray-400">{t('home.loading_seekers')}</div>
                 ) : seekersError ? (
                   <div className="bg-red-100 dark:bg-red-900/30 border border-red-400 text-red-700 dark:text-red-400 px-4 py-3 rounded relative text-center">
-                    <strong className="font-bold block text-lg mb-1">Не удалось загрузить списки резюме!</strong>
+                    <strong className="font-bold block text-lg mb-1">{t('home.seekers_error_title')}</strong>
                     <span className="block">{seekersError}</span>
-                    <span className="block mt-2 text-sm">Пожалуйста, убедитесь, что вы скопировали файл <b>seekers.php</b> в папку <b>OSPanel/domains/jobsearch/api/</b></span>
+                    <span className="block mt-2 text-sm">{t('home.seekers_error_hint')}</span>
                   </div>
                 ) : (
                   <SeekerList seekers={seekers} globalCity={globalCity} user={user} onOpenChat={openChatWith} />
                 )
               ) : (
                 loadingVacancies ? (
-                  <div className="text-center py-10 dark:text-gray-400">Загрузка...</div>
+                  <div className="text-center py-10 dark:text-gray-400">{t('home.loading_vacancies')}</div>
                 ) : (
                   <VacancyList 
                     vacancies={vacancies} 
@@ -328,10 +330,10 @@ function App() {
             >
               <ArrowLeft className="h-6 w-6" />
             </button>
-            <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white">Мои опубликованные вакансии</h1>
+            <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white">{t('home.my_vacancies_title')}</h1>
           </div>
           {loadingVacancies ? (
-            <div className="text-center py-10 dark:text-gray-400">Загрузка...</div>
+            <div className="text-center py-10 dark:text-gray-400">{t('common.loading')}</div>
           ) : (
               <VacancyList 
                 vacancies={vacancies.filter(v => String(v.employer_id) === String(user.id))} 
@@ -416,7 +418,7 @@ function App() {
       )}
 
       {currentPage === 'resume' && user && user.role === UserRole.SEEKER && (
-        <ResumeForm user={user} onSuccess={() => toast.success('Резюме обновлено')} onNavigate={setCurrentPage} />
+        <ResumeForm user={user} onSuccess={() => toast.success(t('resume.toast.saved'))} onNavigate={setCurrentPage} />
       )}
 
       {currentPage === 'seeker-applications' && user && user.role === UserRole.SEEKER && (

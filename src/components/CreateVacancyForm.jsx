@@ -2,9 +2,11 @@ import React, { useState } from 'react';
 import { Loader2 } from 'lucide-react';
 import { API_URL } from '../constants';
 import { useToast } from '../toast.jsx';
+import { useT } from '../i18n.jsx';
 
 const CreateVacancyForm = ({ user, onSuccess, onCancel }) => {
   const toast = useToast();
+  const { t } = useT();
   const [title, setTitle] = useState('');
   const [salary, setSalary] = useState('');
   const [city, setCity] = useState(''); 
@@ -29,15 +31,15 @@ const CreateVacancyForm = ({ user, onSuccess, onCancel }) => {
         })
       });
       if (response.ok) {
-        toast.success('Вакансия создана');
+        toast.success(t('vac_form.toast.created'));
         onSuccess();
       } else {
         const err = await response.json().catch(() => ({}));
-        toast.error(`Ошибка: ${err.message || 'не удалось создать'}`);
+        toast.error(`${t('vac_form.toast.create_error')}: ${err.message || ''}`);
       }
     } catch (error) {
       console.error(error);
-      toast.error('Ошибка сети: не удалось подключиться к серверу');
+      toast.error(t('vac_form.toast.create_net'));
     } finally {
       setLoading(false);
     }
@@ -45,33 +47,33 @@ const CreateVacancyForm = ({ user, onSuccess, onCancel }) => {
 
   return (
     <div className="bg-white dark:bg-gray-800 shadow sm:rounded-lg max-w-2xl mx-auto mt-10 p-6 transition-colors">
-      <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">Создание новой вакансии</h3>
+      <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">{t('vac_form.create_title')}</h3>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Название должности</label>
-          <input type="text" required value={title} onChange={e => setTitle(e.target.value)} className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-blue-500 focus:ring-blue-500 border p-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors" placeholder="Например: PHP Разработчик" />
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">{t('vac_form.field.title')}</label>
+          <input type="text" required value={title} onChange={e => setTitle(e.target.value)} className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-blue-500 focus:ring-blue-500 border p-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors" placeholder={t('vac_form.field.title_placeholder')} />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Город</label>
-          <input type="text" value={city} onChange={e => setCity(e.target.value)} className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-blue-500 focus:ring-blue-500 border p-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors" placeholder="Например: Астана" />
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">{t('vac_form.field.city')}</label>
+          <input type="text" value={city} onChange={e => setCity(e.target.value)} className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-blue-500 focus:ring-blue-500 border p-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors" placeholder={t('vac_form.field.city_placeholder')} />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Ссылка на логотип/картинку (необязательно)</label>
-          <input type="text" value={image} onChange={e => setImage(e.target.value)} className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-blue-500 focus:ring-blue-500 border p-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors" placeholder="https://..." />
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">{t('vac_form.field.image')}</label>
+          <input type="text" value={image} onChange={e => setImage(e.target.value)} className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-blue-500 focus:ring-blue-500 border p-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors" placeholder={t('vac_form.field.image_placeholder')} />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Зарплата</label>
-          <input type="text" required value={salary} onChange={e => setSalary(e.target.value)} className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-blue-500 focus:ring-blue-500 border p-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors" placeholder="Например: 100 000 руб." />
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">{t('vac_form.field.salary')}</label>
+          <input type="text" required value={salary} onChange={e => setSalary(e.target.value)} className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-blue-500 focus:ring-blue-500 border p-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors" placeholder={t('vac_form.field.salary_placeholder')} />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Описание</label>
-          <textarea required value={description} onChange={e => setDescription(e.target.value)} rows={4} className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-blue-500 focus:ring-blue-500 border p-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors" placeholder="Обязанности, требования..." />
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">{t('vac_form.field.description')}</label>
+          <textarea required value={description} onChange={e => setDescription(e.target.value)} rows={4} className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-blue-500 focus:ring-blue-500 border p-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors" placeholder={t('vac_form.field.description_placeholder')} />
         </div>
         <div className="flex justify-end space-x-3">
-          <button type="button" onClick={onCancel} className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">Отмена</button>
+          <button type="button" onClick={onCancel} className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">{t('common.cancel')}</button>
           <button type="submit" disabled={loading} className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
             {loading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-            {loading ? 'Создание...' : 'Создать'}
+            {loading ? t('vac_form.creating') : t('vac_form.create_button')}
           </button>
         </div>
       </form>

@@ -2,9 +2,11 @@ import React, { useState } from 'react';
 import { User, Mail, Lock, Save, X, Camera, ArrowLeft, Loader2 } from 'lucide-react';
 import { API_URL } from '../constants';
 import { useToast } from '../toast.jsx';
+import { useT } from '../i18n.jsx';
 
 const EditProfileForm = ({ user, onUpdate, onCancel }) => {
   const toast = useToast();
+  const { t } = useT();
   const [name, setName] = useState(user.name || '');
   const [email, setEmail] = useState(user.email || '');
   const [avatar, setAvatar] = useState(user.avatar || '');
@@ -18,7 +20,7 @@ const EditProfileForm = ({ user, onUpdate, onCancel }) => {
     setError('');
 
     if (password && password !== confirmPassword) {
-      setError('Пароли не совпадают');
+      setError(t('profile.passwords_mismatch'));
       return;
     }
 
@@ -41,12 +43,12 @@ const EditProfileForm = ({ user, onUpdate, onCancel }) => {
 
       if (response.ok) {
         onUpdate(data.user);
-        toast.success('Профиль успешно обновлён!');
+        toast.success(t('profile.toast.updated'));
       } else {
-        setError(data.error || 'Ошибка обновления профиля');
+        setError(data.error || t('profile.toast.update_error'));
       }
     } catch (err) {
-      setError('Ошибка сети');
+      setError(t('common.network_error'));
     } finally {
       setLoading(false);
     }
@@ -55,12 +57,12 @@ const EditProfileForm = ({ user, onUpdate, onCancel }) => {
   return (
     <div className="max-w-2xl mx-auto mt-10 p-8 bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700 transition-colors">
       <div className="flex justify-between items-center mb-8">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Редактирование профиля</h2>
-        <button 
-          onClick={onCancel} 
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{t('profile.title')}</h2>
+        <button
+          onClick={onCancel}
           className="inline-flex items-center px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors font-medium shadow-sm"
         >
-          <ArrowLeft className="h-5 w-5 mr-2" /> Назад
+          <ArrowLeft className="h-5 w-5 mr-2" /> {t('common.back')}
         </button>
       </div>
 
@@ -81,7 +83,7 @@ const EditProfileForm = ({ user, onUpdate, onCancel }) => {
             )}
           </div>
           <div className="w-full max-w-xs">
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 text-center">Ссылка на аватар</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 text-center">{t('profile.avatar_url')}</label>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                 <Camera className="h-4 w-4 text-gray-400" />
@@ -91,7 +93,7 @@ const EditProfileForm = ({ user, onUpdate, onCancel }) => {
                 value={avatar}
                 onChange={(e) => setAvatar(e.target.value)}
                 className="pl-10 block w-full border-gray-300 dark:border-gray-600 rounded-lg focus:ring-blue-500 focus:border-blue-500 sm:text-sm p-2.5 border bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors"
-                placeholder="https://example.com/avatar.jpg"
+                placeholder={t('profile.avatar_placeholder')}
               />
             </div>
           </div>
@@ -99,7 +101,7 @@ const EditProfileForm = ({ user, onUpdate, onCancel }) => {
 
         <div className="grid grid-cols-1 gap-6">
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Имя</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('profile.name')}</label>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                 <User className="h-4 w-4 text-gray-400" />
@@ -115,7 +117,7 @@ const EditProfileForm = ({ user, onUpdate, onCancel }) => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('profile.email')}</label>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                 <Mail className="h-4 w-4 text-gray-400" />
@@ -131,10 +133,10 @@ const EditProfileForm = ({ user, onUpdate, onCancel }) => {
           </div>
 
           <div className="border-t border-gray-100 dark:border-gray-700 pt-6 mt-2">
-            <h3 className="text-sm font-bold text-gray-900 dark:text-white mb-4 uppercase tracking-wider">Смена пароля (необязательно)</h3>
+            <h3 className="text-sm font-bold text-gray-900 dark:text-white mb-4 uppercase tracking-wider">{t('profile.password_section')}</h3>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Новый пароль</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('profile.new_password')}</label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                     <Lock className="h-4 w-4 text-gray-400" />
@@ -144,13 +146,13 @@ const EditProfileForm = ({ user, onUpdate, onCancel }) => {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     className="pl-10 block w-full border-gray-300 dark:border-gray-600 rounded-lg focus:ring-blue-500 focus:border-blue-500 sm:text-sm p-2.5 border bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors"
-                    placeholder="Оставьте пустым, если не меняете"
+                    placeholder={t('profile.new_password_placeholder')}
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Подтвердите пароль</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('profile.confirm_password')}</label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                     <Lock className="h-4 w-4 text-gray-400" />
@@ -160,7 +162,7 @@ const EditProfileForm = ({ user, onUpdate, onCancel }) => {
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     className="pl-10 block w-full border-gray-300 dark:border-gray-600 rounded-lg focus:ring-blue-500 focus:border-blue-500 sm:text-sm p-2.5 border bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors"
-                    placeholder="Повторите новый пароль"
+                    placeholder={t('profile.confirm_password_placeholder')}
                   />
                 </div>
               </div>
@@ -174,7 +176,7 @@ const EditProfileForm = ({ user, onUpdate, onCancel }) => {
             onClick={onCancel}
             className="mr-3 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
           >
-            Отмена
+            {t('common.cancel')}
           </button>
           <button
             type="submit"
@@ -182,7 +184,7 @@ const EditProfileForm = ({ user, onUpdate, onCancel }) => {
             className="inline-flex items-center px-6 py-2 border border-transparent text-sm font-medium rounded-lg shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Save className="w-4 h-4 mr-2" />}
-            {loading ? 'Сохранение...' : 'Сохранить изменения'}
+            {loading ? t('profile.saving') : t('profile.save')}
           </button>
         </div>
       </form>

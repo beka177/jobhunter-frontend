@@ -2,11 +2,12 @@ import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { ArrowLeft, Send, User, MessageCircle, Briefcase, Loader2, CheckCircle2, XCircle, Clock, Info } from 'lucide-react';
 import { API_URL, UserRole } from '../constants';
 import { useToast } from '../toast.jsx';
+import { useT } from '../i18n.jsx';
 
-const APPLICATION_STATUS_LABEL = {
-  pending:  { text: 'Ожидает',  cls: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400', Icon: Clock },
-  accepted: { text: 'Принят',   cls: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',     Icon: CheckCircle2 },
-  rejected: { text: 'Отклонён', cls: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',             Icon: XCircle },
+const APPLICATION_STATUS_META = {
+  pending:  { cls: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400', Icon: Clock, key: 'msg.app_status.pending' },
+  accepted: { cls: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',     Icon: CheckCircle2, key: 'msg.app_status.accepted' },
+  rejected: { cls: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',             Icon: XCircle, key: 'msg.app_status.rejected' },
 };
 
 const POLL_INTERVAL_MS = 5000;
@@ -14,6 +15,7 @@ const POLL_INTERVAL_MS = 5000;
 // Корневая страница чатов: слева — список диалогов, справа — выбранный диалог.
 const MessagesPage = ({ user, onNavigate, chatTarget, onChatTargetConsumed, onUnreadRefresh }) => {
   const toast = useToast();
+  const { t, lang } = useT();
   const [conversations, setConversations] = useState([]);
   const [loadingList, setLoadingList] = useState(true);
   const [selectedId, setSelectedId] = useState(null);
@@ -68,7 +70,7 @@ const MessagesPage = ({ user, onNavigate, chatTarget, onChatTargetConsumed, onUn
         await fetchConversations();
         setSelectedId(data.conversation_id);
       } catch (e) {
-        toast.error('Не удалось открыть чат');
+        toast.error(t('msg.toast.open_error'));
         onChatTargetConsumed?.();
       }
     })();
@@ -130,7 +132,7 @@ const MessagesPage = ({ user, onNavigate, chatTarget, onChatTargetConsumed, onUn
       setDraft('');
       fetchConversations();
     } catch (err) {
-      toast.error('Не удалось отправить сообщение');
+      toast.error(t('msg.toast.send_error'));
     } finally {
       setSending(false);
     }
@@ -152,9 +154,10 @@ const MessagesPage = ({ user, onNavigate, chatTarget, onChatTargetConsumed, onUn
     const d = new Date(iso);
     const today = new Date();
     const sameDay = d.toDateString() === today.toDateString();
+    const loc = lang === 'kk' ? 'kk-KZ' : 'ru-RU';
     return sameDay
-      ? d.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })
-      : d.toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit' });
+      ? d.toLocaleTimeString(loc, { hour: '2-digit', minute: '2-digit' })
+      : d.toLocaleDateString(loc, { day: '2-digit', month: '2-digit' });
   };
 
   const selectedConv = conversations.find(c => c.id === selectedId);
@@ -166,7 +169,7 @@ const MessagesPage = ({ user, onNavigate, chatTarget, onChatTargetConsumed, onUn
         onClick={() => onNavigate('home')}
         className="mb-4 inline-flex items-center px-4 py-2 bg-white dark:bg-gray-800 border border-blue-600 dark:border-blue-500 text-blue-700 dark:text-blue-400 rounded-md hover:bg-blue-50 dark:hover:bg-gray-700 transition-colors font-medium shadow-sm"
       >
-        <ArrowLeft className="h-5 w-5 mr-2" /> На главную
+        <ArrowLeft className="h-5 w-5 mr-2" /> {t('msg.back_home')}
       </button>
 
       <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700 overflow-hidden flex flex-col md:flex-row h-[70vh] min-h-[500px]">
@@ -174,19 +177,16 @@ const MessagesPage = ({ user, onNavigate, chatTarget, onChatTargetConsumed, onUn
         <aside className={`md:w-80 lg:w-96 border-r border-gray-100 dark:border-gray-700 flex flex-col ${selectedId ? 'hidden md:flex' : 'flex'}`}>
           <div className="px-5 py-4 border-b border-gray-100 dark:border-gray-700">
             <h2 className="text-xl font-bold text-gray-900 dark:text-white flex items-center">
-              <MessageCircle className="w-5 h-5 mr-2 text-blue-500" /> Сообщения
+              <MessageCircle className="w-5 h-5 mr-2 text-blue-500" /> {t('msg.title')}
             </h2>
           </div>
 
           <div className="flex-1 overflow-y-auto">
             {loadingList ? (
-              <div className="p-6 text-center text-gray-400 dark:text-gray-500">Загрузка...</div>
+              <div className="p-6 text-center text-gray-400 dark:text-gray-500">{t('msg.list.loading')}</div>
             ) : conversations.length === 0 ? (
-              <div className="p-6 text-center text-gray-400 dark:text-gray-500 text-sm">
-                Пока нет диалогов.<br/>
-                {user.role === UserRole.SEEKER
-                  ? 'Откройте вакансию и нажмите «Написать работодателю».'
-                  : 'Откройте резюме соискателя и нажмите «Написать кандидату».'}
+              <div className="p-6 text-center text-gray-400 dark:text-gray-500 text-sm whitespace-pre-line">
+                {t(user.role === UserRole.SEEKER ? 'msg.list.empty_seeker' : 'msg.list.empty_employer')}
               </div>
             ) : (
               <ul className="divide-y divide-gray-100 dark:divide-gray-700">
@@ -209,7 +209,7 @@ const MessagesPage = ({ user, onNavigate, chatTarget, onChatTargetConsumed, onUn
                         )}
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center justify-between gap-2">
-                            <p className={`truncate text-sm ${unread ? 'font-bold' : 'font-semibold'} text-gray-900 dark:text-white`}>{oth?.name || 'Пользователь'}</p>
+                            <p className={`truncate text-sm ${unread ? 'font-bold' : 'font-semibold'} text-gray-900 dark:text-white`}>{oth?.name || t('msg.user_default')}</p>
                             <span className="text-[11px] text-gray-400 dark:text-gray-500 flex-shrink-0">{formatTime(c.last_message_at || c.updated_at)}</span>
                           </div>
                           {c.vacancy_title && (
@@ -217,11 +217,11 @@ const MessagesPage = ({ user, onNavigate, chatTarget, onChatTargetConsumed, onUn
                               <p className="text-[11px] text-blue-600 dark:text-blue-400 truncate flex items-center min-w-0">
                                 <Briefcase className="w-3 h-3 mr-1 flex-shrink-0" /><span className="truncate">{c.vacancy_title}</span>
                               </p>
-                              {c.application_status && APPLICATION_STATUS_LABEL[c.application_status] && (() => {
-                                const s = APPLICATION_STATUS_LABEL[c.application_status];
+                              {c.application_status && APPLICATION_STATUS_META[c.application_status] && (() => {
+                                const s = APPLICATION_STATUS_META[c.application_status];
                                 return (
                                   <span className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wide flex-shrink-0 ${s.cls}`}>
-                                    <s.Icon className="w-3 h-3" /> {s.text}
+                                    <s.Icon className="w-3 h-3" /> {t(s.key)}
                                   </span>
                                 );
                               })()}
@@ -229,7 +229,7 @@ const MessagesPage = ({ user, onNavigate, chatTarget, onChatTargetConsumed, onUn
                           )}
                           <div className="flex items-center justify-between mt-1 gap-2">
                             <p className={`truncate text-xs ${unread ? 'text-gray-900 dark:text-gray-100 font-medium' : 'text-gray-500 dark:text-gray-400'}`}>
-                              {c.last_message || <span className="italic">Пока нет сообщений</span>}
+                              {c.last_message || <span className="italic">{t('msg.no_messages')}</span>}
                             </p>
                             {unread > 0 && (
                               <span className="inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 text-[11px] font-bold text-white bg-red-500 rounded-full flex-shrink-0">{unread}</span>
@@ -250,7 +250,7 @@ const MessagesPage = ({ user, onNavigate, chatTarget, onChatTargetConsumed, onUn
           {!selectedConv ? (
             <div className="flex-1 flex flex-col items-center justify-center text-gray-400 dark:text-gray-500 p-8 text-center">
               <MessageCircle className="w-16 h-16 mb-4 opacity-30" />
-              <p className="font-medium">Выберите диалог</p>
+              <p className="font-medium">{t('msg.empty_select')}</p>
             </div>
           ) : (
             <>
@@ -259,7 +259,7 @@ const MessagesPage = ({ user, onNavigate, chatTarget, onChatTargetConsumed, onUn
                 <button
                   onClick={() => setSelectedId(null)}
                   className="md:hidden p-1 -ml-1 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
-                  title="Назад к списку"
+                  title={t('msg.back_to_list')}
                 >
                   <ArrowLeft className="w-5 h-5" />
                 </button>
@@ -278,11 +278,11 @@ const MessagesPage = ({ user, onNavigate, chatTarget, onChatTargetConsumed, onUn
                     </div>
                   )}
                 </div>
-                {selectedConv.application_status && APPLICATION_STATUS_LABEL[selectedConv.application_status] && (() => {
-                  const s = APPLICATION_STATUS_LABEL[selectedConv.application_status];
+                {selectedConv.application_status && APPLICATION_STATUS_META[selectedConv.application_status] && (() => {
+                  const s = APPLICATION_STATUS_META[selectedConv.application_status];
                   return (
                     <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold ${s.cls}`}>
-                      <s.Icon className="w-3.5 h-3.5" /> {s.text}
+                      <s.Icon className="w-3.5 h-3.5" /> {t(s.key)}
                     </span>
                   );
                 })()}
@@ -291,9 +291,9 @@ const MessagesPage = ({ user, onNavigate, chatTarget, onChatTargetConsumed, onUn
               {/* Лента сообщений */}
               <div className="flex-1 overflow-y-auto px-5 py-4 bg-gray-50 dark:bg-gray-900/40 space-y-3">
                 {loadingMessages ? (
-                  <div className="text-center text-gray-400 dark:text-gray-500 py-10">Загрузка...</div>
+                  <div className="text-center text-gray-400 dark:text-gray-500 py-10">{t('msg.loading_messages')}</div>
                 ) : messages.length === 0 ? (
-                  <div className="text-center text-gray-400 dark:text-gray-500 py-10 text-sm">Напишите первое сообщение</div>
+                  <div className="text-center text-gray-400 dark:text-gray-500 py-10 text-sm">{t('msg.first_message')}</div>
                 ) : (
                   messages.map(m => {
                     if (m.type === 'system') {
@@ -337,14 +337,14 @@ const MessagesPage = ({ user, onNavigate, chatTarget, onChatTargetConsumed, onUn
                     }
                   }}
                   rows={1}
-                  placeholder="Напишите сообщение... (Enter — отправить, Shift+Enter — перенос)"
+                  placeholder={t('msg.input_placeholder')}
                   className="flex-1 resize-none px-4 py-2.5 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-200 dark:focus:ring-blue-800 focus:border-blue-300 dark:focus:border-blue-500 outline-none transition-all max-h-32"
                 />
                 <button
                   type="submit"
                   disabled={!draft.trim() || sending}
                   className="inline-flex items-center justify-center w-11 h-11 rounded-xl bg-blue-600 hover:bg-blue-700 text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-md"
-                  title="Отправить"
+                  title={t('msg.send_title')}
                 >
                   {sending ? <Loader2 className="w-5 h-5 animate-spin" /> : <Send className="w-5 h-5" />}
                 </button>
