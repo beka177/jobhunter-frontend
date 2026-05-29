@@ -24,6 +24,7 @@ import AdminPanel from './components/AdminPanel';
 import SeekerList from './components/SeekerList';
 import MessagesPage from './components/MessagesPage';
 import AIChatWidget from './components/AIChatWidget';
+import EmployerDashboard from './components/EmployerDashboard';
 
 function App() {
   const toast = useToast();
@@ -277,11 +278,13 @@ function App() {
 
           {(currentPage === 'home' || currentPage === 'landing' && user) && (
             <>
-              <div className="mb-8 text-center">
-                <h1 className="text-4xl font-extrabold text-gray-900 dark:text-white tracking-tight sm:text-5xl mb-2">
-                  {user?.role === UserRole.EMPLOYER ? t('home.title.employer') : t('home.title.seeker')}
-                </h1>
-              </div>
+              {user?.role !== UserRole.EMPLOYER && (
+                <div className="mb-8 text-center">
+                  <h1 className="text-4xl font-extrabold text-gray-900 dark:text-white tracking-tight sm:text-5xl mb-2">
+                    {t('home.title.seeker')}
+                  </h1>
+                </div>
+              )}
               {user?.role === UserRole.EMPLOYER ? (
                 loadingSeekers ? (
                   <div className="text-center py-10 dark:text-gray-400">{t('home.loading_seekers')}</div>
@@ -292,7 +295,15 @@ function App() {
                     <span className="block mt-2 text-sm">{t('home.seekers_error_hint')}</span>
                   </div>
                 ) : (
-                  <SeekerList seekers={seekers} globalCity={globalCity} user={user} onOpenChat={openChatWith} />
+                  <>
+                    <EmployerDashboard
+                      user={user}
+                      vacancies={vacancies}
+                      seekers={seekers}
+                      onNavigate={setCurrentPage}
+                    />
+                    <SeekerList seekers={seekers} globalCity={globalCity} user={user} onOpenChat={openChatWith} />
+                  </>
                 )
               ) : (
                 loadingVacancies ? (
