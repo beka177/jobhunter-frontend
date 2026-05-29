@@ -3,6 +3,7 @@ import { User, Mail, Lock, Save, X, Camera, ArrowLeft, Loader2 } from 'lucide-re
 import { API_URL } from '../constants';
 import { useToast } from '../toast.jsx';
 import { useT } from '../i18n.jsx';
+import FileUpload from './FileUpload.jsx';
 
 const EditProfileForm = ({ user, onUpdate, onCancel }) => {
   const toast = useToast();
@@ -82,19 +83,31 @@ const EditProfileForm = ({ user, onUpdate, onCancel }) => {
               <User className="w-10 h-10 text-gray-400" />
             )}
           </div>
-          <div className="w-full max-w-xs">
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 text-center">{t('profile.avatar_url')}</label>
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Camera className="h-4 w-4 text-gray-400" />
-              </div>
-              <input
-                type="text"
-                value={avatar}
-                onChange={(e) => setAvatar(e.target.value)}
-                className="pl-10 block w-full border-gray-300 dark:border-gray-600 rounded-lg focus:ring-blue-500 focus:border-blue-500 sm:text-sm p-2.5 border bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors"
-                placeholder={t('profile.avatar_placeholder')}
+          <div className="w-full max-w-xs space-y-3">
+            {/* Загрузка файлом */}
+            <div className="flex justify-center">
+              <FileUpload
+                kind="avatar"
+                userId={user.id}
+                currentUrl={avatar}
+                onUploaded={(url) => setAvatar(url)}
               />
+            </div>
+            {/* Альтернатива: вставка URL вручную */}
+            <div>
+              <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1 text-center">{t('upload.or_paste_url')}</label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <Camera className="h-4 w-4 text-gray-400" />
+                </div>
+                <input
+                  type="text"
+                  value={avatar}
+                  onChange={(e) => setAvatar(e.target.value)}
+                  className="pl-10 block w-full border-gray-300 dark:border-gray-600 rounded-lg focus:ring-blue-500 focus:border-blue-500 sm:text-sm p-2.5 border bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors"
+                  placeholder={t('profile.avatar_placeholder')}
+                />
+              </div>
             </div>
           </div>
         </div>

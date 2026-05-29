@@ -3,6 +3,7 @@ import { ArrowLeft, Save, Loader2 } from 'lucide-react';
 import { API_URL } from '../constants';
 import { useToast } from '../toast.jsx';
 import { useT } from '../i18n.jsx';
+import FileUpload from './FileUpload.jsx';
 
 const EditVacancyForm = ({ vacancyId, onSuccess, onCancel }) => {
   const toast = useToast();
@@ -121,6 +122,12 @@ const EditVacancyForm = ({ vacancyId, onSuccess, onCancel }) => {
 
         <div>
           <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 uppercase tracking-wide">{t('vac_form.field.image_short')}</label>
+          <FileUpload
+            kind="vacancy"
+            currentUrl={image}
+            onUploaded={(url) => setImage(url)}
+          />
+          <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mt-3 mb-1">{t('upload.or_paste_url')}</label>
           <input
             type="text"
             value={image}

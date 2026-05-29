@@ -3,6 +3,7 @@ import { Loader2 } from 'lucide-react';
 import { API_URL } from '../constants';
 import { useToast } from '../toast.jsx';
 import { useT } from '../i18n.jsx';
+import FileUpload from './FileUpload.jsx';
 
 const CreateVacancyForm = ({ user, onSuccess, onCancel }) => {
   const toast = useToast();
@@ -58,8 +59,15 @@ const CreateVacancyForm = ({ user, onSuccess, onCancel }) => {
           <input type="text" value={city} onChange={e => setCity(e.target.value)} className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-blue-500 focus:ring-blue-500 border p-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors" placeholder={t('vac_form.field.city_placeholder')} />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">{t('vac_form.field.image')}</label>
-          <input type="text" value={image} onChange={e => setImage(e.target.value)} className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-blue-500 focus:ring-blue-500 border p-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors" placeholder={t('vac_form.field.image_placeholder')} />
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{t('vac_form.field.image')}</label>
+          <FileUpload
+            kind="vacancy"
+            userId={user.id}
+            currentUrl={image}
+            onUploaded={(url) => setImage(url)}
+          />
+          <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mt-2 mb-1">{t('upload.or_paste_url')}</label>
+          <input type="text" value={image} onChange={e => setImage(e.target.value)} className="block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-blue-500 focus:ring-blue-500 border p-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors" placeholder={t('vac_form.field.image_placeholder')} />
         </div>
         <div>
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">{t('vac_form.field.salary')}</label>
