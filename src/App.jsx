@@ -278,13 +278,11 @@ function App() {
 
           {(currentPage === 'home' || currentPage === 'landing' && user) && (
             <>
-              {user?.role !== UserRole.EMPLOYER && (
-                <div className="mb-8 text-center">
-                  <h1 className="text-4xl font-extrabold text-gray-900 dark:text-white tracking-tight sm:text-5xl mb-2">
-                    {t('home.title.seeker')}
-                  </h1>
-                </div>
-              )}
+              <div className="mb-8 text-center">
+                <h1 className="text-4xl font-extrabold text-gray-900 dark:text-white tracking-tight sm:text-5xl mb-2">
+                  {user?.role === UserRole.EMPLOYER ? t('home.title.employer') : t('home.title.seeker')}
+                </h1>
+              </div>
               {user?.role === UserRole.EMPLOYER ? (
                 loadingSeekers ? (
                   <div className="text-center py-10 dark:text-gray-400">{t('home.loading_seekers')}</div>
@@ -295,15 +293,7 @@ function App() {
                     <span className="block mt-2 text-sm">{t('home.seekers_error_hint')}</span>
                   </div>
                 ) : (
-                  <>
-                    <EmployerDashboard
-                      user={user}
-                      vacancies={vacancies}
-                      seekers={seekers}
-                      onNavigate={setCurrentPage}
-                    />
-                    <SeekerList seekers={seekers} globalCity={globalCity} user={user} onOpenChat={openChatWith} />
-                  </>
+                  <SeekerList seekers={seekers} globalCity={globalCity} user={user} onOpenChat={openChatWith} />
                 )
               ) : (
                 loadingVacancies ? (
@@ -426,6 +416,15 @@ function App() {
 
       {currentPage === 'applications' && user && user.role === UserRole.EMPLOYER && (
         <ApplicationsList user={user} onNavigate={setCurrentPage} onOpenChat={openChatWith} />
+      )}
+
+      {currentPage === 'employer-dashboard' && user && user.role === UserRole.EMPLOYER && (
+        <EmployerDashboard
+          user={user}
+          vacancies={vacancies}
+          seekers={seekers}
+          onNavigate={setCurrentPage}
+        />
       )}
 
       {currentPage === 'resume' && user && user.role === UserRole.SEEKER && (

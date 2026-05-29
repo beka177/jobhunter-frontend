@@ -79,6 +79,19 @@ const DICT = {
     'emp_dash.action.messages_sub': 'Переписка с кандидатами',
     'emp_dash.catalog_title': 'Каталог соискателей',
     'emp_dash.catalog_subtitle': 'Найдите своих будущих сотрудников',
+
+    // === Меню работодателя ===
+    'nav.dashboard': 'Дашборд',
+
+    // === Поиск соискателей: hero + чипы + бейджи ===
+    'slist.hero.label': 'Каталог соискателей',
+    'slist.hero.title': 'Найдите своего идеального кандидата',
+    'slist.popular': 'Популярные',
+    'slist.found_total': 'соискателей соответствуют запросу',
+    'slist.action.details': 'Подробнее',
+    'slist.action.write': 'Написать',
+    'slist.badge.complete': 'Резюме заполнено',
+    'slist.badge.partial': 'Частично заполнено',
     'common.try_again': 'Попробуйте ещё раз',
     'common.actions': 'Действия',
     'common.status': 'Статус',
@@ -651,6 +664,19 @@ const DICT = {
     'emp_dash.action.messages_sub': 'Үміткерлермен жазысу',
     'emp_dash.catalog_title': 'Үміткерлер каталогы',
     'emp_dash.catalog_subtitle': 'Болашақ қызметкерлеріңізді табыңыз',
+
+    // === Жұмыс беруші мәзірі ===
+    'nav.dashboard': 'Дашборд',
+
+    // === Үміткерлерді іздеу ===
+    'slist.hero.label': 'Үміткерлер каталогы',
+    'slist.hero.title': 'Өзіңізге сай үміткерді табыңыз',
+    'slist.popular': 'Танымал',
+    'slist.found_total': 'үміткер сұранысқа сәйкес',
+    'slist.action.details': 'Толығырақ',
+    'slist.action.write': 'Жазу',
+    'slist.badge.complete': 'Түйіндеме толтырылған',
+    'slist.badge.partial': 'Жартылай толтырылған',
     'common.try_again': 'Қайталап көріңіз',
     'common.actions': 'Әрекеттер',
     'common.status': 'Күйі',

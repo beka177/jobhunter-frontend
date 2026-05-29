@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Briefcase, Plus, LogOut, User, FileText, Bell, HelpCircle, List, Heart, ShieldAlert, Moon, Sun, MapPin, MessageCircle, Globe } from 'lucide-react';
+import { Briefcase, Plus, LogOut, User, FileText, Bell, HelpCircle, List, Heart, ShieldAlert, Moon, Sun, MapPin, MessageCircle, Globe, LayoutDashboard } from 'lucide-react';
 import { UserRole, CITIES } from '../constants';
 import { useT } from '../i18n.jsx';
 
@@ -153,6 +153,10 @@ const Navbar = ({ user, onLogout, onNavigate, globalCity, onCityChange, unreadMe
 
                 {user.role === UserRole.EMPLOYER && (
                   <div className="flex items-center space-x-2">
+                    <button onClick={() => onNavigate('employer-dashboard')} className="flex items-center px-4 py-2 rounded-md text-sm font-bold text-white bg-gradient-to-br from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 transition-colors shadow-sm">
+                      <LayoutDashboard className="h-4 w-4 mr-2" />
+                      <span className="hidden md:inline">{t('nav.dashboard')}</span>
+                    </button>
                     <button onClick={() => onNavigate('my-vacancies')} className="flex items-center px-4 py-2 rounded-md text-sm font-bold text-white bg-blue-500 hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700 transition-colors shadow-sm">
                       <List className="h-4 w-4 mr-2" />
                       <span className="hidden md:inline">{t('nav.my_vacancies')}</span>
