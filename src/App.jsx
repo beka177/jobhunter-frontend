@@ -436,7 +436,7 @@ function App() {
       )}
         </main>
 
-        <Footer isConnected={isConnected} onNavigate={setCurrentPage} />
+        <Footer onNavigate={setCurrentPage} user={user} />
       </>
     );
   };

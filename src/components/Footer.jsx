@@ -6,9 +6,18 @@ const GITHUB_URL = 'https://github.com/beka177';
 const EMAIL = 'bekaseitkali@gmail.com';
 
 // Единый футер для лендинга и приложения.
-const Footer = ({ onNavigate }) => {
+const Footer = ({ onNavigate, user }) => {
   const { t } = useT();
   const go = (page) => { if (onNavigate) onNavigate(page); };
+  const role = user?.role;
+
+  // Навигация зависит от контекста: неавторизованного ведём на регистрацию
+  // (страницы каталога ему недоступны и App редиректит обратно на лендинг),
+  // авторизованного — на профильную страницу по роли.
+  const onCreateResume   = () => go(!user ? 'register' : role === 'seeker'   ? 'resume'         : 'home');
+  const onSearchVacancies = () => go(!user ? 'register' : 'home');
+  const onPostVacancy    = () => go(!user ? 'register' : role === 'employer' ? 'create-vacancy' : 'home');
+  const onSearchResumes  = () => go(!user ? 'register' : 'home');
 
   return (
     <footer className="bg-gray-900 dark:bg-gray-950 text-gray-300 mt-auto">
@@ -41,8 +50,8 @@ const Footer = ({ onNavigate }) => {
           <div>
             <h4 className="text-white font-bold mb-4 uppercase text-xs tracking-wider">{t('landing.footer.for_seekers')}</h4>
             <ul className="space-y-2 text-sm">
-              <li><button onClick={() => go('home')} className="hover:text-white transition-colors">{t('landing.footer.create_resume')}</button></li>
-              <li><button onClick={() => go('home')} className="hover:text-white transition-colors">{t('landing.footer.search_vacancies')}</button></li>
+              <li><button onClick={onCreateResume} className="hover:text-white transition-colors">{t('landing.footer.create_resume')}</button></li>
+              <li><button onClick={onSearchVacancies} className="hover:text-white transition-colors">{t('landing.footer.search_vacancies')}</button></li>
               <li><button onClick={() => go('help')} className="hover:text-white transition-colors">{t('landing.footer.help')}</button></li>
             </ul>
           </div>
@@ -51,8 +60,8 @@ const Footer = ({ onNavigate }) => {
           <div>
             <h4 className="text-white font-bold mb-4 uppercase text-xs tracking-wider">{t('landing.footer.for_employers')}</h4>
             <ul className="space-y-2 text-sm">
-              <li><button onClick={() => go('home')} className="hover:text-white transition-colors">{t('landing.footer.post_vacancy')}</button></li>
-              <li><button onClick={() => go('home')} className="hover:text-white transition-colors">{t('landing.footer.search_resumes')}</button></li>
+              <li><button onClick={onPostVacancy} className="hover:text-white transition-colors">{t('landing.footer.post_vacancy')}</button></li>
+              <li><button onClick={onSearchResumes} className="hover:text-white transition-colors">{t('landing.footer.search_resumes')}</button></li>
               <li><button onClick={() => go('help')} className="hover:text-white transition-colors">{t('landing.footer.support')}</button></li>
             </ul>
           </div>
