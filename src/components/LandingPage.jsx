@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import { API_URL, CITIES } from '../constants';
 import { useT } from '../i18n.jsx';
+import Footer from './Footer.jsx';
 
 const FEATURES = [
   { icon: Zap,        titleKey: 'landing.feature1.title', descKey: 'landing.feature1.desc', iconBg: 'bg-blue-500',   cardBg: 'bg-blue-50 dark:bg-blue-900/20',     border: 'border-blue-100 dark:border-blue-800/40' },
@@ -467,55 +468,7 @@ const LandingPage = ({ onNavigate, onCityChange, globalCity }) => {
       </section>
 
       {/* ============================ FOOTER ============================ */}
-      <footer className="bg-gray-900 dark:bg-gray-950 text-gray-300 mt-auto">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-            <div className="col-span-2">
-              <div className="flex items-center text-white mb-4">
-                <Briefcase className="h-8 w-8 text-blue-400" />
-                <span className="ml-2 text-xl font-black">JobSearch</span>
-              </div>
-              <p className="text-sm text-gray-400 leading-relaxed max-w-md">
-                {t('landing.footer.about')}
-              </p>
-              <div className="mt-5 flex items-center gap-3">
-                <a href="#" onClick={(e) => e.preventDefault()} className="p-2 bg-gray-800 hover:bg-gray-700 rounded-lg transition-colors" title="GitHub">
-                  <Github className="w-5 h-5" />
-                </a>
-                <a href="#" onClick={(e) => e.preventDefault()} className="p-2 bg-gray-800 hover:bg-gray-700 rounded-lg transition-colors" title="Email">
-                  <Mail className="w-5 h-5" />
-                </a>
-                <a href="#" onClick={(e) => e.preventDefault()} className="p-2 bg-gray-800 hover:bg-gray-700 rounded-lg transition-colors" title="Phone">
-                  <Phone className="w-5 h-5" />
-                </a>
-              </div>
-            </div>
-
-            <div>
-              <h4 className="text-white font-bold mb-4 uppercase text-xs tracking-wider">{t('landing.footer.for_seekers')}</h4>
-              <ul className="space-y-2 text-sm">
-                <li><button onClick={() => onNavigate('register')} className="hover:text-white transition-colors">{t('landing.footer.create_resume')}</button></li>
-                <li><button onClick={() => onNavigate('register')} className="hover:text-white transition-colors">{t('landing.footer.search_vacancies')}</button></li>
-                <li><button onClick={() => onNavigate('help')} className="hover:text-white transition-colors">{t('landing.footer.help')}</button></li>
-              </ul>
-            </div>
-
-            <div>
-              <h4 className="text-white font-bold mb-4 uppercase text-xs tracking-wider">{t('landing.footer.for_employers')}</h4>
-              <ul className="space-y-2 text-sm">
-                <li><button onClick={() => onNavigate('register')} className="hover:text-white transition-colors">{t('landing.footer.post_vacancy')}</button></li>
-                <li><button onClick={() => onNavigate('register')} className="hover:text-white transition-colors">{t('landing.footer.search_resumes')}</button></li>
-                <li><button onClick={() => onNavigate('help')} className="hover:text-white transition-colors">{t('landing.footer.support')}</button></li>
-              </ul>
-            </div>
-          </div>
-
-          <div className="mt-10 pt-6 border-t border-gray-800 flex flex-col sm:flex-row justify-between items-center gap-3 text-sm text-gray-500">
-            <p>{t('landing.footer.copyright')}</p>
-            <p>{t('footer.stack')}</p>
-          </div>
-        </div>
-      </footer>
+      <Footer onNavigate={onNavigate} />
 
       {/* ============================ CITY MODAL ============================ */}
       {isCityModalOpen && (
