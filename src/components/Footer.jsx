@@ -1,13 +1,11 @@
 import React from 'react';
-import { Briefcase, Github, Mail, Phone, Server } from 'lucide-react';
+import { Briefcase, Github, Mail, Phone } from 'lucide-react';
 import { useT } from '../i18n.jsx';
 
 // Единый футер для лендинга и приложения.
-// isConnected передаётся только из приложения — тогда показывается бейдж статуса бэкенда.
-const Footer = ({ isConnected, onNavigate }) => {
+const Footer = ({ onNavigate }) => {
   const { t } = useT();
   const go = (page) => { if (onNavigate) onNavigate(page); };
-  const showStatus = typeof isConnected === 'boolean';
 
   return (
     <footer className="bg-gray-900 dark:bg-gray-950 text-gray-300 mt-auto">
@@ -37,17 +35,6 @@ const Footer = ({ isConnected, onNavigate }) => {
                 <Phone className="w-5 h-5" />
               </a>
             </div>
-
-            {showStatus && (
-              <div className="mt-5 inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-gray-800 border border-gray-700 text-sm">
-                <Server className="h-4 w-4 text-gray-400" />
-                <span className="text-gray-400">{t('footer.connection')}</span>
-                <span className={`flex items-center font-bold ${isConnected ? 'text-green-400' : 'text-red-400'}`}>
-                  <span className={`h-2 w-2 rounded-full mr-1.5 ${isConnected ? 'bg-green-500' : 'bg-red-500'}`}></span>
-                  {isConnected ? t('footer.connected') : t('footer.disconnected')}
-                </span>
-              </div>
-            )}
           </div>
 
           {/* Соискателям */}
@@ -72,9 +59,8 @@ const Footer = ({ isConnected, onNavigate }) => {
         </div>
 
         {/* Нижняя полоса */}
-        <div className="mt-10 pt-6 border-t border-gray-800 flex flex-col sm:flex-row justify-between items-center gap-3 text-sm text-gray-500">
+        <div className="mt-10 pt-6 border-t border-gray-800 flex justify-center items-center text-sm text-gray-500">
           <p>{t('landing.footer.copyright')}</p>
-          <p className="text-gray-600 dark:text-gray-500">{t('footer.stack')}</p>
         </div>
       </div>
     </footer>

@@ -239,7 +239,7 @@ const DICT = {
     'landing.footer.search_resumes': 'База резюме',
     'landing.footer.help': 'Помощь',
     'landing.footer.support': 'Поддержка',
-    'landing.footer.copyright': '© 2026 JobSearch — Курсовая работа',
+    'landing.footer.copyright': '© 2026 JobSearch. Все права защищены.',
     'landing.city_modal.title': 'Выберите ваш город',
 
     // === Home / VacancyList & SeekerList ===
@@ -824,7 +824,7 @@ const DICT = {
     'landing.footer.search_resumes': 'Түйіндемелер базасы',
     'landing.footer.help': 'Көмек',
     'landing.footer.support': 'Қолдау',
-    'landing.footer.copyright': '© 2026 JobSearch — Курстық жұмыс',
+    'landing.footer.copyright': '© 2026 JobSearch. Барлық құқықтар қорғалған.',
     'landing.city_modal.title': 'Қалаңызды таңдаңыз',
 
     // === Home / VacancyList & SeekerList ===
