@@ -1,6 +1,9 @@
 import React from 'react';
-import { Briefcase, Github, Mail, Phone } from 'lucide-react';
+import { Briefcase, Github, Mail } from 'lucide-react';
 import { useT } from '../i18n.jsx';
+
+const GITHUB_URL = 'https://github.com/beka177';
+const EMAIL = 'bekaseitkali@gmail.com';
 
 // Единый футер для лендинга и приложения.
 const Footer = ({ onNavigate }) => {
@@ -25,14 +28,11 @@ const Footer = ({ onNavigate }) => {
             </p>
 
             <div className="mt-5 flex items-center gap-3">
-              <a href="#" onClick={(e) => e.preventDefault()} className="p-2 bg-gray-800 hover:bg-gray-700 rounded-lg transition-colors" title="GitHub">
+              <a href={GITHUB_URL} target="_blank" rel="noopener noreferrer" className="p-2 bg-gray-800 hover:bg-gray-700 rounded-lg transition-colors" title="GitHub">
                 <Github className="w-5 h-5" />
               </a>
-              <a href="#" onClick={(e) => e.preventDefault()} className="p-2 bg-gray-800 hover:bg-gray-700 rounded-lg transition-colors" title="Email">
+              <a href={`mailto:${EMAIL}`} className="p-2 bg-gray-800 hover:bg-gray-700 rounded-lg transition-colors" title={EMAIL}>
                 <Mail className="w-5 h-5" />
-              </a>
-              <a href="#" onClick={(e) => e.preventDefault()} className="p-2 bg-gray-800 hover:bg-gray-700 rounded-lg transition-colors" title="Phone">
-                <Phone className="w-5 h-5" />
               </a>
             </div>
           </div>
