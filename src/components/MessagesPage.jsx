@@ -25,6 +25,7 @@ const MessagesPage = ({ user, onNavigate, chatTarget, onChatTargetConsumed, onUn
   const [draft, setDraft] = useState('');
   const [sending, setSending] = useState(false);
   const messagesEndRef = useRef(null);
+  const lastScrollKeyRef = useRef(null);
 
   // ============== ЗАГРУЗКА СПИСКА ==============
   const fetchConversations = useCallback(async () => {
@@ -105,10 +106,16 @@ const MessagesPage = ({ user, onNavigate, chatTarget, onChatTargetConsumed, onUn
     return () => clearInterval(id);
   }, [selectedId, fetchMessages, fetchConversations, onUnreadRefresh]);
 
-  // Автоскролл вниз при новом сообщении
+  // Автоскролл вниз — только при смене диалога или появлении нового сообщения,
+  // а не на каждом обновлении поллинга (иначе страницу дёргает вниз каждые N секунд).
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
+    const lastId = messages.length ? messages[messages.length - 1].id : null;
+    const key = `${selectedId}:${messages.length}:${lastId}`;
+    if (key !== lastScrollKeyRef.current) {
+      lastScrollKeyRef.current = key;
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [messages, selectedId]);
 
   // ============== ОТПРАВКА СООБЩЕНИЯ ==============
   const handleSend = async (e) => {
