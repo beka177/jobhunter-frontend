@@ -3,6 +3,7 @@ import { Trash2, Briefcase, Loader2 } from 'lucide-react';
 import { API_URL } from '../constants';
 import { useToast } from '../toast.jsx';
 import { useT } from '../i18n.jsx';
+import BackButton from './BackButton.jsx';
 
 const FavoritesList = ({ user, onNavigate, onOpenVacancy }) => {
   const toast = useToast();
@@ -52,6 +53,7 @@ const FavoritesList = ({ user, onNavigate, onOpenVacancy }) => {
 
   return (
     <div className="max-w-4xl mx-auto">
+      <BackButton onClick={() => onNavigate('home')} className="mb-6" />
       <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-8">{t('fav.title')}</h1>
 
       {favorites.length === 0 ? (

@@ -4,6 +4,7 @@ import { API_URL } from '../constants';
 import { useToast } from '../toast.jsx';
 import { useT } from '../i18n.jsx';
 import FileUpload from './FileUpload.jsx';
+import BackButton from './BackButton.jsx';
 
 const EditVacancyForm = ({ vacancyId, onSuccess, onCancel }) => {
   const toast = useToast();
@@ -85,14 +86,8 @@ const EditVacancyForm = ({ vacancyId, onSuccess, onCancel }) => {
         </div>
       )}
       
-      <div className="flex items-center mb-8">
-        <button 
-          onClick={onCancel} 
-          className="mr-4 p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition-all text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400"
-          title={t('common.back')}
-        >
-            <ArrowLeft className="h-6 w-6" />
-        </button>
+      <div className="flex items-center gap-4 mb-8">
+        <BackButton onClick={onCancel} />
         <h3 className="text-3xl font-black text-gray-900 dark:text-white tracking-tight">{t('vac_form.edit_title')}</h3>
       </div>
 

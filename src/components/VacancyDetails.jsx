@@ -4,6 +4,7 @@ import { ArrowLeft, Building, Calendar, User, Pencil, Briefcase, DollarSign, Hea
 import { API_URL, UserRole } from '../constants';
 import { useToast } from '../toast.jsx';
 import { useT } from '../i18n.jsx';
+import BackButton from './BackButton.jsx';
 
 const VacancyDetails = ({ vacancyId, user, favorites = [], onToggleFavorite, onNavigate, onEdit, onOpenChat }) => {
   const toast = useToast();
@@ -78,12 +79,7 @@ const VacancyDetails = ({ vacancyId, user, favorites = [], onToggleFavorite, onN
     <div className="max-w-4xl mx-auto mt-6 px-4 pb-12">
       {/* Шапка с кнопками управления */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-        <button 
-          onClick={() => onNavigate('home')} 
-          className="inline-flex items-center px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors font-medium shadow-sm"
-        >
-          <ArrowLeft className="h-5 w-5 mr-2" /> {t('vdetails.back')}
-        </button>
+        <BackButton onClick={() => onNavigate('home')} label={t('vdetails.back')} />
 
         {isOwner && (
           <button

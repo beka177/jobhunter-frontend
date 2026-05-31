@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { HelpCircle, ArrowLeft, BookOpen } from 'lucide-react';
 import { API_URL } from '../constants';
 import { useT } from '../i18n.jsx';
+import BackButton from './BackButton.jsx';
 
 const HelpPage = ({ onNavigate }) => {
   const { t } = useT();
@@ -27,12 +28,7 @@ const HelpPage = ({ onNavigate }) => {
 
   return (
     <div className="max-w-4xl mx-auto mt-6 px-4 pb-12">
-      <button
-        onClick={() => onNavigate('home')}
-        className="mb-6 inline-flex items-center px-4 py-2 bg-white dark:bg-gray-800 border border-blue-600 dark:border-blue-500 text-blue-700 dark:text-blue-400 rounded-md hover:bg-blue-50 dark:hover:bg-gray-700 transition-colors font-medium shadow-sm"
-      >
-        <ArrowLeft className="h-5 w-5 mr-2" /> {t('help.back')}
-      </button>
+      <BackButton onClick={() => onNavigate('home')} label={t('help.back')} className="mb-6" />
 
       <div className="text-center mb-10">
         <HelpCircle className="h-16 w-16 text-blue-600 dark:text-blue-500 mx-auto mb-4" />

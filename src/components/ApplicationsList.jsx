@@ -3,6 +3,7 @@ import { FileText, User, Mail, Calendar, CheckCircle, XCircle, Clock, ArrowLeft,
 import { API_URL, UserRole } from '../constants';
 import { useToast } from '../toast.jsx';
 import { useT } from '../i18n.jsx';
+import BackButton from './BackButton.jsx';
 
 const ApplicationsList = ({ user, onNavigate, onOpenChat }) => {
   const toast = useToast();
@@ -91,12 +92,7 @@ const ApplicationsList = ({ user, onNavigate, onOpenChat }) => {
 
   return (
     <div className="space-y-6 mt-6 max-w-7xl mx-auto">
-       <button
-        onClick={() => onNavigate('home')}
-        className="inline-flex items-center px-4 py-2 bg-white dark:bg-gray-800 border border-blue-600 dark:border-blue-500 text-blue-700 dark:text-blue-400 rounded-md hover:bg-blue-50 dark:hover:bg-gray-700 transition-colors font-medium shadow-sm mb-4"
-      >
-        <ArrowLeft className="h-5 w-5 mr-2" /> {t('common.back')}
-      </button>
+       <BackButton onClick={() => onNavigate('home')} className="mb-4" />
 
       <h2 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-6">{t('apps.title')}</h2>
 

@@ -4,6 +4,7 @@ import { API_URL } from '../constants';
 import { useToast } from '../toast.jsx';
 import { useT } from '../i18n.jsx';
 import FileUpload from './FileUpload.jsx';
+import BackButton from './BackButton.jsx';
 
 const EditProfileForm = ({ user, onUpdate, onCancel }) => {
   const toast = useToast();
@@ -59,12 +60,7 @@ const EditProfileForm = ({ user, onUpdate, onCancel }) => {
     <div className="max-w-2xl mx-auto mt-10 p-8 bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700 transition-colors">
       <div className="flex justify-between items-center mb-8">
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{t('profile.title')}</h2>
-        <button
-          onClick={onCancel}
-          className="inline-flex items-center px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors font-medium shadow-sm"
-        >
-          <ArrowLeft className="h-5 w-5 mr-2" /> {t('common.back')}
-        </button>
+        <BackButton onClick={onCancel} />
       </div>
 
       {error && (

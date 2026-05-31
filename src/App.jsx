@@ -1,7 +1,6 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { API_URL, UserRole } from './constants';
-import { ArrowLeft } from 'lucide-react';
 import { useToast } from './toast.jsx';
 import { useT } from './i18n.jsx';
 
@@ -25,6 +24,7 @@ import SeekerList from './components/SeekerList';
 import MessagesPage from './components/MessagesPage';
 import AIChatWidget from './components/AIChatWidget';
 import EmployerDashboard from './components/EmployerDashboard';
+import BackButton from './components/BackButton';
 
 function App() {
   const toast = useToast();
@@ -324,13 +324,8 @@ function App() {
 
       {currentPage === 'my-vacancies' && user && user.role === UserRole.EMPLOYER && (
         <>
-          <div className="flex items-center mb-8">
-            <button 
-              onClick={() => setCurrentPage('home')} 
-              className="mr-4 p-2 hover:bg-white dark:hover:bg-gray-800 rounded-full transition-colors text-blue-600 dark:text-blue-400"
-            >
-              <ArrowLeft className="h-6 w-6" />
-            </button>
+          <div className="flex items-center gap-4 mb-8">
+            <BackButton onClick={() => setCurrentPage('home')} />
             <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white">{t('home.my_vacancies_title')}</h1>
           </div>
           {loadingVacancies ? (

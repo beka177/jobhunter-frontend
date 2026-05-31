@@ -4,6 +4,7 @@ import {
 } from 'lucide-react';
 import { API_URL } from '../constants';
 import { useT } from '../i18n.jsx';
+import BackButton from './BackButton.jsx';
 
 // Дашборд для работодателя: приветствие, статистика, быстрые действия.
 // Показывается на главной странице работодателя над каталогом соискателей.
@@ -81,6 +82,8 @@ const EmployerDashboard = ({ user, vacancies = [], seekers = [], onNavigate }) =
 
   return (
     <div className="space-y-6 mb-10">
+      <BackButton onClick={() => onNavigate('home')} />
+
       {/* Hero-приветствие */}
       <div className="relative overflow-hidden rounded-3xl shadow-2xl bg-gradient-to-br from-blue-600 via-indigo-600 to-indigo-700 text-white p-8 sm:p-10">
         {/* декоративные пузыри */}

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Clock, CheckCircle, XCircle, Building, ArrowLeft } from 'lucide-react';
 import { API_URL } from '../constants';
 import { useT } from '../i18n.jsx';
+import BackButton from './BackButton.jsx';
 
 const SeekerApplications = ({ user, onNavigate }) => {
   const { t, lang } = useT();
@@ -29,12 +30,7 @@ const SeekerApplications = ({ user, onNavigate }) => {
 
   return (
     <div className="max-w-4xl mx-auto mt-6 px-4">
-      <button
-        onClick={() => onNavigate('home')}
-        className="mb-6 inline-flex items-center px-4 py-2 bg-white dark:bg-gray-800 border border-blue-600 dark:border-blue-500 text-blue-700 dark:text-blue-400 rounded-md hover:bg-blue-50 dark:hover:bg-gray-700 transition-colors font-medium shadow-sm"
-      >
-        <ArrowLeft className="h-5 w-5 mr-2" /> {t('sapps.back_home')}
-      </button>
+      <BackButton onClick={() => onNavigate('home')} label={t('sapps.back_home')} className="mb-6" />
 
       <h2 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-8">{t('sapps.title')}</h2>
 

@@ -4,6 +4,7 @@ import { API_URL } from '../constants';
 import { useToast } from '../toast.jsx';
 import { useT } from '../i18n.jsx';
 import FileUpload from './FileUpload.jsx';
+import BackButton from './BackButton.jsx';
 
 const CreateVacancyForm = ({ user, onSuccess, onCancel }) => {
   const toast = useToast();
@@ -47,7 +48,9 @@ const CreateVacancyForm = ({ user, onSuccess, onCancel }) => {
   };
 
   return (
-    <div className="bg-white dark:bg-gray-800 shadow sm:rounded-lg max-w-2xl mx-auto mt-10 p-6 transition-colors">
+    <div className="max-w-2xl mx-auto mt-10">
+      <BackButton onClick={onCancel} className="mb-4" />
+      <div className="bg-white dark:bg-gray-800 shadow sm:rounded-lg p-6 transition-colors">
       <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">{t('vac_form.create_title')}</h3>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
@@ -85,6 +88,7 @@ const CreateVacancyForm = ({ user, onSuccess, onCancel }) => {
           </button>
         </div>
       </form>
+      </div>
     </div>
   );
 };

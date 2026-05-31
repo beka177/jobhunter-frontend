@@ -3,6 +3,7 @@ import { ArrowLeft, Send, User, MessageCircle, Briefcase, Loader2, CheckCircle2,
 import { API_URL, UserRole } from '../constants';
 import { useToast } from '../toast.jsx';
 import { useT } from '../i18n.jsx';
+import BackButton from './BackButton.jsx';
 
 const APPLICATION_STATUS_META = {
   pending:  { cls: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400', Icon: Clock, key: 'msg.app_status.pending' },
@@ -165,12 +166,7 @@ const MessagesPage = ({ user, onNavigate, chatTarget, onChatTargetConsumed, onUn
 
   return (
     <div className="max-w-6xl mx-auto mt-6 px-4 pb-10">
-      <button
-        onClick={() => onNavigate('home')}
-        className="mb-4 inline-flex items-center px-4 py-2 bg-white dark:bg-gray-800 border border-blue-600 dark:border-blue-500 text-blue-700 dark:text-blue-400 rounded-md hover:bg-blue-50 dark:hover:bg-gray-700 transition-colors font-medium shadow-sm"
-      >
-        <ArrowLeft className="h-5 w-5 mr-2" /> {t('msg.back_home')}
-      </button>
+      <BackButton onClick={() => onNavigate('home')} label={t('msg.back_home')} className="mb-4" />
 
       <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700 overflow-hidden flex flex-col md:flex-row h-[70vh] min-h-[500px]">
         {/* ============ СПИСОК СЛЕВА ============ */}
