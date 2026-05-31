@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { User, Mail, Lock, Save, X, Camera, ArrowLeft, Loader2 } from 'lucide-react';
-import { API_URL } from '../constants';
+import { User, Mail, Lock, Save, X, Camera, ArrowLeft, Loader2, ShieldCheck } from 'lucide-react';
+import { API_URL, UserRole } from '../constants';
 import { useToast } from '../toast.jsx';
 import { useT } from '../i18n.jsx';
 import FileUpload from './FileUpload.jsx';
@@ -9,6 +9,14 @@ import BackButton from './BackButton.jsx';
 const EditProfileForm = ({ user, onUpdate, onCancel }) => {
   const toast = useToast();
   const { t } = useT();
+  const roleLabel = user.role === UserRole.ADMIN ? t('role.admin')
+    : user.role === UserRole.EMPLOYER ? t('role.employer')
+    : t('role.seeker');
+  const roleBadgeClass = user.role === UserRole.ADMIN
+    ? 'bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300'
+    : user.role === UserRole.EMPLOYER
+    ? 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-300'
+    : 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300';
   const [name, setName] = useState(user.name || '');
   const [email, setEmail] = useState(user.email || '');
   const [avatar, setAvatar] = useState(user.avatar || '');
@@ -58,9 +66,27 @@ const EditProfileForm = ({ user, onUpdate, onCancel }) => {
 
   return (
     <div className="max-w-2xl mx-auto mt-10 p-8 bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700 transition-colors">
-      <div className="flex justify-between items-center mb-8">
+      <div className="flex justify-between items-center mb-6">
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{t('profile.title')}</h2>
         <BackButton onClick={onCancel} />
+      </div>
+
+      {/* Шапка профиля: имя и роль */}
+      <div className="flex items-center gap-4 mb-8 pb-6 border-b border-gray-100 dark:border-gray-700">
+        {avatar ? (
+          <img src={avatar} alt={name} className="w-16 h-16 rounded-2xl object-cover ring-2 ring-white dark:ring-gray-700 shadow-md" />
+        ) : (
+          <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-extrabold text-2xl shadow-md">
+            {(name || user.name || 'U').charAt(0).toUpperCase()}
+          </div>
+        )}
+        <div className="min-w-0">
+          <p className="text-xl font-extrabold text-gray-900 dark:text-white truncate">{name || user.name}</p>
+          <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold mt-1 ${roleBadgeClass}`}>
+            <ShieldCheck className="w-3.5 h-3.5" />
+            {roleLabel}
+          </span>
+        </div>
       </div>
 
       {error && (
