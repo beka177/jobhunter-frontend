@@ -16,8 +16,6 @@ const FileUpload = ({ kind, userId, currentUrl, onUploaded }) => {
   const [uploading, setUploading] = useState(false);
   const [localPreview, setLocalPreview] = useState(null);
 
-  const maxMb = kind === 'avatar' ? 2 : 5;
-
   const previewUrl = localPreview || currentUrl;
 
   const handlePick = () => inputRef.current?.click();
@@ -27,11 +25,7 @@ const FileUpload = ({ kind, userId, currentUrl, onUploaded }) => {
     e.target.value = ''; // сбрасываем, чтобы повторный выбор того же файла триггерил onChange
     if (!file) return;
 
-    // Локальная валидация по размеру и MIME — мгновенный фидбек
-    if (file.size > maxMb * 1024 * 1024) {
-      toast.error(t('upload.error_size').replace('{max}', maxMb));
-      return;
-    }
+    // Локальная валидация только по формату — ограничения по размеру нет
     if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
       toast.error(t('upload.error_format'));
       return;
@@ -52,9 +46,7 @@ const FileUpload = ({ kind, userId, currentUrl, onUploaded }) => {
       const data = await r.json().catch(() => ({}));
       if (!r.ok || !data.url) {
         const err = data.error || '';
-        if (err === 'file too large') {
-          toast.error(t('upload.error_size').replace('{max}', maxMb));
-        } else if (err === 'unsupported format') {
+        if (err === 'unsupported format') {
           toast.error(t('upload.error_format'));
         } else {
           toast.error(t('upload.error_generic'));

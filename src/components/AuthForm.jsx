@@ -3,6 +3,7 @@ import { AlertCircle, ArrowLeft, Loader2 } from 'lucide-react';
 import { API_URL, UserRole } from '../constants';
 import { useToast } from '../toast.jsx';
 import { useT } from '../i18n.jsx';
+import FileUpload from './FileUpload.jsx';
 
 const AuthForm = ({ isRegister = false, onSuccess, onNavigate }) => {
   const toast = useToast();
@@ -91,6 +92,13 @@ const AuthForm = ({ isRegister = false, onSuccess, onNavigate }) => {
             </div>
           )}
           
+          {isRegister && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{t('auth.avatar_label')}</label>
+              <FileUpload kind="avatar" currentUrl={avatar} onUploaded={(url) => setAvatar(url)} />
+            </div>
+          )}
+
           <div className="rounded-md shadow-sm -space-y-px">
             {isRegister && (
               <>
