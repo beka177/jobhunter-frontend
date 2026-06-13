@@ -545,6 +545,13 @@ const DICT = {
     'admin.conv.confirm_delete': 'Удалить этот диалог? Все сообщения будут стёрты.',
     'admin.conv.toast.deleted': 'Диалог удалён',
     'admin.conv.delete_title': 'Удалить диалог',
+    'admin.conv.view_msgs_title': 'Просмотреть сообщения',
+    'admin.msg.open_title': 'Диалоги и сообщения',
+    'admin.msg.user_dialogs': 'Диалоги пользователя',
+    'admin.msg.no_dialogs': 'У этого пользователя нет диалогов',
+    'admin.msg.no_messages': 'В этом диалоге нет сообщений',
+    'admin.msg.back': '← Назад к списку диалогов',
+    'admin.msg.system': 'Системное',
 
     // === Messages (chat) ===
     'msg.back_home': 'На главную',
@@ -1131,6 +1138,13 @@ const DICT = {
     'admin.conv.confirm_delete': 'Бұл диалогты жою керек пе? Барлық хабарламалар жойылады.',
     'admin.conv.toast.deleted': 'Диалог жойылды',
     'admin.conv.delete_title': 'Диалогты жою',
+    'admin.conv.view_msgs_title': 'Хабарламаларды қарау',
+    'admin.msg.open_title': 'Диалогтар мен хабарламалар',
+    'admin.msg.user_dialogs': 'Пайдаланушы диалогтары',
+    'admin.msg.no_dialogs': 'Бұл пайдаланушыда диалогтар жоқ',
+    'admin.msg.no_messages': 'Бұл диалогта хабарламалар жоқ',
+    'admin.msg.back': '← Диалогтар тізіміне оралу',
+    'admin.msg.system': 'Жүйелік',
 
     // === Messages ===
     'msg.back_home': 'Басты бетке',

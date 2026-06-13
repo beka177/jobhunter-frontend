@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Trash2, Users, Briefcase, ShieldAlert, Plus, X, BarChart3, Edit, Ban, CheckCircle2, Loader2, MessageCircle, MapPin, TrendingUp, Heart, FileText, UserCheck, Clock, XCircle, Activity } from 'lucide-react';
+import { Trash2, Users, Briefcase, ShieldAlert, Plus, X, BarChart3, Edit, Ban, CheckCircle2, Loader2, MessageCircle, MapPin, TrendingUp, Heart, FileText, UserCheck, Clock, XCircle, Activity, Eye } from 'lucide-react';
 import { API_URL } from '../constants';
 import { useToast } from '../toast.jsx';
 import { useT } from '../i18n.jsx';
@@ -27,6 +27,11 @@ const AdminPanel = ({ user, onNavigate, onEditVacancy }) => {
   const [busyVacancyId, setBusyVacancyId] = useState(null);
   const [busyConvId, setBusyConvId] = useState(null);
   const [submittingAdmin, setSubmittingAdmin] = useState(false);
+  // Просмотрщик диалогов/сообщений пользователей
+  const [msgModal, setMsgModal] = useState({ show: false, view: 'list', userName: '', convTitle: '', fromUser: false });
+  const [userConvs, setUserConvs] = useState([]);
+  const [convMessages, setConvMessages] = useState([]);
+  const [msgLoading, setMsgLoading] = useState(false);
 
   useEffect(() => {
     if (user?.role !== 'admin') {
@@ -156,6 +161,40 @@ const AdminPanel = ({ user, onNavigate, onEditVacancy }) => {
       toast.error(t('common.network_error'));
     } finally {
       setSubmittingAdmin(false);
+    }
+  };
+
+  const convTitleOf = (c) => `${c.seeker_name} ↔ ${c.employer_name}` + (c.vacancy_title ? ` · ${c.vacancy_title}` : '');
+
+  const closeMsgModal = () => setMsgModal({ show: false, view: 'list', userName: '', convTitle: '', fromUser: false });
+
+  // Открыть список диалогов конкретного пользователя
+  const openUserDialogs = async (u) => {
+    setMsgModal({ show: true, view: 'list', userName: u.name, convTitle: '', fromUser: true });
+    setUserConvs([]);
+    setMsgLoading(true);
+    try {
+      const r = await fetch(`${API_URL}/admin.php?action=user_conversations&user_id=${u.id}&admin_id=${user.id}`);
+      if (r.ok) setUserConvs(await r.json());
+    } catch (e) {
+      toast.error(t('common.network_error'));
+    } finally {
+      setMsgLoading(false);
+    }
+  };
+
+  // Загрузить и показать сообщения одной переписки
+  const loadConvMessages = async (convId, title, fromUser) => {
+    setMsgModal(prev => ({ show: true, view: 'messages', userName: prev.userName, convTitle: title, fromUser: fromUser ?? prev.fromUser }));
+    setConvMessages([]);
+    setMsgLoading(true);
+    try {
+      const r = await fetch(`${API_URL}/admin.php?action=conversation_messages&id=${convId}&admin_id=${user.id}`);
+      if (r.ok) setConvMessages(await r.json());
+    } catch (e) {
+      toast.error(t('common.network_error'));
+    } finally {
+      setMsgLoading(false);
     }
   };
 
@@ -290,7 +329,7 @@ const AdminPanel = ({ user, onNavigate, onEditVacancy }) => {
                     <th className="px-2 py-3 text-left text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider w-16">{t('admin.conv.col.msgs')}</th>
                     <th className="px-2 py-3 text-left text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">{t('admin.conv.col.last_msg')}</th>
                     <th className="px-2 py-3 text-left text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider whitespace-nowrap">{t('admin.conv.col.updated')}</th>
-                    <th className="px-2 py-3 text-right text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider w-20">{t('common.actions')}</th>
+                    <th className="px-2 py-3 text-right text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider w-24">{t('common.actions')}</th>
                   </tr>
                 </thead>
                 <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
@@ -303,15 +342,24 @@ const AdminPanel = ({ user, onNavigate, onEditVacancy }) => {
                       <td className="px-2 py-3 text-sm text-gray-500 dark:text-gray-400">{c.messages_count}</td>
                       <td className="px-2 py-3 text-sm text-gray-500 dark:text-gray-400 truncate max-w-[160px]">{c.last_message || <span className="italic">{t('common.empty')}</span>}</td>
                       <td className="px-2 py-3 text-sm text-gray-500 dark:text-gray-400 whitespace-nowrap">{new Date(c.updated_at).toLocaleString(lang === 'kk' ? 'kk-KZ' : 'ru-RU')}</td>
-                      <td className="px-2 py-3 text-right w-20">
-                        <button
-                          onClick={() => handleDeleteConversation(c.id)}
-                          disabled={busyConvId === c.id}
-                          className="inline-flex items-center justify-center text-red-500 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 bg-red-50 dark:bg-red-900/20 hover:bg-red-100 dark:hover:bg-red-900/40 p-2 rounded-lg transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
-                          title={t('admin.conv.delete_title')}
-                        >
-                          {busyConvId === c.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
-                        </button>
+                      <td className="px-2 py-3 text-right w-24">
+                        <div className="flex justify-end gap-1.5">
+                          <button
+                            onClick={() => loadConvMessages(c.id, convTitleOf(c), false)}
+                            className="inline-flex items-center justify-center text-blue-500 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 bg-blue-50 dark:bg-blue-900/20 hover:bg-blue-100 dark:hover:bg-blue-900/40 p-2 rounded-lg transition-colors"
+                            title={t('admin.conv.view_msgs_title')}
+                          >
+                            <Eye className="w-4 h-4" />
+                          </button>
+                          <button
+                            onClick={() => handleDeleteConversation(c.id)}
+                            disabled={busyConvId === c.id}
+                            className="inline-flex items-center justify-center text-red-500 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 bg-red-50 dark:bg-red-900/20 hover:bg-red-100 dark:hover:bg-red-900/40 p-2 rounded-lg transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+                            title={t('admin.conv.delete_title')}
+                          >
+                            {busyConvId === c.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))}
@@ -416,6 +464,9 @@ const AdminPanel = ({ user, onNavigate, onEditVacancy }) => {
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                       {u.id !== user.id && (
                         <div className="flex justify-end space-x-2">
+                          <button onClick={() => openUserDialogs(u)} className="text-indigo-500 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 bg-indigo-50 dark:bg-indigo-900/20 hover:bg-indigo-100 dark:hover:bg-indigo-900/40 p-2 rounded-lg transition-colors" title={t('admin.msg.open_title')}>
+                            <MessageCircle className="w-5 h-5" />
+                          </button>
                           {u.banned_until ? (
                             <button onClick={() => handleBanUser('unban', u.id)} disabled={busyUserId === u.id} className="text-green-600 dark:text-green-400 hover:text-green-900 dark:hover:text-green-300 bg-green-50 dark:bg-green-900/20 hover:bg-green-100 dark:hover:bg-green-900/40 p-2 rounded-lg transition-colors disabled:opacity-60 disabled:cursor-not-allowed" title={t('admin.users.unban_title')}>
                               {busyUserId === u.id ? <Loader2 className="w-5 h-5 animate-spin" /> : <CheckCircle2 className="w-5 h-5" />}
@@ -490,6 +541,71 @@ const AdminPanel = ({ user, onNavigate, onEditVacancy }) => {
           </div>
         )}
       </div>
+
+      {msgModal.show && (
+        <div className="fixed inset-0 bg-black/50 dark:bg-black/70 flex items-center justify-center z-50 p-4" onClick={closeMsgModal}>
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl max-w-2xl w-full max-h-[85vh] flex flex-col border border-gray-100 dark:border-gray-700" onClick={e => e.stopPropagation()}>
+            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+              <div className="flex items-center gap-3 min-w-0">
+                {msgModal.view === 'messages' && msgModal.fromUser && (
+                  <button onClick={() => setMsgModal(prev => ({ ...prev, view: 'list' }))} className="text-sm font-medium text-blue-600 dark:text-blue-400 hover:underline whitespace-nowrap">{t('admin.msg.back')}</button>
+                )}
+                <h3 className="text-lg font-bold text-gray-900 dark:text-white truncate">
+                  {msgModal.view === 'list' ? `${t('admin.msg.user_dialogs')}: ${msgModal.userName}` : msgModal.convTitle}
+                </h3>
+              </div>
+              <button onClick={closeMsgModal} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 flex-shrink-0"><X className="w-5 h-5" /></button>
+            </div>
+
+            <div className="p-6 overflow-y-auto">
+              {msgLoading ? (
+                <div className="text-center py-10 text-gray-500 dark:text-gray-400">{t('common.loading')}</div>
+              ) : msgModal.view === 'list' ? (
+                userConvs.length === 0 ? (
+                  <div className="text-center py-10 text-gray-500 dark:text-gray-400">{t('admin.msg.no_dialogs')}</div>
+                ) : (
+                  <ul className="space-y-2">
+                    {userConvs.map(c => (
+                      <li key={c.id}>
+                        <button onClick={() => loadConvMessages(c.id, convTitleOf(c), true)} className="w-full text-left p-4 rounded-xl border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+                          <div className="flex items-center justify-between gap-2">
+                            <span className="font-medium text-gray-900 dark:text-white truncate">{c.seeker_name} ↔ {c.employer_name}</span>
+                            <span className="text-xs text-gray-400 flex-shrink-0">{c.messages_count} · {new Date(c.updated_at).toLocaleDateString(lang === 'kk' ? 'kk-KZ' : 'ru-RU')}</span>
+                          </div>
+                          {c.vacancy_title && <div className="text-xs text-blue-600 dark:text-blue-400 truncate mt-0.5">{c.vacancy_title}</div>}
+                          {c.last_message && <div className="text-sm text-gray-500 dark:text-gray-400 truncate mt-1">{c.last_message}</div>}
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                )
+              ) : (
+                convMessages.length === 0 ? (
+                  <div className="text-center py-10 text-gray-500 dark:text-gray-400">{t('admin.msg.no_messages')}</div>
+                ) : (
+                  <div className="space-y-3">
+                    {convMessages.map(m => (
+                      m.type === 'system' ? (
+                        <div key={m.id} className="text-center">
+                          <span className="inline-block text-xs text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 rounded-full px-3 py-1">{m.body}</span>
+                        </div>
+                      ) : (
+                        <div key={m.id} className="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-3 border border-gray-100 dark:border-gray-700">
+                          <div className="flex items-center justify-between mb-1 gap-2">
+                            <span className="text-xs font-bold text-gray-700 dark:text-gray-300 truncate">{m.sender_name || '—'}</span>
+                            <span className="text-xs text-gray-400 flex-shrink-0">{new Date(m.created_at).toLocaleString(lang === 'kk' ? 'kk-KZ' : 'ru-RU')}</span>
+                          </div>
+                          <div className="text-sm text-gray-900 dark:text-gray-100 whitespace-pre-wrap break-words">{m.body}</div>
+                        </div>
+                      )
+                    ))}
+                  </div>
+                )
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
