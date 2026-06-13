@@ -587,6 +587,7 @@ const DICT = {
     'admin.userinfo.conversations': 'Диалогов',
     'admin.userinfo.resume': 'Резюме',
     'admin.userinfo.no_resume': 'не заполнено',
+    'admin.userinfo.vacancies_list': 'Вакансии пользователя',
 
     // === Messages (chat) ===
     'msg.back_home': 'На главную',
@@ -1215,6 +1216,7 @@ const DICT = {
     'admin.userinfo.conversations': 'Диалогтар',
     'admin.userinfo.resume': 'Резюме',
     'admin.userinfo.no_resume': 'толтырылмаған',
+    'admin.userinfo.vacancies_list': 'Пайдаланушы вакансиялары',
 
     // === Messages ===
     'msg.back_home': 'Басты бетке',

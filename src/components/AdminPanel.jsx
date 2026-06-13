@@ -208,6 +208,35 @@ const AdminPanel = ({ user, onNavigate, onEditVacancy }) => {
     }
   };
 
+  // Открыть полное резюме соискателя из карточки пользователя
+  const openResumeFromUser = () => {
+    const r = userModal.data?.resume;
+    if (!r) return;
+    const meta = { user_name: userModal.data.name, user_email: userModal.data.email };
+    setUserModal({ show: false, loading: false, data: null });
+    setResumeModal({ show: true, data: { ...r, ...meta } });
+  };
+
+  // Удаление вакансии прямо из карточки пользователя (модерация работодателя)
+  const handleModalDeleteVacancy = async (id) => {
+    if (!window.confirm(t('admin.vac.confirm_delete'))) return;
+    setBusyVacancyId(id);
+    try {
+      const r = await fetch(`${API_URL}/admin.php?action=vacancy&id=${id}&admin_id=${user.id}`, { method: 'DELETE' });
+      if (r.ok) {
+        setVacancies(prev => prev.filter(v => v.id !== id));
+        setUserModal(prev => prev.data ? { ...prev, data: { ...prev.data, vacancies: (prev.data.vacancies || []).filter(v => v.id !== id), vacancies_count: Math.max(0, (prev.data.vacancies_count || 1) - 1) } } : prev);
+        toast.success(t('admin.vac.toast.deleted'));
+      } else {
+        toast.error(t('admin.users.toast.delete_error'));
+      }
+    } catch (e) {
+      toast.error(t('common.network_error'));
+    } finally {
+      setBusyVacancyId(null);
+    }
+  };
+
   // --- Утилиты поиска/сортировки ---
   const fmtDate = (d) => { if (!d) return ''; const dt = new Date(d); return isNaN(dt) ? '' : dt.toLocaleDateString(locale); };
 
@@ -829,16 +858,52 @@ const AdminPanel = ({ user, onNavigate, onEditVacancy }) => {
                     </div>
                   </div>
 
-                  <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-3 text-sm">
-                    <div className="text-xs text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-1">{t('admin.userinfo.resume')}</div>
-                    {userModal.data.resume ? (
-                      <div className="text-gray-900 dark:text-gray-100">
-                        {[userModal.data.resume.profession, userModal.data.resume.city, userModal.data.resume.phone].filter(Boolean).join(' · ') || t('admin.userinfo.no_resume')}
+                  {/* Резюме соискателя — с кнопкой полного просмотра */}
+                  {userModal.data.resume ? (
+                    <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-3 text-sm">
+                      <div className="flex items-center justify-between mb-1 gap-2">
+                        <div className="text-xs text-gray-400 dark:text-gray-500 uppercase tracking-wider">{t('admin.userinfo.resume')}</div>
+                        <button onClick={openResumeFromUser} className="inline-flex items-center gap-1 text-blue-600 dark:text-blue-400 hover:underline text-xs font-medium flex-shrink-0">
+                          <Eye className="w-4 h-4" /> {t('admin.resume.view')}
+                        </button>
                       </div>
-                    ) : (
+                      <div className="text-gray-900 dark:text-gray-100">{[userModal.data.resume.profession, userModal.data.resume.city, userModal.data.resume.phone].filter(Boolean).join(' · ') || '—'}</div>
+                    </div>
+                  ) : userModal.data.role === 'seeker' ? (
+                    <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-3 text-sm">
+                      <div className="text-xs text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-1">{t('admin.userinfo.resume')}</div>
                       <div className="text-gray-400 dark:text-gray-500 italic">{t('admin.userinfo.no_resume')}</div>
-                    )}
-                  </div>
+                    </div>
+                  ) : null}
+
+                  {/* Вакансии работодателя — с модерацией (редактировать / удалить) */}
+                  {userModal.data.role === 'employer' && (
+                    <div>
+                      <div className="text-xs text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-2">{t('admin.userinfo.vacancies_list')}</div>
+                      {(!userModal.data.vacancies || userModal.data.vacancies.length === 0) ? (
+                        <div className="text-sm text-gray-400 dark:text-gray-500 italic">{t('admin.vac.empty')}</div>
+                      ) : (
+                        <ul className="space-y-2 max-h-60 overflow-y-auto pr-1">
+                          {userModal.data.vacancies.map(v => (
+                            <li key={v.id} className="flex items-center justify-between gap-2 bg-gray-50 dark:bg-gray-700/50 rounded-lg p-2">
+                              <div className="min-w-0">
+                                <div className="text-sm font-medium text-gray-900 dark:text-white truncate">{v.title}</div>
+                                <div className="text-xs text-gray-400 dark:text-gray-500">{[v.city, fmtDate(v.created_at)].filter(Boolean).join(' · ')}</div>
+                              </div>
+                              <div className="flex gap-1 flex-shrink-0">
+                                <button onClick={() => { setUserModal({ show: false, loading: false, data: null }); onEditVacancy(v.id); }} className="text-blue-500 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 bg-blue-50 dark:bg-blue-900/20 hover:bg-blue-100 dark:hover:bg-blue-900/40 p-1.5 rounded-lg transition-colors" title={t('common.edit')}>
+                                  <Edit className="w-4 h-4" />
+                                </button>
+                                <button onClick={() => handleModalDeleteVacancy(v.id)} disabled={busyVacancyId === v.id} className="text-red-500 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 bg-red-50 dark:bg-red-900/20 hover:bg-red-100 dark:hover:bg-red-900/40 p-1.5 rounded-lg transition-colors disabled:opacity-60 disabled:cursor-not-allowed" title={t('common.delete')}>
+                                  {busyVacancyId === v.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
+                                </button>
+                              </div>
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </div>
+                  )}
                 </div>
               )}
             </div>
