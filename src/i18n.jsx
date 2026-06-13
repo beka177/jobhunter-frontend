@@ -552,6 +552,15 @@ const DICT = {
     'admin.msg.no_messages': 'В этом диалоге нет сообщений',
     'admin.msg.back': '← Назад к списку диалогов',
     'admin.msg.system': 'Системное',
+    'admin.tab.resumes': 'Резюме',
+    'admin.resume.col.name': 'ФИО',
+    'admin.resume.col.profession': 'Профессия',
+    'admin.resume.col.city': 'Город',
+    'admin.resume.col.phone': 'Телефон',
+    'admin.resume.col.education': 'Образование',
+    'admin.resume.col.skills': 'Навыки',
+    'admin.resume.col.updated': 'Обновлено',
+    'admin.resume.empty': 'Резюме пока нет',
 
     // === Messages (chat) ===
     'msg.back_home': 'На главную',
@@ -1145,6 +1154,15 @@ const DICT = {
     'admin.msg.no_messages': 'Бұл диалогта хабарламалар жоқ',
     'admin.msg.back': '← Диалогтар тізіміне оралу',
     'admin.msg.system': 'Жүйелік',
+    'admin.tab.resumes': 'Резюме',
+    'admin.resume.col.name': 'Аты-жөні',
+    'admin.resume.col.profession': 'Мамандық',
+    'admin.resume.col.city': 'Қала',
+    'admin.resume.col.phone': 'Телефон',
+    'admin.resume.col.education': 'Білім',
+    'admin.resume.col.skills': 'Дағдылар',
+    'admin.resume.col.updated': 'Жаңартылды',
+    'admin.resume.empty': 'Әзірге резюме жоқ',
 
     // === Messages ===
     'msg.back_home': 'Басты бетке',

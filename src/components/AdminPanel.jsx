@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Trash2, Users, Briefcase, ShieldAlert, Plus, X, BarChart3, Edit, Ban, CheckCircle2, Loader2, MessageCircle, MapPin, TrendingUp, Heart, FileText, UserCheck, Clock, XCircle, Activity, Eye } from 'lucide-react';
+import { Trash2, Users, Briefcase, ShieldAlert, Plus, X, BarChart3, Edit, Ban, CheckCircle2, Loader2, MessageCircle, MapPin, TrendingUp, Heart, FileText, UserCheck, Clock, XCircle, Activity } from 'lucide-react';
 import { API_URL } from '../constants';
 import { useToast } from '../toast.jsx';
 import { useT } from '../i18n.jsx';
@@ -10,7 +10,7 @@ const AdminPanel = ({ user, onNavigate, onEditVacancy }) => {
   const [activeTab, setActiveTab] = useState('stats');
   const [users, setUsers] = useState([]);
   const [vacancies, setVacancies] = useState([]);
-  const [conversations, setConversations] = useState([]);
+  const [resumes, setResumes] = useState([]);
   const [stats, setStats] = useState({
     users: 0, vacancies: 0, applications: 0,
     roles: { seeker: 0, employer: 0, admin: 0 },
@@ -25,7 +25,6 @@ const AdminPanel = ({ user, onNavigate, onEditVacancy }) => {
   const [banModal, setBanModal] = useState({ show: false, userId: null });
   const [busyUserId, setBusyUserId] = useState(null);
   const [busyVacancyId, setBusyVacancyId] = useState(null);
-  const [busyConvId, setBusyConvId] = useState(null);
   const [submittingAdmin, setSubmittingAdmin] = useState(false);
   // Просмотрщик диалогов/сообщений пользователей
   const [msgModal, setMsgModal] = useState({ show: false, view: 'list', userName: '', convTitle: '', fromUser: false });
@@ -50,30 +49,12 @@ const AdminPanel = ({ user, onNavigate, onEditVacancy }) => {
         if (tab === 'users') setUsers(data);
         if (tab === 'vacancies') setVacancies(data);
         if (tab === 'stats') setStats(data);
-        if (tab === 'conversations') setConversations(data);
+        if (tab === 'resumes') setResumes(data);
       }
     } catch (error) {
       console.error('Ошибка загрузки данных:', error);
     } finally {
       setLoading(false);
-    }
-  };
-
-  const handleDeleteConversation = async (id) => {
-    if (!window.confirm(t('admin.conv.confirm_delete'))) return;
-    setBusyConvId(id);
-    try {
-      const response = await fetch(`${API_URL}/admin.php?action=conversation&id=${id}&admin_id=${user.id}`, { method: 'DELETE' });
-      if (response.ok) {
-        setConversations(prev => prev.filter(c => c.id !== id));
-        toast.success(t('admin.conv.toast.deleted'));
-      } else {
-        toast.error(t('admin.users.toast.delete_error'));
-      }
-    } catch (e) {
-      toast.error(t('common.network_error'));
-    } finally {
-      setBusyConvId(null);
     }
   };
 
@@ -215,7 +196,7 @@ const AdminPanel = ({ user, onNavigate, onEditVacancy }) => {
           { id: 'stats',         icon: BarChart3,    labelKey: 'admin.tab.stats' },
           { id: 'users',         icon: Users,        labelKey: 'admin.tab.users' },
           { id: 'vacancies',     icon: Briefcase,    labelKey: 'admin.tab.vacancies' },
-          { id: 'conversations', icon: MessageCircle, labelKey: 'admin.tab.conversations' },
+          { id: 'resumes',       icon: FileText,     labelKey: 'admin.tab.resumes' },
         ].map(tab => (
           <button
             key={tab.id}
@@ -313,56 +294,45 @@ const AdminPanel = ({ user, onNavigate, onEditVacancy }) => {
               </div>
             </div>
           </div>
-        ) : activeTab === 'conversations' ? (
+        ) : activeTab === 'resumes' ? (
           <div className="overflow-x-auto">
-            <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">{t('admin.conv.title')}</h3>
-            {conversations.length === 0 ? (
-              <div className="text-center py-10 text-gray-500 dark:text-gray-400">{t('admin.conv.empty')}</div>
+            <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">{t('admin.tab.resumes')}</h3>
+            {resumes.length === 0 ? (
+              <div className="text-center py-10 text-gray-500 dark:text-gray-400">{t('admin.resume.empty')}</div>
             ) : (
               <table className="min-w-[950px] w-full divide-y divide-gray-200 dark:divide-gray-700">
                 <thead className="bg-gray-50 dark:bg-gray-800/50">
                   <tr>
-                    <th className="px-2 py-3 text-left text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider w-12">{t('common.id')}</th>
-                    <th className="px-2 py-3 text-left text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">{t('admin.conv.col.seeker')}</th>
-                    <th className="px-2 py-3 text-left text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">{t('admin.conv.col.employer')}</th>
-                    <th className="px-2 py-3 text-left text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider min-w-[100px]">{t('admin.conv.col.vacancy')}</th>
-                    <th className="px-2 py-3 text-left text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider w-16">{t('admin.conv.col.msgs')}</th>
-                    <th className="px-2 py-3 text-left text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">{t('admin.conv.col.last_msg')}</th>
-                    <th className="px-2 py-3 text-left text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider whitespace-nowrap">{t('admin.conv.col.updated')}</th>
-                    <th className="px-2 py-3 text-right text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider w-24">{t('common.actions')}</th>
+                    <th className="px-3 py-3 text-left text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">{t('admin.resume.col.name')}</th>
+                    <th className="px-3 py-3 text-left text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">{t('admin.resume.col.profession')}</th>
+                    <th className="px-3 py-3 text-left text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">{t('admin.resume.col.city')}</th>
+                    <th className="px-3 py-3 text-left text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider whitespace-nowrap">{t('admin.resume.col.phone')}</th>
+                    <th className="px-3 py-3 text-left text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider min-w-[140px]">{t('admin.resume.col.education')}</th>
+                    <th className="px-3 py-3 text-left text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider min-w-[160px]">{t('admin.resume.col.skills')}</th>
+                    <th className="px-3 py-3 text-left text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider whitespace-nowrap">{t('admin.resume.col.updated')}</th>
                   </tr>
                 </thead>
                 <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                  {conversations.map(c => (
-                    <tr key={c.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
-                      <td className="px-2 py-3 text-sm text-gray-500 dark:text-gray-400">{c.id}</td>
-                      <td className="px-2 py-3 text-sm font-medium text-gray-900 dark:text-white truncate max-w-[120px]">{c.seeker_name}</td>
-                      <td className="px-2 py-3 text-sm font-medium text-gray-900 dark:text-white truncate max-w-[120px]">{c.employer_name}</td>
-                      <td className="px-2 py-3 text-sm text-blue-600 dark:text-blue-400 truncate max-w-[130px]">{c.vacancy_title || <span className="text-gray-400 dark:text-gray-500 italic">—</span>}</td>
-                      <td className="px-2 py-3 text-sm text-gray-500 dark:text-gray-400">{c.messages_count}</td>
-                      <td className="px-2 py-3 text-sm text-gray-500 dark:text-gray-400 truncate max-w-[160px]">{c.last_message || <span className="italic">{t('common.empty')}</span>}</td>
-                      <td className="px-2 py-3 text-sm text-gray-500 dark:text-gray-400 whitespace-nowrap">{new Date(c.updated_at).toLocaleString(lang === 'kk' ? 'kk-KZ' : 'ru-RU')}</td>
-                      <td className="px-2 py-3 text-right w-24">
-                        <div className="flex justify-end gap-1.5">
-                          <button
-                            onClick={() => loadConvMessages(c.id, convTitleOf(c), false)}
-                            className="inline-flex items-center justify-center text-blue-500 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 bg-blue-50 dark:bg-blue-900/20 hover:bg-blue-100 dark:hover:bg-blue-900/40 p-2 rounded-lg transition-colors"
-                            title={t('admin.conv.view_msgs_title')}
-                          >
-                            <Eye className="w-4 h-4" />
-                          </button>
-                          <button
-                            onClick={() => handleDeleteConversation(c.id)}
-                            disabled={busyConvId === c.id}
-                            className="inline-flex items-center justify-center text-red-500 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 bg-red-50 dark:bg-red-900/20 hover:bg-red-100 dark:hover:bg-red-900/40 p-2 rounded-lg transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
-                            title={t('admin.conv.delete_title')}
-                          >
-                            {busyConvId === c.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
+                  {resumes.map(r => {
+                    const fio = [r.surname, r.first_name, r.patronymic].filter(Boolean).join(' ') || r.user_name;
+                    const edu = [r.education_level, r.education_institution].filter(Boolean).join(', ');
+                    return (
+                      <tr key={r.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors align-top">
+                        <td className="px-3 py-3 text-sm font-medium text-gray-900 dark:text-white">
+                          {fio}
+                          <div className="text-xs font-normal text-gray-400 dark:text-gray-500">{r.user_email}</div>
+                        </td>
+                        <td className="px-3 py-3 text-sm text-gray-700 dark:text-gray-300">{r.profession || <span className="text-gray-400 italic">—</span>}</td>
+                        <td className="px-3 py-3 text-sm text-gray-500 dark:text-gray-400">{r.city || '—'}</td>
+                        <td className="px-3 py-3 text-sm text-gray-500 dark:text-gray-400 whitespace-nowrap">{r.phone || '—'}</td>
+                        <td className="px-3 py-3 text-sm text-gray-500 dark:text-gray-400">{edu || <span className="text-gray-400 italic">—</span>}</td>
+                        <td className="px-3 py-3 text-sm text-gray-500 dark:text-gray-400">
+                          <span className="block truncate max-w-[220px]" title={r.skills || ''}>{r.skills || <span className="text-gray-400 italic">—</span>}</span>
+                        </td>
+                        <td className="px-3 py-3 text-sm text-gray-500 dark:text-gray-400 whitespace-nowrap">{r.updated_at ? new Date(r.updated_at).toLocaleDateString(lang === 'kk' ? 'kk-KZ' : 'ru-RU') : '—'}</td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             )}
