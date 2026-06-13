@@ -162,15 +162,16 @@ const AdminPanel = ({ user, onNavigate, onEditVacancy }) => {
   if (user?.role !== 'admin') return null;
 
   return (
-    <div className="max-w-6xl mx-auto bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700 overflow-hidden mt-8">
-      <div className="bg-gray-900 dark:bg-gray-950 px-8 py-6 flex items-center justify-between">
-        <div className="flex items-center text-white">
-          <ShieldAlert className="w-8 h-8 mr-3 text-red-500" />
-          <h1 className="text-2xl font-bold">{t('admin.title')}</h1>
+    <div className="max-w-6xl mx-auto bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700 mt-8">
+      <div className="overflow-hidden rounded-t-2xl">
+        <div className="bg-gray-900 dark:bg-gray-950 px-8 py-6 flex items-center justify-between">
+          <div className="flex items-center text-white">
+            <ShieldAlert className="w-8 h-8 mr-3 text-red-500" />
+            <h1 className="text-2xl font-bold">{t('admin.title')}</h1>
+          </div>
         </div>
-      </div>
 
-      <div className="flex border-b border-gray-200 dark:border-gray-700 overflow-x-auto">
+        <div className="flex border-b border-gray-200 dark:border-gray-700 overflow-x-auto">
         {[
           { id: 'stats',         icon: BarChart3,    labelKey: 'admin.tab.stats' },
           { id: 'users',         icon: Users,        labelKey: 'admin.tab.users' },
@@ -188,6 +189,7 @@ const AdminPanel = ({ user, onNavigate, onEditVacancy }) => {
             {t(tab.labelKey)}
           </button>
         ))}
+      </div>
       </div>
 
       <div className="p-8">
