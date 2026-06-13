@@ -3,24 +3,41 @@ import {
   MapPin, Briefcase, User, ChevronRight, GraduationCap, Plus, Search,
   Zap, Shield, TrendingUp, Heart, FileText, CheckCircle2, Star,
   Code2, Megaphone, ShoppingBag, Palette, Wrench, Stethoscope, Truck, BookOpen,
-  Quote, ArrowRight, Sparkles, Globe, Mail, Phone, Github
+  Quote, ArrowRight, Sparkles, Globe, Mail, Phone, Github,
+  Users, Inbox, BarChart3
 } from 'lucide-react';
 import { API_URL, CITIES } from '../constants';
 import { useT } from '../i18n.jsx';
 import Footer from './Footer.jsx';
 
-const FEATURES = [
-  { icon: Zap,        titleKey: 'landing.feature1.title', descKey: 'landing.feature1.desc', iconBg: 'bg-blue-500',   cardBg: 'bg-blue-50 dark:bg-blue-900/20',     border: 'border-blue-100 dark:border-blue-800/40' },
-  { icon: Shield,     titleKey: 'landing.feature2.title', descKey: 'landing.feature2.desc', iconBg: 'bg-green-500',  cardBg: 'bg-green-50 dark:bg-green-900/20',   border: 'border-green-100 dark:border-green-800/40' },
-  { icon: TrendingUp, titleKey: 'landing.feature3.title', descKey: 'landing.feature3.desc', iconBg: 'bg-purple-500', cardBg: 'bg-purple-50 dark:bg-purple-900/20', border: 'border-purple-100 dark:border-purple-800/40' },
-  { icon: Heart,      titleKey: 'landing.feature4.title', descKey: 'landing.feature4.desc', iconBg: 'bg-pink-500',   cardBg: 'bg-pink-50 dark:bg-pink-900/20',     border: 'border-pink-100 dark:border-pink-800/40' },
-];
+// Преимущества и шаги различаются для соискателя и работодателя
+const FEATURES = {
+  seeker: [
+    { icon: Zap,        titleKey: 'landing.feature1.title', descKey: 'landing.feature1.desc', iconBg: 'bg-blue-500',   cardBg: 'bg-blue-50 dark:bg-blue-900/20',     border: 'border-blue-100 dark:border-blue-800/40' },
+    { icon: Shield,     titleKey: 'landing.feature2.title', descKey: 'landing.feature2.desc', iconBg: 'bg-green-500',  cardBg: 'bg-green-50 dark:bg-green-900/20',   border: 'border-green-100 dark:border-green-800/40' },
+    { icon: TrendingUp, titleKey: 'landing.feature3.title', descKey: 'landing.feature3.desc', iconBg: 'bg-purple-500', cardBg: 'bg-purple-50 dark:bg-purple-900/20', border: 'border-purple-100 dark:border-purple-800/40' },
+    { icon: Heart,      titleKey: 'landing.feature4.title', descKey: 'landing.feature4.desc', iconBg: 'bg-pink-500',   cardBg: 'bg-pink-50 dark:bg-pink-900/20',     border: 'border-pink-100 dark:border-pink-800/40' },
+  ],
+  employer: [
+    { icon: Users,     titleKey: 'landing.empfeature1.title', descKey: 'landing.empfeature1.desc', iconBg: 'bg-blue-500',   cardBg: 'bg-blue-50 dark:bg-blue-900/20',     border: 'border-blue-100 dark:border-blue-800/40' },
+    { icon: Plus,      titleKey: 'landing.empfeature2.title', descKey: 'landing.empfeature2.desc', iconBg: 'bg-green-500',  cardBg: 'bg-green-50 dark:bg-green-900/20',   border: 'border-green-100 dark:border-green-800/40' },
+    { icon: Inbox,     titleKey: 'landing.empfeature3.title', descKey: 'landing.empfeature3.desc', iconBg: 'bg-purple-500', cardBg: 'bg-purple-50 dark:bg-purple-900/20', border: 'border-purple-100 dark:border-purple-800/40' },
+    { icon: BarChart3, titleKey: 'landing.empfeature4.title', descKey: 'landing.empfeature4.desc', iconBg: 'bg-pink-500',   cardBg: 'bg-pink-50 dark:bg-pink-900/20',     border: 'border-pink-100 dark:border-pink-800/40' },
+  ],
+};
 
-const STEPS = [
-  { num: '01', icon: User,         titleKey: 'landing.step1.title', descKey: 'landing.step1.desc' },
-  { num: '02', icon: FileText,     titleKey: 'landing.step2.title', descKey: 'landing.step2.desc' },
-  { num: '03', icon: CheckCircle2, titleKey: 'landing.step3.title', descKey: 'landing.step3.desc' },
-];
+const STEPS = {
+  seeker: [
+    { num: '01', icon: User,         titleKey: 'landing.step1.title', descKey: 'landing.step1.desc' },
+    { num: '02', icon: FileText,     titleKey: 'landing.step2.title', descKey: 'landing.step2.desc' },
+    { num: '03', icon: CheckCircle2, titleKey: 'landing.step3.title', descKey: 'landing.step3.desc' },
+  ],
+  employer: [
+    { num: '01', icon: Plus,         titleKey: 'landing.empstep1.title', descKey: 'landing.empstep1.desc' },
+    { num: '02', icon: Inbox,        titleKey: 'landing.empstep2.title', descKey: 'landing.empstep2.desc' },
+    { num: '03', icon: CheckCircle2, titleKey: 'landing.empstep3.title', descKey: 'landing.empstep3.desc' },
+  ],
+};
 
 const CATEGORIES = [
   { icon: Code2,       nameKey: 'landing.cat.it',           count: 1250, accent: 'blue' },
@@ -245,7 +262,7 @@ const LandingPage = ({ onNavigate, onCityChange, globalCity }) => {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {FEATURES.map((f) => (
+          {(FEATURES[activeTab] || FEATURES.seeker).map((f) => (
             <div key={f.titleKey} className={`p-6 rounded-2xl border ${f.cardBg} ${f.border} hover:shadow-lg transition-all hover:-translate-y-1`}>
               <div className={`w-12 h-12 rounded-xl ${f.iconBg} flex items-center justify-center text-white mb-4 shadow-md`}>
                 <f.icon className="w-6 h-6" />
@@ -267,7 +284,7 @@ const LandingPage = ({ onNavigate, onCityChange, globalCity }) => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 relative">
-            {STEPS.map((s, idx) => (
+            {(STEPS[activeTab] || STEPS.seeker).map((s, idx, arr) => (
               <div key={s.num} className="relative bg-white dark:bg-gray-800 p-7 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm hover:shadow-md transition-shadow">
                 <div className="flex items-center justify-between mb-5">
                   <div className="text-5xl font-black text-gray-100 dark:text-gray-700 select-none">{s.num}</div>
@@ -277,7 +294,7 @@ const LandingPage = ({ onNavigate, onCityChange, globalCity }) => {
                 </div>
                 <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">{t(s.titleKey)}</h3>
                 <p className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed">{t(s.descKey)}</p>
-                {idx < STEPS.length - 1 && (
+                {idx < arr.length - 1 && (
                   <ChevronRight className="hidden md:block absolute -right-5 top-1/2 -translate-y-1/2 w-8 h-8 text-gray-200 dark:text-gray-700" />
                 )}
               </div>
@@ -426,10 +443,10 @@ const LandingPage = ({ onNavigate, onCityChange, globalCity }) => {
           <div className="relative grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
             <div className="text-white">
               <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black leading-tight mb-4 tracking-tight">
-                {t('landing.cta_banner.title')}
+                {t(activeTab === 'employer' ? 'landing.cta_banner.title.employer' : 'landing.cta_banner.title')}
               </h2>
               <p className="text-base sm:text-lg text-blue-100 mb-8 max-w-xl">
-                {t('landing.cta_banner.desc')}
+                {t(activeTab === 'employer' ? 'landing.cta_banner.desc.employer' : 'landing.cta_banner.desc')}
               </p>
               <div className="flex flex-col sm:flex-row gap-3">
                 <button onClick={() => onNavigate('register')} className="inline-flex items-center justify-center px-7 py-3.5 bg-white text-blue-700 font-bold rounded-xl hover:bg-gray-100 transition-colors shadow-lg">
