@@ -278,34 +278,34 @@ const AdminPanel = ({ user, onNavigate, onEditVacancy }) => {
             {conversations.length === 0 ? (
               <div className="text-center py-10 text-gray-500 dark:text-gray-400">{t('admin.conv.empty')}</div>
             ) : (
-              <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+              <table className="min-w-[950px] w-full divide-y divide-gray-200 dark:divide-gray-700">
                 <thead className="bg-gray-50 dark:bg-gray-800/50">
                   <tr>
-                    <th className="px-4 py-3 text-left text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">{t('common.id')}</th>
-                    <th className="px-4 py-3 text-left text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">{t('admin.conv.col.seeker')}</th>
-                    <th className="px-4 py-3 text-left text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">{t('admin.conv.col.employer')}</th>
-                    <th className="px-4 py-3 text-left text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">{t('admin.conv.col.vacancy')}</th>
-                    <th className="px-4 py-3 text-left text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">{t('admin.conv.col.msgs')}</th>
-                    <th className="px-4 py-3 text-left text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">{t('admin.conv.col.last_msg')}</th>
-                    <th className="px-4 py-3 text-left text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">{t('admin.conv.col.updated')}</th>
-                    <th className="px-4 py-3 text-right text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">{t('common.actions')}</th>
+                    <th className="px-2 py-3 text-left text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider w-12">{t('common.id')}</th>
+                    <th className="px-2 py-3 text-left text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">{t('admin.conv.col.seeker')}</th>
+                    <th className="px-2 py-3 text-left text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">{t('admin.conv.col.employer')}</th>
+                    <th className="px-2 py-3 text-left text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider min-w-[100px]">{t('admin.conv.col.vacancy')}</th>
+                    <th className="px-2 py-3 text-left text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider w-16">{t('admin.conv.col.msgs')}</th>
+                    <th className="px-2 py-3 text-left text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">{t('admin.conv.col.last_msg')}</th>
+                    <th className="px-2 py-3 text-left text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider whitespace-nowrap">{t('admin.conv.col.updated')}</th>
+                    <th className="px-2 py-3 text-right text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider w-20">{t('common.actions')}</th>
                   </tr>
                 </thead>
                 <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                   {conversations.map(c => (
                     <tr key={c.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
-                      <td className="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">{c.id}</td>
-                      <td className="px-4 py-3 text-sm font-medium text-gray-900 dark:text-white">{c.seeker_name}</td>
-                      <td className="px-4 py-3 text-sm font-medium text-gray-900 dark:text-white">{c.employer_name}</td>
-                      <td className="px-4 py-3 text-sm text-blue-600 dark:text-blue-400 truncate max-w-[200px]">{c.vacancy_title || <span className="text-gray-400 dark:text-gray-500 italic">—</span>}</td>
-                      <td className="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">{c.messages_count}</td>
-                      <td className="px-4 py-3 text-sm text-gray-500 dark:text-gray-400 truncate max-w-[250px]">{c.last_message || <span className="italic">{t('common.empty')}</span>}</td>
-                      <td className="px-4 py-3 text-sm text-gray-500 dark:text-gray-400 whitespace-nowrap">{new Date(c.updated_at).toLocaleString(lang === 'kk' ? 'kk-KZ' : 'ru-RU')}</td>
-                      <td className="px-4 py-3 text-right">
+                      <td className="px-2 py-3 text-sm text-gray-500 dark:text-gray-400">{c.id}</td>
+                      <td className="px-2 py-3 text-sm font-medium text-gray-900 dark:text-white truncate max-w-[120px]">{c.seeker_name}</td>
+                      <td className="px-2 py-3 text-sm font-medium text-gray-900 dark:text-white truncate max-w-[120px]">{c.employer_name}</td>
+                      <td className="px-2 py-3 text-sm text-blue-600 dark:text-blue-400 truncate max-w-[130px]">{c.vacancy_title || <span className="text-gray-400 dark:text-gray-500 italic">—</span>}</td>
+                      <td className="px-2 py-3 text-sm text-gray-500 dark:text-gray-400">{c.messages_count}</td>
+                      <td className="px-2 py-3 text-sm text-gray-500 dark:text-gray-400 truncate max-w-[160px]">{c.last_message || <span className="italic">{t('common.empty')}</span>}</td>
+                      <td className="px-2 py-3 text-sm text-gray-500 dark:text-gray-400 whitespace-nowrap">{new Date(c.updated_at).toLocaleString(lang === 'kk' ? 'kk-KZ' : 'ru-RU')}</td>
+                      <td className="px-2 py-3 text-right w-20">
                         <button
                           onClick={() => handleDeleteConversation(c.id)}
                           disabled={busyConvId === c.id}
-                          className="text-red-500 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 bg-red-50 dark:bg-red-900/20 hover:bg-red-100 dark:hover:bg-red-900/40 p-2 rounded-lg transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+                          className="inline-flex items-center justify-center text-red-500 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 bg-red-50 dark:bg-red-900/20 hover:bg-red-100 dark:hover:bg-red-900/40 p-2 rounded-lg transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
                           title={t('admin.conv.delete_title')}
                         >
                           {busyConvId === c.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
