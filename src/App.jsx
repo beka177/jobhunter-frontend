@@ -135,7 +135,8 @@ function App() {
       try {
         const parsedUser = JSON.parse(savedUser);
         setUser(parsedUser);
-        setCurrentPage('home');
+        // Администратор сразу попадает в админ-панель, остальные — на главную
+        setCurrentPage(parsedUser.role === UserRole.ADMIN ? 'admin-panel' : 'home');
       } catch (e) {
         console.error("Ошибка чтения пользователя", e);
         setCurrentPage('landing');
@@ -201,7 +202,8 @@ function App() {
   const handleLoginSuccess = (userData) => {
     localStorage.setItem('jobsearch_user', JSON.stringify(userData));
     setUser(userData);
-    setCurrentPage('home');
+    // Администратор сразу попадает в админ-панель, остальные — на главную
+    setCurrentPage(userData.role === UserRole.ADMIN ? 'admin-panel' : 'home');
     fetchVacancies();
   };
 
